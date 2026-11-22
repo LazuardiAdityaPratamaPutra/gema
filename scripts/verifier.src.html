@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<title>Verifier Mandiri Gema</title>
+<style>
+:root{--paper:#F6F2EA;--card:#FFFDF8;--ink:#14223B;--muted:#56627A;--line:#D8D0C0;--teal:#145F5E;--tealbg:#DCEBE8;--rose:#9B2C2C;--rosebg:#F6DDDA;--amber:#8A4B0F;--amberbg:#F6E6CC}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 Georgia,'Times New Roman',serif;padding:2rem 1rem}
+main{max-width:720px;margin:0 auto}
+h1{font-size:2.2rem;line-height:1.15;margin:.2rem 0 .6rem;font-weight:500}
+h2{font-size:1.3rem;margin:0 0 .5rem}
+.eyebrow{font:500 .75rem ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.2rem;margin:1rem 0}
+.ok{background:var(--tealbg)}.bad{background:var(--rosebg)}.warn{background:var(--amberbg)}
+code,.h{font:.82rem ui-monospace,Menlo,monospace;word-break:break-all}
+.h{display:block;background:#EDE7DB;padding:.5rem .7rem;border-radius:6px}
+input[type=file]{width:100%;font:inherit;padding:.7rem;border:1.5px solid #3B4A63;border-radius:8px;background:#fff;min-height:48px}
+label{font-weight:700;display:block;margin-bottom:.3rem}
+:focus-visible{outline:3px solid #1B5FD1;outline-offset:2px}
+small,.muted{color:var(--muted)}
+ul{padding-left:1.2rem}
+li{margin:.3rem 0}
+</style>
+</head>
+<body>
+<main>
+<span class="eyebrow">Verifier Mandiri · berjalan tanpa internet</span>
+<h1>Periksa keutuhan bukti</h1>
+<p>Berkas ini berisi sertifikat bukti dan seluruh logika pemeriksanya. Tidak ada yang dikirim ke mana pun. Pilih berkas aslinya; sidik SHA-256 dihitung di perangkat ini lalu dicocokkan.</p>
+<div class="card" id="info" aria-live="polite"></div>
+<div class="card">
+<label for="f">Berkas asli yang diperiksa</label>
+<input id="f" type="file">
+</div>
+<div id="out" aria-live="polite"></div>
+<div class="card"><h2>Batas pernyataan</h2><p id="stmt"></p></div>
+<div class="card"><h2>Cara memeriksa tanpa berkas ini</h2><p class="muted">Hitung SHA-256 berkas dengan alat apa pun (mis. <code>sha256sum</code>), lalu bandingkan dengan nilai pada sertifikat. Daun Merkle adalah SHA-256 dari byte 0x00, sidik berkas, dan akar pesan (32 byte nol bila tidak ada). Simpul dalam adalah SHA-256 dari 0x01 diikuti dua anak. Cocokkan akar harian dengan repositori publik anchor.</p></div>
+</main>
+<script type="application/json" id="gema-proof">null</script>
+<script>
+(function(){
+'use strict';
+var enc=new TextEncoder();
+function hex(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')}
+function unhex(s){var o=new Uint8Array(s.length/2);for(var i=0;i<o.length;i++)o[i]=parseInt(s.substr(i*2,2),16);return o}
+function cat(){var n=0,a=[].slice.call(arguments);a.forEach(function(x){n+=x.length});var o=new Uint8Array(n),p=0;a.forEach(function(x){o.set(x,p);p+=x.length});return o}
+function sha(b){return crypto.subtle.digest('SHA-256',b).then(function(h){return new Uint8Array(h)})}
+function leaf(d){return sha(cat(new Uint8Array([0]),d))}
+function node(l,r){return sha(cat(new Uint8Array([1]),l,r))}
+function eq(a,b){if(a.length!==b.length)return false;var d=0;for(var i=0;i<a.length;i++)d|=a[i]^b[i];return d===0}
+function b64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var r=atob(s),o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
+async function verifyPath(lf,index,size,path,root){
+  if(index<0||index>=size)return false;
+  var fn=index,sn=size-1,r=lf;
+  for(var i=0;i<path.length;i++){
+    var p=path[i];
+    if(sn===0)return false;
+    if((fn&1)===1||fn===sn){
+      r=await node(p,r);
+      if((fn&1)===0){while((fn&1)===0&&fn!==0){fn>>=1;sn>>=1}}
+    }else{r=await node(r,p)}
+    fn>>=1;sn>>=1;
+  }
+  return sn===0&&eq(r,root);
+}
+var proof;
+try{proof=JSON.parse(document.getElementById('gema-proof').textContent)}catch(e){proof=null}
+var info=document.getElementById('info'),out=document.getElementById('out');
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+if(!proof||!proof.certificate){
+  info.className='card warn';info.innerHTML='<strong>Templat kosong.</strong> Berkas ini belum memuat sertifikat. Unduh Paket Bukti dari brankasmu.';
+  document.getElementById('f').disabled=true;
+}else{
+  var c=proof.certificate;
+  document.getElementById('stmt').textContent=c.statement;
+  info.innerHTML='<h2>Sertifikat</h2><p class="muted">ID <code>'+esc(c.evidenceId)+'</code><br>Dicatat server: '+esc(c.uploadedAt)+(c.messageCount?'<br>Pesan tercatat: '+esc(c.messageCount):'')+'</p><span class="muted">SHA-256 tercatat</span><code class="h">'+esc(c.sha256)+'</code>'+(c.anchor?'<p class="muted" style="margin-bottom:0">Akar harian '+esc(c.anchor.date)+' (posisi '+(c.anchor.index+1)+' dari '+c.anchor.size+')</p><code class="h">'+esc(c.anchor.root)+'</code>':'<p class="muted" style="margin-bottom:0">Akar harian belum terbit saat paket ini dibuat.</p>');
+  document.getElementById('f').addEventListener('change',async function(e){
+    var f=e.target.files[0];if(!f)return;
+    out.innerHTML='<p role="status">Menghitung…</p>';
+    try{
+      var h=hex(await sha(new Uint8Array(await f.arrayBuffer())));
+      var fileOk=h===c.sha256.toLowerCase();
+      var lf=await leaf(cat(unhex(c.sha256),c.messageRoot?unhex(c.messageRoot):new Uint8Array(32)));
+      var leafOk=hex(lf)===c.leaf.toLowerCase();
+      var anchor=null;
+      if(c.anchor){anchor=await verifyPath(unhex(c.leaf),c.anchor.index,c.anchor.size,c.anchor.path.map(unhex),unhex(c.anchor.root))}
+      var ok=fileOk&&leafOk&&anchor!==false;
+      var html='<div class="card '+(ok?'ok':'bad')+'"><h2>'+(ok?'Utuh dan tercatat':'Tidak cocok')+'</h2><ul>'+
+        '<li>Sidik berkas: '+(fileOk?'cocok':'<strong>berbeda</strong>')+'</li>'+
+        '<li>Daun Merkle konsisten: '+(leafOk?'ya':'<strong>tidak</strong>')+'</li>'+
+        '<li>Jalur ke akar harian: '+(anchor===null?'belum ada akar saat paket dibuat':anchor?'valid':'<strong>tidak valid</strong>')+'</li></ul>'+
+        '<small>Dihitung: </small><code class="h">'+esc(h)+'</code></div>';
+      if(proof.disclosure&&proof.disclosure.items){
+        var d=proof.disclosure,rows='',allOk=true,root=unhex(d.messageRoot);
+        for(var i=0;i<d.items.length;i++){
+          var it=d.items[i],m=it.message;
+          var l2=await leaf(cat(b64u(it.salt),enc.encode(JSON.stringify([m.ts,m.sender,m.text,m.attachment]))));
+          var good=await verifyPath(l2,it.index,d.count,it.path.map(unhex),root);
+          if(!good)allOk=false;
+          rows+='<li><strong>#'+(it.index+1)+'</strong> '+esc(m.ts)+' · '+esc(m.sender)+': '+esc(m.text)+' <em>'+(good?'(terbukti ada)':'(TIDAK VALID)')+'</em></li>';
+        }
+        var rootMatches=!c.messageRoot||d.messageRoot===c.messageRoot;
+        html+='<div class="card '+(allOk&&rootMatches?'ok':'bad')+'"><h2>Pesan yang diungkap</h2><ul>'+rows+'</ul><small>'+esc(d.note)+'</small></div>';
+      }
+      out.innerHTML=html;
+    }catch(err){out.innerHTML='<div class="card bad">Gagal memeriksa: '+esc(err.message)+'</div>'}
+  });
+}
+})();
+</script>
+</body>
+</html>

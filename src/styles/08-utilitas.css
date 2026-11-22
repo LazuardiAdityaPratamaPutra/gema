@@ -1,0 +1,44 @@
+/* Utilitas kecil untuk jarak dan ukuran judul. Memakai !important agar menang atas aturan komponen, seperti style inline sebelumnya. */
+.m-0 {
+  margin: 0 !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mt-sm {
+  margin-top: 0.6rem !important;
+}
+
+.mt-md {
+  margin-top: 1rem !important;
+}
+
+.mt-lg {
+  margin-top: 1.5rem !important;
+}
+
+.my-md {
+  margin-block: 1rem !important;
+}
+
+.my-lg {
+  margin-block: 1.5rem !important;
+}
+
+.my-xl {
+  margin-block: 2rem !important;
+}
+
+.title-sm {
+  font-size: 1.25rem !important;
+}
+
+.title-md {
+  font-size: 1.4rem !important;
+}
+
+.row-between {
+  justify-content: space-between !important;
+}

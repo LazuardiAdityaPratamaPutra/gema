@@ -1,0 +1,64 @@
+/* Token desain. Satu sumber untuk warna, tipografi, dan gerak. Zona halaman menimpa sebagian di 07-palet-dan-pita.css. */
+:root {
+  /* Kertas, tinta, garis */
+  --paper: #f4f5f1;
+  --paper-2: #e8e9ee;
+  --card: #fff;
+  --ink: #151b3b;
+  --ink-2: #3a4060;
+  --muted: #5d6279;
+  --line: #d9dbe3;
+
+  /* Aksi dan sorotan */
+  --pen: #2747d9;
+  --pen-dark: #1b33a8;
+  --lime: #ffe14a;
+  --lime-soft: #fff4b8;
+  --stempel: #4638b5;
+  --focus: var(--pen);
+
+  /* Palet jalur (satu warna = satu jalur) */
+  --map-biru: #bfe1f8;
+  --map-hijau: #c6ebd3;
+  --map-oranye: #ffc98f;
+  --map-merah: #f8b4b4;
+  --map-kuning: #ffe88a;
+  --map-pink: #f9c6d3;
+  --kraft: #d7b98a;
+  --kraft-2: #c49e66;
+  --kraft-3: #b38a52;
+  --malam: #1b1552;
+  --mawar: #c72b65;
+  --mawar-lembut: #ffd3e2;
+  --teal: #0a6e67;
+  --teal-lembut: #c2f0ea;
+  --jingga: #ff7a3d;
+  --jingga-lembut: #ffd9c2;
+  --mentari: #ffc21a;
+  --langit: #bfe3ff;
+  --c-penyintas: var(--mawar-lembut);
+  --c-saksi: var(--langit);
+  --c-satgas: var(--teal-lembut);
+  --c-publik: var(--jingga-lembut);
+  --zone: var(--malam);
+  --on: #fff;
+  --on-2: #dad6f7;
+
+  /* Status */
+  --ok: #0e6b3b;
+  --ok-bg: #d8efdf;
+  --warn: #6e4300;
+  --warn-bg: #f8e7b4;
+  --bad: #a4162b;
+  --bad-bg: #fadadd;
+
+  /* Tipografi dan gerak */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --display: 'Archivo Variable', arial, sans-serif;
+  --sans: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Tata letak */
+  --nb-h: 64px;
+  color-scheme: light;
+}

@@ -1,0 +1,11 @@
+.next
+node_modules
+public
+package-lock.json
+.data
+tests/fixtures
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+tests/vectors/
+scripts/verifier.src.html

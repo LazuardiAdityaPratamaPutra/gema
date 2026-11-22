@@ -1,0 +1,38 @@
+# Mengarsipkan akar harian Gema ke repositori publik, lalu mencatat SHA komit kembali ke server.
+# Secrets: GEMA_URL (mis. https://gema.contoh.id), GEMA_CRON_SECRET (sama dengan env server).
+name: anchor-harian
+on:
+  schedule: [{ cron: '15 17 * * *' }] # 00.15 WIB
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  anchor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Jalankan tick dan ambil akar
+        env: { GEMA_URL: '${{ secrets.GEMA_URL }}', S: '${{ secrets.GEMA_CRON_SECRET }}' }
+        run: |
+          curl -fsS -X POST -H "authorization: Bearer $S" "$GEMA_URL/api/cron/tick" > /dev/null
+          mkdir -p anchors
+          curl -fsS "$GEMA_URL/api/public/anchors" > anchors/latest.json
+      - name: Komit
+        id: commit
+        run: |
+          git config user.name "gema-anchor"; git config user.email "anchor@users.noreply.github.com"
+          git add anchors
+          git diff --cached --quiet && { echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          git commit -m "anchor: $(date -u +%F)"; git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"; echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Catat SHA komit untuk akar yang belum punya referensi
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          {
+            GEMA_URL: '${{ secrets.GEMA_URL }}',
+            S: '${{ secrets.GEMA_CRON_SECRET }}',
+            SHA: '${{ steps.commit.outputs.sha }}',
+          }
+        run: |
+          for d in $(jq -r '.[] | select(.commitRef == null) | .date' anchors/latest.json); do
+            curl -fsS -X POST -H "authorization: Bearer $S" -H 'content-type: application/json' -d "{\"date\":\"$d\",\"commitRef\":\"$SHA\"}" "$GEMA_URL/api/cron/commit-ref" || true
+          done
