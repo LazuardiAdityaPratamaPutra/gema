@@ -3,6 +3,10 @@
  * Memakai location.replace agar halaman ini tidak tersisa sebagai entri "kembali".
  * Batas yang jujur: riwayat peramban di luar kendali halaman web tetap bisa menyimpan kunjungan sebelumnya.
  */
+/** Teks batas perlindungan, ditampilkan dekat setiap tombol Keluar cepat. */
+export const QUICK_EXIT_LIMITS =
+  'Menghapus draf dan sesi di perangkat ini, lalu membuka situs cuaca. Laporan yang sudah tersimpan tetap aman: masuk lagi dengan Kode dan kata sandimu. Tidak menghapus riwayat peramban. Hapus riwayat sendiri, atau pakai jendela privat.';
+
 export const NEUTRAL_URL = 'https://id.wikipedia.org/wiki/Cuaca';
 
 export async function wipeLocal(): Promise<void> {
@@ -36,6 +40,13 @@ export async function wipeLocal(): Promise<void> {
 }
 
 export async function quickExit() {
+  // Sembunyikan seketika dan netralkan judul tab, sebelum penghapusan yang bisa memakan waktu.
+  try {
+    document.documentElement.style.visibility = 'hidden';
+    document.title = 'Cuaca';
+  } catch {
+    /* abaikan */
+  }
   await wipeLocal();
   window.location.replace(NEUTRAL_URL);
 }

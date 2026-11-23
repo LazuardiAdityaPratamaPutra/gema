@@ -7,6 +7,7 @@ import { CERT_STATEMENT, verifyCertificate, type EvidenceCertificate } from '@ge
 import { api } from '@/lib/api';
 import { fetchCertificate } from '@/lib/proof';
 import { fmtBytes, shortHash } from '@/lib/format';
+import { Term } from '@/components/Term';
 
 type Result = {
   cert: EvidenceCertificate | null;
@@ -102,13 +103,21 @@ function Verifikasi() {
         <section className={`card ${res.ok ? 'tint' : 'alert'}`} role="status" aria-live="polite">
           <h2 className="title-md">{res.ok ? 'Utuh dan tercatat' : 'Tidak cocok'}</h2>
           <p>{res.detail}</p>
+          {!res.ok && (
+            <p className="small">
+              Tidak cocok belum berarti buktimu hilang. Ada dua kemungkinan: berkas yang kamu pilih
+              bukan versi aslinya (misalnya sudah dikompres, dipotong, atau diekspor ulang), atau
+              isinya memang berubah. Catatan di Gema tidak terpengaruh. Coba berkas aslinya.
+            </p>
+          )}
           <p className="small muted">
             {res.name}, {fmtBytes(res.size)}
           </p>
           <code className="hash">{res.fileHash}</code>
           {res.cert?.anchor && (
             <p className="small" style={{ marginTop: '.8rem' }}>
-              Akar harian {res.cert.anchor.date}: <code>{shortHash(res.cert.anchor.root)}</code>
+              <Term k="akar">Akar harian</Term> {res.cert.anchor.date}:{' '}
+              <code>{shortHash(res.cert.anchor.root)}</code>
             </p>
           )}
           <p className="small muted mt-md">{CERT_STATEMENT}</p>

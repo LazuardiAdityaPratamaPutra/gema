@@ -483,3 +483,27 @@ th.rowhead {
   gap: 1.2rem;
   flex-wrap: wrap;
 }
+
+/* istilah teknis yang bisa dibuka penjelasannya */
+.term-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
+.term-tip {
+  display: block;
+  margin: 0.35rem 0 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font: 400 0.88rem/1.45 var(--sans);
+  text-transform: none;
+  letter-spacing: normal;
+}

@@ -74,7 +74,7 @@ export default function Pahami() {
             </div>
           )}
           {hits.length > 0 && (
-            <div className="hasil-card ok">
+            <div className="hasil-card">
               <p className="hasil-title">Yang kamu ceritakan mirip dengan bentuk yang diatur:</p>
               <ol className="bentuk">
                 {hits.map((h) => (
@@ -93,7 +93,7 @@ export default function Pahami() {
           )}
           <div className="row" style={{ marginTop: '1.2rem' }}>
             <Link className="btn teal" href="/mulai" onClick={() => carry(text)}>
-              Simpan dulu, anonim
+              Simpan dulu, tanpa nama
             </Link>
             <Link className="btn ghost" href="/panduan#bantuan">
               Cari bantuan

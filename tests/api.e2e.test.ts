@@ -288,6 +288,7 @@ describe('Jembatan Buta, pencocokan, eskalasi, Satgas', () => {
         'alias',
         'escalatedAt',
         'id',
+        'penanggungJawab', // akuntabilitas: Pimpinan melihat siapa yang bertanggung jawab (nama, bukan isi kasus)
         'prioritas',
         'sla',
         'status',

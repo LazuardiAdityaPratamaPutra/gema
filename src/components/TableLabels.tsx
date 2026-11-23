@@ -8,7 +8,17 @@ export function TableLabels() {
   useEffect(() => {
     const apply = () =>
       document.querySelectorAll('main table').forEach((t) => {
-        const heads = [...t.querySelectorAll('thead th')].map((h) => h.textContent?.trim() ?? '');
+        // kolom yang judulnya hanya untuk pembaca layar (mis. "Aksi") tidak diberi label tampak
+        const heads = [...t.querySelectorAll('thead th')].map((h) => {
+          const visible = [...h.childNodes]
+            .filter((n) => !(n instanceof Element && n.classList.contains('sr')))
+            .map((n) => n.textContent ?? '')
+            .join('')
+            .trim();
+          return h.querySelector('.sr') && !visible ? '' : (h.textContent?.trim() ?? '');
+        });
+        // tabel dengan data-row-title: kolom pertama adalah judul baris, tanpa label
+        if (t.hasAttribute('data-row-title')) heads[0] = '';
         t.querySelectorAll('tbody tr').forEach((tr) =>
           [...tr.children].forEach((c, i) => {
             if (heads[i] && c.getAttribute('data-label') !== heads[i])

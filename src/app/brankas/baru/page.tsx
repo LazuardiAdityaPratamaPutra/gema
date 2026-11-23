@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useReporter } from '@/components/useReporter';
 import { api } from '@/lib/api';
 import { submitReport, type InstitutionInfo } from '@/lib/vault-client';
@@ -15,6 +15,19 @@ import { Dictate } from '@/components/Dictate';
 import { Nudges } from '@/components/Nudges';
 import { ChatSignals } from '@/components/ChatSignals';
 import { takeCarried } from '@/lib/carry';
+import { Rujukan } from '@/components/Rujukan';
+import { Term } from '@/components/Term';
+import { VeilBar } from '@/components/Veil';
+
+/** Penjelasan "sebelum mengisi" terbuka di layar lebar dan terlipat di layar sempit agar kolom pertama tidak terdorong ke bawah lipatan. */
+const LEBAR = '(min-width: 48em)';
+const subscribeLebar = (cb: () => void) => {
+  const m = window.matchMedia(LEBAR);
+  m.addEventListener('change', cb);
+  return () => m.removeEventListener('change', cb);
+};
+const kLebar = () => window.matchMedia(LEBAR).matches;
+const sLebar = () => true;
 
 const EMPTY: Draft = {
   kapan: '',
@@ -36,18 +49,108 @@ const EMPTY: Draft = {
   relasi: '',
 };
 const STEPS = ['Siapa dan di mana', 'Kejadian dan bukti', 'Tinjau dan kunci'];
+const PERAN_LABEL: Record<string, string> = {
+  dosen: 'Dosen',
+  tendik: 'Tenaga kependidikan',
+  mahasiswa: 'Mahasiswa',
+  lainnya: 'Lainnya',
+};
+const hasExtras = (d: Draft) => !!(d.saksi || d.dampak || d.alias || d.periode);
+const fmtClock = (ms: number) =>
+  new Date(ms).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+/** Lampiran dari draf yang belum dipasang lagi. Isinya tidak ikut tersimpan, jadi harus dipilih ulang atau dilewati dengan sadar. */
+function MissingFiles({
+  items,
+  onPick,
+  onSkip,
+  tone,
+}: {
+  items: { nama: string; size: number }[];
+  onPick: () => void;
+  onSkip: (nama: string) => void;
+  tone: 'warn' | 'alert';
+}) {
+  if (items.length === 0) return null;
+  return (
+    <section className={`card ${tone} small`} aria-labelledby="belum-terlampir">
+      <h2 id="belum-terlampir" className="title-sm m-0">
+        {items.length} berkas dari draf belum terlampir
+      </h2>
+      <p className="m-0">
+        Isi berkas tidak ikut tersimpan di draf. Kalau kamu mengunci sekarang, berkas ini tidak akan
+        ada di laporanmu.
+      </p>
+      <ul className="plain-list">
+        {items.map((m) => (
+          <li key={m.nama} className="row row-between">
+            <span>
+              <strong>{m.nama}</strong>{' '}
+              <span className="muted">{fmtBytes(m.size)}, belum terlampir</span>
+            </span>
+            <button
+              type="button"
+              className="btn ghost sm"
+              aria-label={`Lewati ${m.nama}, kunci tanpa berkas ini`}
+              onClick={() => onSkip(m.nama)}
+            >
+              Lewati
+            </button>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className="btn teal sm" onClick={onPick}>
+        Pilih ulang berkas
+      </button>
+    </section>
+  );
+}
+
+/** Satu bagian tinjauan dengan tombol Ubah yang menyebut bagiannya untuk pembaca layar. */
+function ReviewPart({
+  title,
+  onEdit,
+  editLabel,
+  children,
+}: {
+  title: string;
+  onEdit: () => void;
+  editLabel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="card review-part sensitive">
+      <div className="row row-between">
+        <h2 className="title-sm m-0">{title}</h2>
+        <button type="button" className="btn ghost sm" aria-label={editLabel} onClick={onEdit}>
+          Ubah
+        </button>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export default function Baru() {
+  const lebar = useSyncExternalStore(subscribeLebar, kLebar, sLebar);
   const { session } = useReporter();
   const router = useRouter();
   const [insts, setInsts] = useState<InstitutionInfo[]>([]);
   const [d, setD] = useState<Draft>(EMPTY);
   const [files, setFiles] = useState<FileInput[]>([]);
-  const [restored, setRestored] = useState(false);
+  const [restoredAt, setRestoredAt] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [fileErr, setFileErr] = useState('');
+  const [lastSaved, setLastSaved] = useState(0);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lostFiles, setLostFiles] = useState<{ nama: string; size: number }[]>([]);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [fromReview, setFromReview] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const headRef = useRef<HTMLHeadingElement>(null);
+  const focusRef = useRef('');
   const dirty = useRef(false);
   const scope = 'baru';
 
@@ -73,26 +176,43 @@ export default function Baru() {
     void loadDraft(session.kek, session.caseCode, scope).then((x) => {
       if (x) {
         setD(carried && !x.apa ? { ...x, apa: carried } : x);
-        setRestored(true);
+        setLastSaved(x.savedAt);
+        setSaveState('saved');
+        setLostFiles(x.fileMeta ?? []);
+        setMoreOpen(hasExtras(x));
+        setRestoredAt(Math.min(x.step, STEPS.length - 1));
       } else if (carried) {
         dirty.current = true;
         setD((p) => ({ ...p, apa: carried }));
       }
     });
   }, [session]);
+  const persistRef = useRef<() => Promise<boolean>>(async () => false);
+  useEffect(() => {
+    persistRef.current = persistDraft;
+  });
   useEffect(() => {
     if (!session) return;
     const t = setInterval(() => {
-      if (dirty.current) {
-        dirty.current = false;
-        void saveDraft(session.kek, session.caseCode, scope, { ...d, savedAt: Date.now() });
-        island.toast('Draf tersimpan, terenkripsi');
-      }
+      if (dirty.current) void persistRef.current();
     }, 10_000);
-    return () => clearInterval(t);
-  }, [session, d]);
+    // Penguncian otomatis (tidak aktif) meminta draf disimpan dulu agar pekerjaan tidak hilang.
+    const onLock = (e: Event) => {
+      (e as CustomEvent<{ tasks: Promise<unknown>[] }>).detail.tasks.push(
+        dirty.current ? persistRef.current() : Promise.resolve(),
+      );
+    };
+    window.addEventListener('gema:before-lock', onLock);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener('gema:before-lock', onLock);
+    };
+  }, [session]);
   useEffect(() => {
-    headRef.current?.focus();
+    const id = focusRef.current;
+    focusRef.current = '';
+    const target = (id ? document.getElementById(id) : null) ?? headRef.current;
+    target?.focus();
   }, [step]);
 
   const ok = useMemo(
@@ -121,6 +241,63 @@ export default function Baru() {
         : '';
   const normName = useMemo(() => normalizeName(d.nama), [d.nama]);
 
+  const draftNow = (): Draft => ({
+    ...d,
+    savedAt: Date.now(),
+    fileMeta: [...files.map((f) => ({ nama: f.nama, size: f.bytes.length })), ...lostFiles],
+  });
+
+  async function persistDraft(): Promise<boolean> {
+    if (!session) return false;
+    const snap = draftNow();
+    setSaveState('saving');
+    try {
+      await saveDraft(session.kek, session.caseCode, scope, snap);
+      dirty.current = false;
+      setLastSaved(snap.savedAt);
+      setSaveState('saved');
+      return true;
+    } catch {
+      setSaveState('error');
+      return false;
+    }
+  }
+
+  /** Pindah ke bagian tertentu dari tinjauan; tombol "Lanjut" lalu membawa kembali ke tinjauan. */
+  function editFrom(toStep: number, fieldId: string, extra = false) {
+    focusRef.current = fieldId;
+    if (extra) setMoreOpen(true);
+    setFromReview(true);
+    set('step', toStep);
+  }
+
+  async function saveForLater() {
+    if (!(await persistDraft())) return;
+    island.toast('Draf tersimpan. Kamu bisa lanjut kapan saja.');
+    router.push('/brankas');
+  }
+
+  async function discardDraft() {
+    if (!session) return;
+    await clearDraft(session.caseCode, scope);
+    dirty.current = false;
+    setD(EMPTY);
+    setFiles([]);
+    setLastSaved(0);
+    setSaveState('idle');
+    setLostFiles([]);
+    setMoreOpen(false);
+    setFromReview(false);
+    setConfirmDiscard(false);
+    focusRef.current = '';
+    island.toast('Draf dihapus dari perangkat ini.');
+  }
+
+  function removeFile(i: number) {
+    dirty.current = true;
+    setFiles(files.filter((_, j) => j !== i));
+  }
+
   async function addFiles(list: FileList | null) {
     if (!list) return;
     setFileErr('');
@@ -146,6 +323,8 @@ export default function Baru() {
       }
       next.push(item);
     }
+    dirty.current = true;
+    setLostFiles((m) => m.filter((x) => !next.some((f) => f.nama === x.nama)));
     setFiles(next);
   }
 
@@ -190,12 +369,13 @@ export default function Baru() {
         (label, done, total) => island.progress(label, done, total),
       );
       await clearDraft(session.caseCode, scope);
-      island.toast('Tersimpan dan terkunci');
       router.push(`/brankas/${id}?baru=1`);
     } catch (e) {
       island.clear();
       setBusy(false);
-      setError(e instanceof Error ? e.message : 'Gagal menyimpan laporan.');
+      setError(
+        `${e instanceof Error ? e.message : 'Gagal mengunci laporan.'} Laporanmu belum terkunci, tetapi isianmu masih ada di layar dan draf tidak hilang. Coba lagi sebentar lagi.`,
+      );
     }
   }
 
@@ -217,9 +397,31 @@ export default function Baru() {
           </li>
         ))}
       </ol>
-      {restored && step === 0 && (
+      <p className="savestate" data-state={saveState}>
+        {saveState === 'saving'
+          ? 'Menyimpan…'
+          : saveState === 'saved'
+            ? `Tersimpan pukul ${fmtClock(lastSaved)}, terenkripsi di perangkat ini`
+            : saveState === 'error'
+              ? 'Belum tersimpan'
+              : 'Draf disimpan otomatis di perangkat ini'}
+      </p>
+      {saveState === 'error' && (
+        <p className="err" role="alert">
+          Draf belum bisa disimpan di perangkat ini, mungkin karena penyimpanan peramban penuh atau
+          dinonaktifkan. Tulisanmu masih ada di layar.{' '}
+          <button type="button" className="btn ghost sm" onClick={() => void persistDraft()}>
+            Coba simpan lagi
+          </button>
+        </p>
+      )}
+      {restoredAt === step && (
         <p className="card tint small" role="status">
-          Draf terenkripsi dipulihkan. Berkas bukti perlu dipilih ulang.
+          Draf terenkripsi dipulihkan. Tulisanmu kembali, tetapi isi berkas bukti tidak ikut
+          tersimpan
+          {lostFiles.length > 0
+            ? `. Ada ${lostFiles.length} berkas yang perlu dipilih ulang di langkah Kejadian dan bukti.`
+            : '.'}
         </p>
       )}
 
@@ -228,6 +430,54 @@ export default function Baru() {
           <h1 ref={headRef} tabIndex={-1}>
             Siapa dan di mana?
           </h1>
+          <details className="card ctx" open={lebar}>
+            <summary>
+              <h2 id="ctx-judul" className="title-sm">
+                Sebelum mengisi: ini yang terjadi pada isianmu
+              </h2>
+            </summary>
+            <dl className="ctx-list">
+              <div>
+                <dt>Yang kami minta</dt>
+                <dd>
+                  Kampus dan unit, nama orang yang kamu laporkan dan perannya, apakah ia punya kuasa
+                  atas studi atau pekerjaanmu, lalu kejadian dan bukti. Namamu, email, dan nomor
+                  teleponmu tidak diminta.
+                </dd>
+              </div>
+              <div>
+                <dt>Yang terlihat saat eskalasi</dt>
+                <dd>
+                  Sebelum kamu memilih <Term k="eskalasi">eskalasi</Term>, hanya kamu yang bisa
+                  membaca isinya. Sesudahnya, Satgas kampus bisa membaca seluruh isi laporan dan
+                  bukti dengan nama samaran kasus. Gema tidak pernah meminta identitasmu, tetapi
+                  cerita dan buktimu bisa memuat petunjuk tentang siapa kamu.
+                </dd>
+              </div>
+            </dl>
+            <details className="more">
+              <summary>Mengapa diminta, dan apa yang dipakai untuk mencocokkan</summary>
+              <dl className="ctx-list">
+                <div>
+                  <dt>Mengapa diminta</dt>
+                  <dd>
+                    Kampus dan unit menentukan Satgas mana yang menangani. Peran dan kuasa membantu
+                    menilai apakah kasusmu perlu diprioritaskan. Kejadian dan bukti adalah isi
+                    laporanmu.
+                  </dd>
+                </div>
+                <div>
+                  <dt>Yang dipakai untuk mencocokkan</dt>
+                  <dd>
+                    Hanya nama terlapor (dalam beberapa ejaan), unit, peran, periode, dan lokasi
+                    umum. Semuanya diolah di perangkatmu menjadi kode, lalu server mencocokkan kode
+                    itu dengan laporan lain. Server tidak menerima nama aslinya. Kejadian dan bukti
+                    tidak ikut dicocokkan.
+                  </dd>
+                </div>
+              </dl>
+            </details>
+          </details>
           <div className="field">
             <label htmlFor="inst">Perguruan tinggi</label>
             <select
@@ -247,6 +497,12 @@ export default function Baru() {
               ))}
             </select>
           </div>
+          {inst?.demo && (
+            <p className="card warn small" role="note">
+              Ini kampus demo. Semua datanya fiktif, jadi jangan masukkan cerita atau bukti
+              sungguhan.
+            </p>
+          )}
           {inst && (
             <div className="field">
               <label htmlFor="unit">Fakultas atau unit terlapor</label>
@@ -261,17 +517,34 @@ export default function Baru() {
             </div>
           )}
           <div className="field">
-            <label htmlFor="nama">Nama terlapor</label>
+            <label htmlFor="nama">Nama orang yang kamu laporkan</label>
             <input
               id="nama"
               value={d.nama}
               onChange={(e) => set('nama', e.target.value)}
               autoComplete="off"
+              aria-describedby="nama-info"
             />
-            <p className="hint">
-              Disamarkan di perangkatmu sebelum dipakai mencocokkan. Server tidak menerima nama
-              asli.
-            </p>
+            <div id="nama-info">
+              <p className="hint">
+                Ini nama pihak yang dilaporkan (terlapor), bukan namamu. Gema tidak pernah meminta
+                identitasmu. Nama disamarkan di perangkatmu sebelum dipakai mencocokkan, jadi server
+                tidak menerima nama aslinya.
+              </p>
+              <details className="more">
+                <summary>Tidak tahu nama lengkapnya?</summary>
+                <p>
+                  Tulis sebisamu, misalnya nama depan atau nama yang biasa dipakai, tanpa gelar pun
+                  boleh (minimal 3 huruf). Gelar dan ejaan yang mirip dibaca sama.
+                </p>
+                <p>
+                  Pencocokan dengan laporan lain paling akurat bila namanya selengkap yang ditulis
+                  pelapor lain. Bila kamu hanya tahu julukan atau jabatan, laporanmu tetap tersimpan
+                  utuh sebagai bukti, tetapi mungkin tidak otomatis terhubung dengan laporan lain
+                  tentang orang yang sama. Nama ini bisa kamu ubah lagi sebelum mengunci.
+                </p>
+              </details>
+            </div>
             {normName && normName !== d.nama.trim().toLowerCase() && (
               <p className="normname">
                 Dibaca sebagai <b>{normName}</b>: gelar dan sapaan dibuang agar ejaan berbeda tetap
@@ -293,8 +566,9 @@ export default function Baru() {
               Apakah terlapor punya kuasa atas studimu atau pekerjaanmu?
             </legend>
             <p className="hint">
-              Bila ya, saat eskalasi kamu bisa meminta Satgas memprioritaskan kasusmu dan
-              mempertimbangkan pelindungan, misalnya pengalihan pembimbing.
+              Bila ya, saat <Term k="eskalasi">eskalasi</Term> kamu bisa meminta Satgas
+              memprioritaskan kasusmu dan mempertimbangkan pelindungan, misalnya pengalihan
+              pembimbing.
             </p>
             <div className="choices">
               {(Object.keys(RELASI_LABEL) as Relasi[]).map((k) => (
@@ -317,8 +591,8 @@ export default function Baru() {
           </fieldset>
           {inst?.fpMode === 'hmac' && (
             <p className="card warn small">
-              Kampus ini memakai mode cadangan (HMAC): perlindungan pencocokan lebih lemah daripada
-              Jembatan Buta penuh.
+              Kampus ini memakai <Term k="hmac">mode cadangan</Term>: perlindungan pencocokan lebih
+              lemah daripada <Term k="jembatanButa">Jembatan Buta</Term> penuh.
             </p>
           )}
         </section>
@@ -329,7 +603,10 @@ export default function Baru() {
           <h1 ref={headRef} tabIndex={-1}>
             Apa yang terjadi?
           </h1>
-          <p className="muted">Tulis sebanyak yang kamu mampu. Kamu bisa kembali melengkapi.</p>
+          <p className="muted">
+            Tulis sebanyak yang kamu mampu. Bagian yang terlalu berat boleh dikosongkan atau ditulis
+            nanti. Kamu bisa kembali melengkapi.
+          </p>
           <div className="field">
             <label htmlFor="apa">Kejadian</label>
             <textarea
@@ -361,6 +638,7 @@ export default function Baru() {
             </span>
             <input
               id="berkas"
+              ref={fileInput}
               type="file"
               multiple
               onChange={(e) => {
@@ -374,6 +652,15 @@ export default function Baru() {
               {fileErr}
             </p>
           )}
+          <MissingFiles
+            items={lostFiles}
+            tone="warn"
+            onPick={() => fileInput.current?.click()}
+            onSkip={(n) => {
+              dirty.current = true;
+              setLostFiles(lostFiles.filter((x) => x.nama !== n));
+            }}
+          />
           <ul style={{ padding: 0, listStyle: 'none' }}>
             {files.map((f, i) => (
               <li
@@ -392,11 +679,7 @@ export default function Baru() {
                     {f.messages ? `, ${f.messages.length} pesan` : ''}
                   </span>
                 </span>
-                <button
-                  className="btn ghost sm"
-                  type="button"
-                  onClick={() => setFiles(files.filter((_, j) => j !== i))}
-                >
+                <button className="btn ghost sm" type="button" onClick={() => removeFile(i)}>
                   Hapus
                 </button>
               </li>
@@ -407,7 +690,11 @@ export default function Baru() {
             .map((f, i) => (
               <ChatSignals key={i} messages={f.messages!} title={`Pesan penting di ${f.nama}`} />
             ))}
-          <details className="more">
+          <details
+            className="more"
+            open={moreOpen}
+            onToggle={(e) => setMoreOpen(e.currentTarget.open)}
+          >
             <summary>Detail tambahan (opsional)</summary>
             <div className="field">
               <label htmlFor="saksi">Saksi atau orang yang tahu</label>
@@ -465,17 +752,109 @@ export default function Baru() {
           <h1 ref={headRef} tabIndex={-1}>
             Tinjau, lalu kunci.
           </h1>
-          <div className="card" style={{ marginBottom: '1rem' }}>
+          <VeilBar defaultOn={false} what="Tinjauan laporan" />
+          <p className="muted">
+            Periksa tiap bagian. Tekan Ubah untuk memperbaikinya, lalu kamu kembali ke sini.
+          </p>
+          <p className="card tint small" role="note">
+            Cerita, dokumen, tangkapan layar, tanggal, tempat, dan detail lain bisa menunjukkan
+            siapa pelapor atau orang lain. Gema tidak meminta identitasmu, tetapi kamu yang
+            menentukan apa yang ditulis dan diunggah. Periksa sekali lagi, dan ubah bagian yang
+            tidak perlu.
+          </p>
+          <ReviewPart
+            title="Kampus dan unit"
+            onEdit={() => editFrom(0, 'inst')}
+            editLabel="Ubah kampus dan unit"
+          >
             <p className="m-0">
               <strong>{inst?.nama}</strong>, {unit?.nama}
             </p>
-            <p className="muted small" style={{ margin: '.3rem 0 0' }}>
-              Terlapor: {d.nama}, {files.length} berkas
-              {files.some((f) => f.messages) ? ', chat dibaca per pesan' : ''}
-              {d.relasi ? `, ${RELASI_LABEL[d.relasi as Relasi]}` : ''}
+          </ReviewPart>
+          <ReviewPart
+            title="Terlapor"
+            onEdit={() => editFrom(0, 'nama')}
+            editLabel="Ubah data terlapor"
+          >
+            <p className="m-0">
+              <strong>{d.nama}</strong>, {PERAN_LABEL[d.peran] ?? d.peran}
             </p>
-          </div>
-          <div className="field">
+            <p className="muted small m-0">
+              {d.relasi
+                ? RELASI_LABEL[d.relasi as Relasi]
+                : 'Kuasa atas studi atau pekerjaanmu: tidak dijawab'}
+            </p>
+          </ReviewPart>
+          <ReviewPart
+            title="Kejadian"
+            onEdit={() => editFrom(1, 'apa')}
+            editLabel="Ubah cerita kejadian"
+          >
+            <p className="review-text">{d.apa}</p>
+            <p className="muted small m-0">
+              Kapan: {d.kapan || 'belum diisi'}. Di mana: {d.dimana || 'belum diisi'}.
+            </p>
+          </ReviewPart>
+          <ReviewPart
+            title={`Bukti (${files.length} berkas)`}
+            onEdit={() => editFrom(1, 'berkas')}
+            editLabel="Ubah bukti"
+          >
+            {files.length === 0 ? (
+              <p className="muted small m-0">
+                Belum ada berkas. Kamu tetap bisa menyimpan dan menambah bukti nanti.
+              </p>
+            ) : (
+              <ul className="plain-list">
+                {files.map((f, i) => (
+                  <li key={i} className="row row-between">
+                    <span>
+                      {f.nama}{' '}
+                      <span className="muted small">
+                        {fmtBytes(f.bytes.length)}
+                        {f.messages ? `, ${f.messages.length} pesan dibaca` : ''}
+                      </span>
+                    </span>
+                    <button
+                      className="btn ghost sm"
+                      type="button"
+                      aria-label={`Hapus ${f.nama}`}
+                      onClick={() => removeFile(i)}
+                    >
+                      Hapus
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {d.bukti && <p className="muted small m-0">Catatan: {d.bukti}</p>}
+          </ReviewPart>
+          <ReviewPart
+            title="Detail tambahan"
+            onEdit={() => editFrom(1, 'saksi', true)}
+            editLabel="Ubah detail tambahan"
+          >
+            {hasExtras(d) ? (
+              <ul className="plain-list small">
+                {d.saksi && <li>Saksi: {d.saksi}</li>}
+                {d.dampak && <li>Dampak: {d.dampak}</li>}
+                {d.alias && <li>Nama panggilan terlapor: {d.alias}</li>}
+                {d.periode && <li>Periode: {d.periode}</li>}
+              </ul>
+            ) : (
+              <p className="muted small m-0">Tidak ada. Ini opsional.</p>
+            )}
+          </ReviewPart>
+          <MissingFiles
+            items={lostFiles}
+            tone="alert"
+            onPick={() => editFrom(1, 'berkas')}
+            onSkip={(n) => {
+              dirty.current = true;
+              setLostFiles(lostFiles.filter((x) => x.nama !== n));
+            }}
+          />
+          <div className="field mt-md">
             <label htmlFor="k">Kapan kamu mau diberi tahu ada pola?</label>
             <select id="k" value={d.k} onChange={(e) => set('k', Number(e.target.value))}>
               <option value={2}>Bila 2 laporan cocok (paling cepat)</option>
@@ -484,8 +863,8 @@ export default function Baru() {
             </select>
           </div>
           <p className="small muted">
-            Menyimpan tidak berarti melapor. Tidak ada yang dikirim ke Satgas sampai kamu memilih
-            eskalasi.
+            Menyimpan tidak berarti melapor. Tidak ada yang dikirim ke Satgas sampai kamu memilih{' '}
+            <Term k="eskalasi">eskalasi</Term>.
           </p>
           {error && (
             <p className="err" role="alert">
@@ -509,6 +888,7 @@ export default function Baru() {
           className="btn ghost"
           type="button"
           disabled={step === 0 || busy}
+          aria-busy={busy}
           onClick={() => set('step', step - 1)}
         >
           Kembali
@@ -518,16 +898,78 @@ export default function Baru() {
             className="btn teal"
             type="button"
             disabled={!ok[step]}
-            onClick={() => set('step', step + 1)}
+            onClick={() => {
+              if (fromReview) {
+                setFromReview(false);
+                set('step', STEPS.length - 1);
+              } else set('step', step + 1);
+            }}
           >
-            Lanjut
+            {fromReview ? 'Kembali ke tinjauan' : 'Lanjut'}
           </button>
         ) : (
-          <button className="btn teal" type="button" disabled={busy} onClick={send}>
+          <button
+            className="btn teal"
+            type="button"
+            disabled={busy || lostFiles.length > 0}
+            aria-busy={busy}
+            aria-describedby={lostFiles.length > 0 ? 'belum-terlampir' : undefined}
+            onClick={send}
+          >
             {busy ? 'Mengunci…' : 'Kunci dan simpan'}
           </button>
         )}
       </div>
+
+      <aside className="pause" aria-labelledby="jeda">
+        <h2 id="jeda" className="title-sm">
+          Kamu tidak harus selesai sekarang
+        </h2>
+        <p className="small m-0">
+          Berhenti kapan saja. Ceritamu tersimpan terenkripsi di perangkat ini. Untuk melanjutkan,
+          masuk lagi dengan Kode dan kata sandimu. Berkas bukti perlu dipilih ulang karena isinya
+          tidak ikut tersimpan.
+        </p>
+        <div className="row mt-sm">
+          <button
+            className="btn ghost sm"
+            type="button"
+            disabled={busy}
+            aria-busy={busy}
+            onClick={saveForLater}
+          >
+            Simpan dan lanjutkan nanti
+          </button>
+          {!confirmDiscard ? (
+            <button
+              className="btn ghost sm"
+              type="button"
+              disabled={busy}
+              aria-busy={busy}
+              onClick={() => setConfirmDiscard(true)}
+            >
+              Hapus draf ini
+            </button>
+          ) : (
+            <span className="row" role="group" aria-label="Konfirmasi hapus draf">
+              <button className="btn danger sm" type="button" onClick={discardDraft}>
+                Ya, hapus draf
+              </button>
+              <button
+                className="btn ghost sm"
+                type="button"
+                onClick={() => setConfirmDiscard(false)}
+              >
+                Batal
+              </button>
+            </span>
+          )}
+        </div>
+        <details className="more">
+          <summary>Butuh bicara dengan seseorang?</summary>
+          <Rujukan kampus={inst?.rujukan} namaKampus={inst?.nama} compact />
+        </details>
+      </aside>
     </div>
   );
 }

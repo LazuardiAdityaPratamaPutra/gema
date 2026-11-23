@@ -55,6 +55,7 @@ export default function Demo() {
             type="button"
             className="btn teal"
             disabled={busy}
+            aria-busy={busy}
             onClick={() =>
               run(async () => {
                 const a = DEMO_ACCOUNTS[0];
@@ -71,7 +72,7 @@ export default function Demo() {
         </div>
       </header>
 
-      <ol className="stack" style={{ paddingLeft: '1.2rem', maxWidth: '70ch' }}>
+      <ol className="stack" style={{ paddingLeft: '1.2rem' }}>
         <li>
           <strong>Maya dan Rafi</strong> melaporkan terlapor yang sama secara terpisah. Masuklah
           sebagai Maya: akan muncul pemberitahuan pola tanpa membuka identitas Rafi.
@@ -115,6 +116,7 @@ export default function Demo() {
               <button
                 className="btn ghost sm"
                 disabled={busy}
+                aria-busy={busy}
                 onClick={() =>
                   run(async () => {
                     await login(a.caseCode, a.passphrase);

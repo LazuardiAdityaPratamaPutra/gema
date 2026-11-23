@@ -4,13 +4,23 @@ import { useEffect, useState } from 'react';
 import { useReporter } from '@/components/useReporter';
 import { listReports, logout, type ReportView } from '@/lib/vault-client';
 import { fmtWhen, count } from '@/lib/format';
+import { loadDraft, type Draft } from '@/lib/drafts';
 import { useRouter } from 'next/navigation';
+import { LoadError } from '@/components/LoadError';
 
 export default function Brankas() {
   const { session } = useReporter();
   const router = useRouter();
   const [reports, setReports] = useState<ReportView[] | null>(null);
   const [error, setError] = useState('');
+  const [draft, setDraft] = useState<Draft | null>(null);
+
+  useEffect(() => {
+    if (!session) return;
+    void loadDraft(session.kek, session.caseCode, 'baru').then((x) =>
+      setDraft(x && (x.nama || x.apa) ? x : null),
+    );
+  }, [session]);
 
   useEffect(() => {
     if (!session) return;
@@ -70,12 +80,23 @@ export default function Brankas() {
           </Link>
         </div>
       </header>
-      {error && (
-        <p className="err" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <LoadError what="brankasmu" message={error} />}
       {!reports && !error && <p role="status">Memuat…</p>}
+
+      {draft && (
+        <section className="card tint draft-card" aria-labelledby="draf">
+          <h2 id="draf" className="title-sm m-0">
+            Ada laporan yang belum selesai
+          </h2>
+          <p className="small m-0">
+            Terakhir disimpan {fmtWhen(draft.savedAt)}, di langkah {Math.min(draft.step, 2) + 1}{' '}
+            dari 3. Isinya terenkripsi dan hanya ada di perangkat ini.
+          </p>
+          <Link href="/brankas/baru" className="btn teal sm">
+            Lanjutkan laporan
+          </Link>
+        </section>
+      )}
 
       {reports && reports.length === 0 && (
         <section className="vault-empty" aria-labelledby="kosong">

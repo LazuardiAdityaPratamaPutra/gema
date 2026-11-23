@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { reporterStore, satgasStore } from '@/lib/store';
 import { useIslandState } from '@/lib/island-bus';
-import { quickExit } from '@/lib/quick-exit';
+import { QUICK_EXIT_LIMITS, quickExit } from '@/lib/quick-exit';
 import { api } from '@/lib/api';
 import { Echo } from './Echo';
 import { ICheck, IExit } from './Icons';
@@ -48,7 +48,24 @@ function satgasLinks(role: string): Link_[] {
   return out;
 }
 
-export function Navbar() {
+/** Status koneksi peramban. Server dianggap online sampai ada kejadian offline. */
+function useOnline() {
+  return useSyncExternalStore(
+    (cb) => {
+      window.addEventListener('online', cb);
+      window.addEventListener('offline', cb);
+      return () => {
+        window.removeEventListener('online', cb);
+        window.removeEventListener('offline', cb);
+      };
+    },
+    () => navigator.onLine,
+    () => true,
+  );
+}
+
+export function Navbar({ demo = false }: { demo?: boolean }) {
+  const online = useOnline();
   const path = usePathname();
   const router = useRouter();
   const reporter = reporterStore.use();
@@ -56,6 +73,7 @@ export function Navbar() {
   const bus = useIslandState();
   // Menu terbuka hanya untuk halaman tempat ia dibuka, jadi pindah halaman otomatis menutupnya.
   const [openOn, setOpenOn] = useState<string | null>(null);
+  const [qxInfo, setQxInfo] = useState(false);
   const open = openOn === path;
   const setOpen = (next: boolean) => setOpenOn(next ? path : null);
   const boxRef = useRef<HTMLElement>(null);
@@ -93,7 +111,7 @@ export function Navbar() {
 
   const inStaff = path.startsWith('/satgas') && !!satgas && path !== '/satgas/masuk';
   let links = GUEST;
-  let cta: Cta | null = { href: '/mulai', label: 'Buat brankas anonim', short: 'Mulai' };
+  let cta: Cta | null = { href: '/mulai', label: 'Buat brankas tanpa nama', short: 'Mulai' };
   let who = '';
   let signOut: (() => void) | null = null;
   if (inStaff && satgas) {
@@ -129,6 +147,17 @@ export function Navbar() {
 
   return (
     <header className="nb" ref={boxRef} data-open={open}>
+      {!online && (
+        <p className="nb-offline" role="status">
+          Koneksi terputus. Draf tetap tersimpan di perangkat ini. Mengunci laporan, eskalasi, dan
+          memuat data baru menunggu koneksi kembali.
+        </p>
+      )}
+      {demo && (
+        <p className="nb-demo" role="note">
+          <strong>Mode demo:</strong> semua data di sini fiktif. Jangan isi data sungguhan.
+        </p>
+      )}
       <div className="nb-bar">
         <Link href={home} className="nb-brand" aria-label="Gema, ke halaman utama">
           <Echo size={26} />
@@ -147,11 +176,10 @@ export function Navbar() {
         </nav>
         <div className="nb-end">
           {cta && (
-            <Link href={cta.href} className="nb-cta" aria-label={cta.label}>
+            <Link href={cta.href} className="nb-cta">
+              {/* nama aksesibel = teks yang tampak (WCAG 2.5.3): CSS menyembunyikan salah satunya */}
               <span className="nb-cta-long">{cta.label}</span>
-              <span className="nb-cta-short" aria-hidden="true">
-                {cta.short}
-              </span>
+              <span className="nb-cta-short">{cta.short}</span>
             </Link>
           )}
           {signOut && (
@@ -159,18 +187,42 @@ export function Navbar() {
               Keluar sesi
             </button>
           )}
-          <button
-            type="button"
-            className="nb-qx"
-            aria-label="Keluar cepat: hapus data lokal dan buka situs netral"
-            onClick={() => void quickExit()}
-            title="Keluar cepat. Esc dua kali juga bisa, kapan saja"
+          <span
+            className="nb-qx-wrap"
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) setQxInfo(false);
+            }}
           >
-            <span className="nb-qx-long">Keluar cepat</span>
-            <span className="nb-qx-short" aria-hidden="true">
-              <IExit />
+            <button
+              type="button"
+              className="nb-qx"
+              aria-label="Keluar cepat: hapus draf dan sesi di perangkat ini, lalu buka situs netral"
+              aria-describedby="qx-desc"
+              onClick={() => void quickExit()}
+              title="Keluar cepat. Esc dua kali juga bisa, kapan saja"
+            >
+              <span className="nb-qx-long">Keluar cepat</span>
+              <span className="nb-qx-short" aria-hidden="true">
+                <IExit />
+              </span>
+            </button>
+            <span id="qx-desc" className="sr">
+              {QUICK_EXIT_LIMITS}
             </span>
-          </button>
+            <button
+              type="button"
+              className="nb-qx-info"
+              aria-expanded={qxInfo}
+              aria-controls="qx-pop"
+              aria-label="Apa yang dihapus Keluar cepat?"
+              onClick={() => setQxInfo(!qxInfo)}
+            >
+              ?
+            </button>
+            <span id="qx-pop" className="nb-qx-pop" role="note" hidden={!qxInfo}>
+              {QUICK_EXIT_LIMITS}
+            </span>
+          </span>
           <button
             type="button"
             className="nb-burger"
@@ -225,6 +277,7 @@ export function Navbar() {
           <button type="button" className="btn danger block" onClick={() => void quickExit()}>
             <IExit /> Keluar cepat
           </button>
+          <p className="nb-qx-note">{QUICK_EXIT_LIMITS}</p>
         </div>
       </div>
       {bus.mode !== 'idle' && (

@@ -5,9 +5,12 @@ import { useState, useSyncExternalStore } from 'react';
 import { loginWithPasskey, passkeySupported } from '@/lib/passkey';
 import { login } from '@/lib/vault-client';
 import { normalizeCaseCode } from '@gema/crypto';
+import { Term } from '@/components/Term';
+import { clearLockNote, useLockNote } from '@/lib/lock-note';
 
 export default function Masuk() {
   const router = useRouter();
+  const locked = useLockNote();
   const [code, setCode] = useState('');
   const [pass, setPass] = useState('');
   const [busy, setBusy] = useState(false);
@@ -37,6 +40,7 @@ export default function Masuk() {
     setError('');
     try {
       await login(normalizeCaseCode(code), pass);
+      clearLockNote();
       router.push('/brankas');
     } catch {
       // Pesan seragam: tidak membedakan kode salah, kata sandi salah, atau akun terkunci.
@@ -53,6 +57,12 @@ export default function Masuk() {
         <h1>Masuk ke brankas</h1>
         <p className="lede">Kode dan enam kata dari kartu catatanmu.</p>
       </header>
+      {locked && (
+        <p className="card tint small" role="status">
+          Layar dikunci karena lama tidak aktif. Isianmu yang belum selesai sudah disimpan sebagai
+          draf di perangkat ini. Masuk lagi untuk melanjutkan.
+        </p>
+      )}
       <form onSubmit={submit} noValidate>
         <div className="field">
           <label htmlFor="kode">Kode</label>
@@ -96,7 +106,7 @@ export default function Masuk() {
             {error}
           </p>
         )}
-        <button className="btn teal" disabled={busy || !code || !pass}>
+        <button className="btn teal" disabled={busy || !code || !pass} aria-busy={busy}>
           {busy ? 'Membuka…' : 'Masuk'}
         </button>
         {pkOk && (
@@ -104,10 +114,18 @@ export default function Masuk() {
             type="button"
             className="btn ghost mt-sm"
             disabled={busy || !code}
+            aria-busy={busy}
             onClick={() => void withPasskey()}
           >
             Masuk dengan passkey
           </button>
+        )}
+        {pkOk && (
+          <p className="hint mt-sm">
+            <Term k="passkey" question>
+              Apa itu passkey?
+            </Term>
+          </p>
         )}
       </form>
       <div className="alt-line">
@@ -119,7 +137,7 @@ export default function Masuk() {
       <div className="alt-line">
         <span className="muted">Belum punya brankas?</span>
         <Link href="/mulai" className="btn ghost sm">
-          Buat brankas anonim
+          Buat brankas tanpa nama
         </Link>
         <Link href="/demo" className="btn ghost sm">
           Coba demo

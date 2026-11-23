@@ -147,7 +147,7 @@
   }
 }
 
-@media (width <= 800px) {
+@media (width <= 50em) {
   .chooser {
     grid-template-columns: 1fr;
   }
@@ -177,7 +177,7 @@
   align-items: center;
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .verify .wrap {
     grid-template-columns: 1fr;
   }
@@ -537,7 +537,7 @@ td {
 }
 
 /* tabel menumpuk jadi kartu di layar sempit, tanpa kolom terpotong */
-@media (width <= 640px) {
+@media (width <= 40em) {
   main table:not(.keep) thead {
     position: absolute;
     width: 1px;
@@ -690,14 +690,14 @@ td {
   opacity: 1;
 }
 
-@media (width <= 980px) {
+@media (width <= 61.25em) {
   .hero-top {
     grid-template-columns: 1fr;
   }
 }
 
 /* pemilih peran di mobile: kisi 2x2, label utuh */
-@media (width <= 800px) {
+@media (width <= 50em) {
   .tabs {
     flex-direction: row;
     border-right: 0;
@@ -836,7 +836,7 @@ td {
   }
 }
 
-@media (width <= 520px) {
+@media (width <= 32.5em) {
   .seg {
     flex-wrap: wrap;
     border-radius: 22px;
@@ -844,7 +844,7 @@ td {
   }
 }
 
-@media (width <= 640px) {
+@media (width <= 40em) {
   main table:not(.keep) tbody th.rowhead {
     white-space: normal;
     font: 700 0.95rem var(--sans);
@@ -863,7 +863,7 @@ td {
   }
 }
 
-@media (width <= 640px) {
+@media (width <= 40em) {
   main table:not(.keep) td > * + *,
   main table:not(.keep) tbody th > * + * {
     margin-top: 0.3rem;

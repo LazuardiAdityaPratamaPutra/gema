@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Term } from '@/components/Term';
 
 const HASH = 'fec0ab92b480521f2e5d872065a1c7f48eb7cf13951e9924da3620311ac16eed';
 const HEX = '0123456789abcdef';
@@ -39,7 +40,9 @@ export function Receipt() {
         <p className="rc-file">
           chat-bimbingan.txt<small>778 B, 19 pesan terbaca</small>
         </p>
-        <p className="rc-label">Sidik SHA-256</p>
+        <p className="rc-label">
+          <Term k="sidik">Sidik SHA-256</Term>
+        </p>
         <code className="rc-hash" data-done={done}>
           {shown.slice(0, 32)}
           <br />
@@ -51,7 +54,9 @@ export function Receipt() {
             <dd>12 Nov 2026, 22.23</dd>
           </div>
           <div>
-            <dt>Akar harian</dt>
+            <dt>
+              <Term k="akar">Akar harian</Term>
+            </dt>
             <dd>13 Nov 2026</dd>
           </div>
         </dl>

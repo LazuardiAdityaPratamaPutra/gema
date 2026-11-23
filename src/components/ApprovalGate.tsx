@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { SatgasSession } from '@/lib/store';
+import { Term } from '@/components/Term';
 
 type Mine = { escalationId: string; approvedAt: number | null }[];
 
@@ -46,9 +47,9 @@ export function ApprovalGate({
         Empat Mata: dosir ini dibuka berdua
       </h2>
       <p>
-        Kampusmu memakai panel dua orang. Isi laporan hanya terbuka bila satu anggota Satgas lain
-        menyetujui, dan persetujuan berlaku 30 menit untukmu saja. Tiap permintaan dan persetujuan
-        tercatat di jejak audit.
+        Kampusmu memakai panel dua orang (<Term k="empatMata">Empat Mata</Term>). Isi laporan hanya
+        terbuka bila satu anggota Satgas lain menyetujui, dan persetujuan berlaku 30 menit untukmu
+        saja. Tiap permintaan dan persetujuan tercatat di jejak audit.
       </p>
       {asked ? (
         <p role="status">

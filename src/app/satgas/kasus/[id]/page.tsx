@@ -19,6 +19,7 @@ import { OwnerProofSatgas } from '@/components/OwnerProofSatgas';
 import { Rujukan } from '@/components/Rujukan';
 import type { InstitutionInfo } from '@/lib/vault-client';
 import { RELASI_LABEL } from '@gema/pendamping';
+import { VeilBar } from '@/components/Veil';
 
 type Detail = {
   escalation: {
@@ -29,6 +30,8 @@ type Detail = {
     wrapped: never;
     institutionId: string;
     prioritas?: boolean;
+    penanggungJawab?: string | null;
+    penanggungJawabId?: string | null;
   };
   sla: {
     due: number;
@@ -130,6 +133,13 @@ export default function Dosir() {
   const [noKey, setNoKey] = useState(false);
   const [locked, setLocked] = useState(false);
   const [inst, setInst] = useState<InstitutionInfo | null>(null);
+  const [team, setTeam] = useState<{ id: string; nama: string; role: string }[]>([]);
+  useEffect(() => {
+    if (session?.member.role === 'Ketua')
+      api<{ members: typeof team }>('satgas/team', { token: session.token })
+        .then((r) => setTeam(r.members))
+        .catch(() => undefined);
+  }, [session]);
   useEffect(() => {
     api<InstitutionInfo[]>('public/institutions')
       .then((l) => setInst(l.find((i) => i.id === session?.institution.id) ?? null))
@@ -249,82 +259,74 @@ export default function Dosir() {
       )}
 
       {canRead && narasi && (
-        <section className="card my-lg">
-          <h2 className="title-md">Laporan</h2>
-          <p>
-            <strong>Terlapor:</strong> {narasi.terlapor.nama} ({narasi.terlapor.peran})
-            {narasi.terlapor.relasi && (
-              <>
-                , <strong>Relasi:</strong> {RELASI_LABEL[narasi.terlapor.relasi]}
-              </>
-            )}
-          </p>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{narasi.apa}</p>
-          <p className="muted small">
-            {[narasi.kapan, narasi.dimana]
-              .filter(Boolean)
-              .map((x) => x.trim().replace(/[.,]$/, ''))
-              .join(', ')}
-          </p>
-        </section>
+        <>
+          <VeilBar defaultOn what="Isi laporan dan bukti" />
+          <section className="card my-lg sensitive">
+            <h2 className="title-md">Laporan</h2>
+            <p>
+              <strong>Terlapor:</strong> {narasi.terlapor.nama} ({narasi.terlapor.peran})
+              {narasi.terlapor.relasi && (
+                <>
+                  , <strong>Relasi:</strong> {RELASI_LABEL[narasi.terlapor.relasi]}
+                </>
+              )}
+            </p>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{narasi.apa}</p>
+            <p className="muted small">
+              {[narasi.kapan, narasi.dimana]
+                .filter(Boolean)
+                .map((x) => x.trim().replace(/[.,]$/, ''))
+                .join(', ')}
+            </p>
+          </section>
+        </>
       )}
-      {canRead && <OwnerProofSatgas session={session} caseId={id} />}
-      {canRead && assistInput && <DosirAssist alias={d.escalation.alias} input={assistInput} />}
-      {canRead && noKey && (
-        <p className="card warn">
-          Isi terkunci. Muat kunci rahasia Satgas di halaman <Link href="/satgas/kunci">Kunci</Link>
-          , lalu kembali ke sini.
+      <section className="my-lg" aria-labelledby="pj-judul">
+        <h2 id="pj-judul" className="title-md">
+          Penanggung jawab
+        </h2>
+        <p>
+          {d.escalation.penanggungJawab ? (
+            <>
+              Kasus ini ditangani oleh <strong>{d.escalation.penanggungJawab}</strong>.
+            </>
+          ) : (
+            'Belum ada penanggung jawab. Kasus tanpa penanggung jawab mudah terlewat.'
+          )}
         </p>
-      )}
-
-      {canRead && (
-        <section className="my-lg">
-          <h2 className="title-md">Bukti</h2>
-          {d.evidence.map((ev) => {
-            const m = meta?.items.find((x) => x.sha256 === ev.sha256);
-            return (
-              <div
-                key={ev.id}
-                className="card row"
-                style={{ justifyContent: 'space-between', marginBottom: '.6rem' }}
+        {session?.member.role === 'Ketua' && d.escalation.status !== 'Selesai' && (
+          <div className="row" style={{ gap: '0.6rem', flexWrap: 'wrap', alignItems: 'end' }}>
+            <div className="field" style={{ margin: 0, minWidth: '14rem' }}>
+              <label htmlFor="pj">Tetapkan kepada</label>
+              <select
+                id="pj"
+                value={d.escalation.penanggungJawabId ?? ''}
+                onChange={async (ev) => {
+                  const memberId = ev.target.value || null;
+                  try {
+                    await api(`satgas/cases/${id}/assign`, {
+                      method: 'POST',
+                      token: session.token,
+                      body: { memberId },
+                    });
+                    setMsg(memberId ? 'Penanggung jawab ditetapkan.' : 'Penugasan dicabut.');
+                    await load();
+                  } catch (e) {
+                    setMsg(e instanceof Error ? e.message : 'Gagal menetapkan.');
+                  }
+                }}
               >
-                <span>
-                  <strong>{m?.nama ?? 'Berkas'}</strong>{' '}
-                  <span className="muted small">
-                    {fmtBytes(ev.ukuran)}, {fmtDateTime(ev.uploadedAt)}
-                  </span>
-                </span>
-                {dek && (
-                  <button
-                    className="btn ghost sm"
-                    onClick={() =>
-                      void act(async () =>
-                        triggerDownload(
-                          m?.nama ?? 'bukti',
-                          await aesGcmDecrypt(
-                            dek,
-                            await api<Uint8Array>(`evidence/${ev.id}/blob`, {
-                              token: session.token,
-                            }),
-                            AAD.evidence,
-                          ),
-                        ),
-                      )
-                    }
-                  >
-                    Unduh
-                  </button>
-                )}
-                {m?.messages?.length ? (
-                  <div style={{ flexBasis: '100%' }}>
-                    <ChatSignals messages={m.messages} />
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </section>
-      )}
+                <option value="">Belum ditugaskan</option>
+                {team.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.nama} ({m.role})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+      </section>
 
       <section className="my-lg">
         <h2 className="title-md">Perkembangan</h2>
@@ -376,6 +378,64 @@ export default function Dosir() {
         ) : null}
       </section>
 
+      {canRead && assistInput && <DosirAssist alias={d.escalation.alias} input={assistInput} />}
+      {canRead && noKey && (
+        <p className="card warn">
+          Isi terkunci. Muat kunci rahasia Satgas di halaman <Link href="/satgas/kunci">Kunci</Link>
+          , lalu kembali ke sini.
+        </p>
+      )}
+
+      {canRead && (
+        <section className="my-lg sensitive">
+          <h2 className="title-md">Bukti</h2>
+          {d.evidence.map((ev) => {
+            const m = meta?.items.find((x) => x.sha256 === ev.sha256);
+            return (
+              <div
+                key={ev.id}
+                className="card row"
+                style={{ justifyContent: 'space-between', marginBottom: '.6rem' }}
+              >
+                <span>
+                  <strong>{m?.nama ?? 'Berkas'}</strong>{' '}
+                  <span className="muted small">
+                    {fmtBytes(ev.ukuran)}, {fmtDateTime(ev.uploadedAt)}
+                  </span>
+                </span>
+                {dek && (
+                  <button
+                    className="btn ghost sm"
+                    onClick={() =>
+                      void act(async () =>
+                        triggerDownload(
+                          m?.nama ?? 'bukti',
+                          await aesGcmDecrypt(
+                            dek,
+                            await api<Uint8Array>(`evidence/${ev.id}/blob`, {
+                              token: session.token,
+                            }),
+                            AAD.evidence,
+                          ),
+                        ),
+                      )
+                    }
+                  >
+                    Unduh
+                  </button>
+                )}
+                {m?.messages?.length ? (
+                  <div style={{ flexBasis: '100%' }}>
+                    <ChatSignals messages={m.messages} />
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </section>
+      )}
+
+      {canRead && <OwnerProofSatgas session={session} caseId={id} />}
       {canRead && (
         <section className="card my-lg" aria-labelledby="rjk">
           <h2 className="title-sm" id="rjk">

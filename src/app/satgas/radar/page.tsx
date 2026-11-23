@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
+import { LoadError } from '@/components/LoadError';
 
 type Snap = {
   unit: string;
@@ -41,12 +42,14 @@ export default function Radar() {
           kasus tunggal. Sel kosong berarti data terlalu sedikit untuk ditampilkan.
         </p>
       </header>
-      {err && (
-        <p className="err" role="alert">
-          {err}
-        </p>
-      )}
-      <div className="tablewrap card" style={{ padding: 0 }}>
+      {err && <LoadError what="radar pola" message={err} />}
+      <div
+        className="tablewrap card"
+        style={{ padding: 0 }}
+        role="region"
+        aria-label="Radar pola per unit dan periode"
+        tabIndex={0}
+      >
         <table>
           <caption className="sr">Radar pola per unit dan periode</caption>
           <thead>

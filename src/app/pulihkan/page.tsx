@@ -106,7 +106,7 @@ export default function Pulihkan() {
             {error}
           </p>
         )}
-        <button className="btn teal" disabled={busy || !ready}>
+        <button className="btn teal" disabled={busy || !ready} aria-busy={busy}>
           {busy ? 'Memulihkan…' : 'Pulihkan brankas'}
         </button>
       </form>

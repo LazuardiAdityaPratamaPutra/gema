@@ -8,6 +8,7 @@ import { clearRecovery, recoveryStatus, setupRecovery } from '@/lib/recovery';
 import { triggerDownload } from '@/lib/proof';
 import { passkeyStatus, passkeySupported, removePasskey, setupPasskey } from '@/lib/passkey';
 import { generatePassphrase } from '@gema/passphrase';
+import { Term } from '@/components/Term';
 
 export default function Pengaturan() {
   const { session } = useReporter();
@@ -64,9 +65,9 @@ export default function Pengaturan() {
         </Link>
         <h1>Pengaturan keamanan</h1>
         <p className="lede">
-          Kode Paksa dan pemulihan. Bila dipaksa membuka brankas, masukkan kata sandi kedua. Brankas
-          akan menampilkan isi tiruan yang kamu tentukan. Dari luar, tidak ada tanda bahwa ada
-          brankas lain.
+          <Term k="kodePaksa">Kode Paksa</Term> dan pemulihan. Bila dipaksa membuka brankas,
+          masukkan kata sandi kedua. Brankas akan menampilkan isi tiruan yang kamu tentukan. Dari
+          luar, tidak ada tanda bahwa ada brankas lain.
         </p>
       </header>
       {justRecovered && (
@@ -116,6 +117,7 @@ export default function Pengaturan() {
           disabled={
             busy || session.vault.t === 'decoy' || pass.split(/\s+/).filter(Boolean).length < 4
           }
+          aria-busy={busy}
           onClick={() =>
             run(
               () => setKodePaksa(session, pass.trim().toLowerCase(), judul, isi),
@@ -128,6 +130,7 @@ export default function Pengaturan() {
         <button
           className="btn ghost"
           disabled={busy || session.vault.t === 'decoy'}
+          aria-busy={busy}
           onClick={() => run(() => removeKodePaksa(session), 'Kode Paksa dilepas.')}
         >
           Lepas
@@ -143,8 +146,8 @@ export default function Pengaturan() {
           enam kata. Rahasianya dibuat oleh perangkatmu dan tidak pernah dikirim ke server.
         </p>
         <p className="card warn small">
-          Passkey membuka brankas <strong>asli</strong> langsung dan tidak lewat Kode Paksa. Jangan
-          pasang bila kamu mengandalkan Kode Paksa untuk situasi dipaksa.
+          <Term k="passkey">Passkey</Term> membuka brankas <strong>asli</strong> langsung dan tidak
+          lewat Kode Paksa. Jangan pasang bila kamu mengandalkan Kode Paksa untuk situasi dipaksa.
         </p>
         {session.vault.t === 'decoy' ? (
           <p className="small muted">Dinonaktifkan di brankas tiruan.</p>
@@ -159,6 +162,7 @@ export default function Pengaturan() {
             <button
               className="btn ghost sm"
               disabled={busy}
+              aria-busy={busy}
               onClick={() =>
                 run(async () => {
                   await removePasskey(session);
@@ -173,6 +177,7 @@ export default function Pengaturan() {
           <button
             className="btn teal"
             disabled={busy}
+            aria-busy={busy}
             onClick={() =>
               run(async () => {
                 await setupPasskey(session);
@@ -235,6 +240,7 @@ export default function Pengaturan() {
             <button
               className="btn ghost sm"
               disabled={busy}
+              aria-busy={busy}
               onClick={() =>
                 run(async () => {
                   await clearRecovery(session);
@@ -249,6 +255,7 @@ export default function Pengaturan() {
           <button
             className="btn teal"
             disabled={busy}
+            aria-busy={busy}
             onClick={() =>
               run(async () => {
                 setShares(await setupRecovery(session));

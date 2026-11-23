@@ -98,3 +98,18 @@ export class RateLimiter {
 export function chainHash(prev: string, payload: unknown): string {
   return toHex(sha256(concat(utf8(prev), utf8(JSON.stringify(payload)))));
 }
+
+/**
+ * Alamat klien dari `x-forwarded-for`. Entri paling kiri dapat dipalsukan klien, jadi yang dipercaya
+ * adalah entri ke-`hops` dari kanan (hops = jumlah proksi tepercaya di depan server, bawaan 1, atur
+ * lewat GEMA_TRUSTED_PROXIES). Tanpa header: 'lokal'.
+ */
+export function clientIpFrom(xff: string | null, hops = 1): string {
+  const parts = (xff ?? '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+  if (!parts.length) return 'lokal';
+  const n = Math.max(1, Math.floor(hops) || 1);
+  return parts[Math.max(0, parts.length - n)];
+}

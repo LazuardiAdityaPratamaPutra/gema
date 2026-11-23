@@ -16,17 +16,22 @@ export default function Home() {
         <div className="wrap home-hero">
           <div className="hero-top">
             <div>
-              <h1 id="judul">Bukti aman. Penanganan terlihat.</h1>
+              <h1 id="judul">Bukti tersimpan. Penanganan terlihat.</h1>
               <p className="sub">
-                Simpan bukti kekerasan seksual di kampus secara anonim, lalu pantau Satgas
-                menanganinya tepat waktu. Pilih posisimu di bawah.
+                Simpan bukti kekerasan seksual di kampus tanpa nama, email, atau telepon, lalu
+                pantau Satgas menanganinya tepat waktu. Kamu yang memutuskan kapan, dan apakah,
+                laporanmu sampai ke Satgas.
+              </p>
+              <p className="sub hero-batas">
+                Gema tidak bisa menjamin anonimitas: isi ceritamu tetap bisa menunjukkan siapa kamu.{' '}
+                <Link href="/panduan#batas">Baca batasnya</Link>
               </p>
               <div className="hero-cta">
-                <Link href="/demo" className="btn teal">
-                  Coba demo 5 menit
+                <Link href="/pahami" className="btn teal">
+                  Pahami dulu
                 </Link>
-                <Link href="/verifikasi" className="btn ghost">
-                  Periksa keutuhan bukti
+                <Link href="/demo" className="btn ghost">
+                  Coba demo 5 menit
                 </Link>
               </div>
             </div>
@@ -43,8 +48,13 @@ export default function Home() {
         <details>
           <summary>Yang tidak bisa kami janjikan</summary>
           <ul>
-            <li>Lupa kata sandi berarti isi hilang. Tidak ada pemulihan.</li>
-            <li>Keluar cepat tidak menghapus riwayat peramban.</li>
+            <li>
+              Lupa kata sandi berarti isi hilang, kecuali kamu sudah menyiapkan pemulihan lewat dua
+              orang tepercaya.
+            </li>
+            <li>
+              Keluar cepat menghapus draf dan sesi di perangkat ini, tetapi tidak riwayat peramban.
+            </li>
             <li>Pencocokan hanya sebaik ejaan nama yang ditulis.</li>
             <li>Prototipe lomba, belum diaudit pihak independen.</li>
           </ul>
@@ -54,7 +64,7 @@ export default function Home() {
         <NextStep
           title="Belum siap melapor? Simpan buktinya saja."
           acts={[
-            { href: '/mulai', label: 'Buat brankas anonim' },
+            { href: '/mulai', label: 'Buat brankas tanpa nama' },
             { href: '/papan', label: 'Lihat papan kampus', ghost: true },
           ]}
         >
