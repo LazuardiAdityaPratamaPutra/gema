@@ -7,11 +7,15 @@ import {
   startRecording,
   toPcm16k,
   transcribe,
+  warmUp,
   type Recorder,
 } from '@/lib/asr';
 import { island } from '@/lib/island-bus';
 
 type St = 'idle' | 'rec' | 'load' | 'work' | 'err';
+
+const progressPct = (e: { loaded: number; total: number }) =>
+  Math.round((e.loaded / e.total) * 100);
 
 /** Tombol "Bicara saja": merekam, lalu mengubah suara menjadi teks di perangkat. Teks ditambahkan ke kolom, bisa disunting. */
 export function Dictate({
@@ -50,6 +54,11 @@ export function Dictate({
       rec.current = await startRecording();
       setSecs(0);
       setSt('rec');
+      // Unduhan model berjalan selagi pengguna bicara, jadi hasilnya lebih cepat muncul.
+      warmUp((e) => {
+        if (e.type === 'progress')
+          setMsg(`Sambil kamu bicara, pengenal suara disiapkan ${progressPct(e)}%.`);
+      });
     } catch {
       setSt('err');
       setMsg('Mikrofon tidak bisa dipakai. Periksa izin mikrofon di peramban.');
@@ -64,8 +73,10 @@ export function Dictate({
       const pcm = await toPcm16k(await r.stop());
       const text = await transcribe(pcm, (e) => {
         if (e.type === 'progress') {
-          const pct = Math.round((e.loaded / e.total) * 100);
-          setMsg(`Menyiapkan pengenal suara ${pct}%. Hanya sekali.`);
+          const pct = progressPct(e);
+          setMsg(
+            `Mengunduh pengenal suara ${pct}%. Hanya sekali, lalu tersimpan di perangkat. Kamu bisa mengetik sambil menunggu.`,
+          );
           island.progress('Menyiapkan pengenal suara', pct, 100);
         }
         if (e.type === 'working') {

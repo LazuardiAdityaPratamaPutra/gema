@@ -47,7 +47,7 @@ export function stem(word: string): string {
   return w;
 }
 
-export function tokens(s: string): string[] {
+function tokens(s: string): string[] {
   return normalize(s).split(' ').filter(Boolean);
 }
 

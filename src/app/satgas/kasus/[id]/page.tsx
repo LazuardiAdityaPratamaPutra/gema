@@ -1,124 +1,25 @@
 'use client';
+import { HeaderPhoto } from '@/components/HeaderPhoto';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
-import { api, ApiError } from '@/lib/api';
-import { aesGcmDecrypt, b64u, decryptJson, encryptJson, fromB64u, fromUtf8 } from '@gema/crypto';
-import { unwrapFromSatgas } from '@gema/pq-kem';
-import { loadSatgasSecret } from '@/lib/satgas-key';
-import type { SatgasSession } from '@/lib/store';
-import { AAD, AAD_CATATAN, type BuktiMeta, type Narasi } from '@/lib/report-format';
-import { fmtBytes, fmtDateTime } from '@/lib/format';
-import { triggerDownload } from '@/lib/proof';
+import { api } from '@/lib/api';
+import type { BuktiMeta, Narasi } from '@/lib/report-format';
+import { fmtDateTime } from '@/lib/format';
 import { DosirAssist } from '@/components/DosirAssist';
-import { ChatSignals } from '@/components/ChatSignals';
 import { ApprovalGate } from '@/components/ApprovalGate';
 import { OwnerProofSatgas } from '@/components/OwnerProofSatgas';
 import { Rujukan } from '@/components/Rujukan';
 import type { InstitutionInfo } from '@/lib/vault-client';
 import { RELASI_LABEL } from '@gema/pendamping';
 import { VeilBar } from '@/components/Veil';
-
-type Detail = {
-  escalation: {
-    id: string;
-    alias: string;
-    sumber: string;
-    status: string;
-    wrapped: never;
-    institutionId: string;
-    prioritas?: boolean;
-    penanggungJawab?: string | null;
-    penanggungJawabId?: string | null;
-  };
-  sla: {
-    due: number;
-    terlambat: boolean;
-    hariSisa: number | null;
-    hariTerlambat: number;
-    tingkat: number;
-  };
-  report: {
-    unitNama: string;
-    secrets: { narasi_ciphertext: string; bukti_meta_ciphertext: string };
-    createdAt: number;
-    flagFast: boolean;
-  };
-  evidence: {
-    id: string;
-    sha256: string;
-    messageCount: number | null;
-    ukuran: number;
-    uploadedAt: number;
-  }[];
-  events: {
-    id: string;
-    at: number;
-    actor: string;
-    tipe: string;
-    label: string;
-    catatan?: string;
-  }[];
-  cluster: { total: number; tereskalasi: number; tersegel: number };
-};
-type Loaded =
-  | 'butuh-persetujuan'
-  | {
-      d: Detail;
-      decrypted: {
-        dek: Uint8Array;
-        narasi: Narasi;
-        meta: BuktiMeta;
-        notes: Record<string, string>;
-      } | null;
-    };
-
-/** Mengambil dosir lalu mendekripsinya dengan kunci Satgas di perangkat ini. Tanpa efek samping pada state. */
-async function fetchDosir(session: SatgasSession, id: string): Promise<Loaded> {
-  let d: Detail;
-  try {
-    d = await api<Detail>(`satgas/cases/${id}`, { token: session.token });
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 403 && e.data?.needApproval)
-      return 'butuh-persetujuan';
-    throw e;
-  }
-  const secret = loadSatgasSecret(session);
-  if (!secret) return { d, decrypted: null };
-  const dek = await unwrapFromSatgas(d.escalation.wrapped, secret, {
-    institutionId: d.escalation.institutionId,
-    escalationId: d.escalation.id,
-  });
-  const narasi = await decryptJson<Narasi>(
-    dek,
-    fromB64u(d.report.secrets.narasi_ciphertext),
-    AAD.narasi,
-  );
-  const meta = await decryptJson<BuktiMeta>(
-    dek,
-    fromB64u(d.report.secrets.bukti_meta_ciphertext),
-    AAD.meta,
-  );
-  const notes: Record<string, string> = {};
-  for (const ev of d.events) {
-    if (!ev.catatan) continue;
-    try {
-      const note = await decryptJson<{ teks: string; penulis: string }>(
-        dek,
-        fromB64u(ev.catatan),
-        AAD_CATATAN,
-      );
-      notes[ev.id] = note.teks;
-    } catch {
-      // Catatan yang tidak bisa dibuka dilewati; sisanya tetap tampil.
-    }
-  }
-  return { d, decrypted: { dek, narasi, meta, notes } };
-}
-
-const STATUSES = ['Diterima', 'Verifikasi', 'Rekomendasi', 'Tindak lanjut pimpinan', 'Selesai'];
+import { BuktiKasus } from './BuktiKasus';
+import { CatatanInternal } from './CatatanInternal';
+import { Penanggung } from './Penanggung';
+import { Perkembangan } from './Perkembangan';
+import { fetchDosir, type Detail, type Loaded } from './dosir';
 
 export default function Dosir() {
   const { id } = useParams<{ id: string }>();
@@ -128,7 +29,6 @@ export default function Dosir() {
   const [narasi, setNarasi] = useState<Narasi | null>(null);
   const [meta, setMeta] = useState<BuktiMeta | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
-  const [note, setNote] = useState('');
   const [msg, setMsg] = useState('');
   const [noKey, setNoKey] = useState(false);
   const [locked, setLocked] = useState(false);
@@ -190,7 +90,8 @@ export default function Dosir() {
   if (session && locked)
     return (
       <div className="wrap">
-        <header className="ph">
+        <header className="ph ph-foto">
+          <HeaderPhoto />
           <SatgasBar s={session} />
           <Link href="/satgas" className="back">
             Kembali ke daftar kasus
@@ -217,11 +118,15 @@ export default function Dosir() {
       setMsg(e instanceof Error ? e.message : 'Gagal.');
     }
   };
-  const idx = STATUSES.indexOf(d.escalation.status);
+
+  const reload = async () => {
+    await load();
+  };
 
   return (
     <div className="wrap" style={{ maxWidth: 900 }}>
-      <header className="ph">
+      <header className="ph ph-foto">
+        <HeaderPhoto />
         <SatgasBar s={session} />
         <Link href="/satgas" className="back">
           Kembali ke daftar kasus
@@ -281,102 +186,9 @@ export default function Dosir() {
           </section>
         </>
       )}
-      <section className="my-lg" aria-labelledby="pj-judul">
-        <h2 id="pj-judul" className="title-md">
-          Penanggung jawab
-        </h2>
-        <p>
-          {d.escalation.penanggungJawab ? (
-            <>
-              Kasus ini ditangani oleh <strong>{d.escalation.penanggungJawab}</strong>.
-            </>
-          ) : (
-            'Belum ada penanggung jawab. Kasus tanpa penanggung jawab mudah terlewat.'
-          )}
-        </p>
-        {session?.member.role === 'Ketua' && d.escalation.status !== 'Selesai' && (
-          <div className="row" style={{ gap: '0.6rem', flexWrap: 'wrap', alignItems: 'end' }}>
-            <div className="field" style={{ margin: 0, minWidth: '14rem' }}>
-              <label htmlFor="pj">Tetapkan kepada</label>
-              <select
-                id="pj"
-                value={d.escalation.penanggungJawabId ?? ''}
-                onChange={async (ev) => {
-                  const memberId = ev.target.value || null;
-                  try {
-                    await api(`satgas/cases/${id}/assign`, {
-                      method: 'POST',
-                      token: session.token,
-                      body: { memberId },
-                    });
-                    setMsg(memberId ? 'Penanggung jawab ditetapkan.' : 'Penugasan dicabut.');
-                    await load();
-                  } catch (e) {
-                    setMsg(e instanceof Error ? e.message : 'Gagal menetapkan.');
-                  }
-                }}
-              >
-                <option value="">Belum ditugaskan</option>
-                {team.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.nama} ({m.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        )}
-      </section>
+      <Penanggung session={session} d={d} caseId={id} team={team} setMsg={setMsg} reload={reload} />
 
-      <section className="my-lg">
-        <h2 className="title-md">Perkembangan</h2>
-        <ul className="timeline">
-          {d.events.map((e) => (
-            <li key={e.id}>
-              <strong>{e.label}</strong>{' '}
-              <span className="muted small">
-                {fmtDateTime(e.at)}, {e.actor}
-              </span>
-              {notes[e.id] && <p style={{ margin: '.3rem 0 0' }}>{notes[e.id]}</p>}
-            </li>
-          ))}
-        </ul>
-        {(idx < STATUSES.length - 1 && role !== 'Anggota') ||
-        (role === 'Anggota' && idx < STATUSES.length - 2) ? (
-          <div className="row">
-            {role !== 'Pimpinan' && idx < STATUSES.length - 2 && (
-              <button
-                className="btn teal sm"
-                onClick={() =>
-                  void act(() =>
-                    api(`satgas/cases/${id}/status`, {
-                      token: session.token,
-                      body: { to: STATUSES[idx + 1] },
-                    }),
-                  )
-                }
-              >
-                Lanjut ke: {STATUSES[idx + 1]}
-              </button>
-            )}
-            {(role === 'Ketua' || role === 'Pimpinan') && idx < STATUSES.length - 1 && (
-              <button
-                className="btn ghost sm"
-                onClick={() =>
-                  void act(() =>
-                    api(`satgas/cases/${id}/status`, {
-                      token: session.token,
-                      body: { to: 'Selesai' },
-                    }),
-                  )
-                }
-              >
-                Tandai selesai
-              </button>
-            )}
-          </div>
-        ) : null}
-      </section>
+      <Perkembangan session={session} d={d} caseId={id} notes={notes} act={act} />
 
       {canRead && assistInput && <DosirAssist alias={d.escalation.alias} input={assistInput} />}
       {canRead && noKey && (
@@ -386,54 +198,7 @@ export default function Dosir() {
         </p>
       )}
 
-      {canRead && (
-        <section className="my-lg sensitive">
-          <h2 className="title-md">Bukti</h2>
-          {d.evidence.map((ev) => {
-            const m = meta?.items.find((x) => x.sha256 === ev.sha256);
-            return (
-              <div
-                key={ev.id}
-                className="card row"
-                style={{ justifyContent: 'space-between', marginBottom: '.6rem' }}
-              >
-                <span>
-                  <strong>{m?.nama ?? 'Berkas'}</strong>{' '}
-                  <span className="muted small">
-                    {fmtBytes(ev.ukuran)}, {fmtDateTime(ev.uploadedAt)}
-                  </span>
-                </span>
-                {dek && (
-                  <button
-                    className="btn ghost sm"
-                    onClick={() =>
-                      void act(async () =>
-                        triggerDownload(
-                          m?.nama ?? 'bukti',
-                          await aesGcmDecrypt(
-                            dek,
-                            await api<Uint8Array>(`evidence/${ev.id}/blob`, {
-                              token: session.token,
-                            }),
-                            AAD.evidence,
-                          ),
-                        ),
-                      )
-                    }
-                  >
-                    Unduh
-                  </button>
-                )}
-                {m?.messages?.length ? (
-                  <div style={{ flexBasis: '100%' }}>
-                    <ChatSignals messages={m.messages} />
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </section>
-      )}
+      {canRead && <BuktiKasus session={session} d={d} meta={meta} dek={dek} act={act} />}
 
       {canRead && <OwnerProofSatgas session={session} caseId={id} />}
       {canRead && (
@@ -448,34 +213,7 @@ export default function Dosir() {
         </section>
       )}
 
-      {canRead && dek && (
-        <section className="card">
-          <h2 className="title-sm">Catatan internal</h2>
-          <p className="hint">Dienkripsi dengan kunci kasus; server tidak membacanya.</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} aria-label="Catatan" />
-          <button
-            className="btn teal sm mt-sm"
-            disabled={!note.trim()}
-            onClick={() =>
-              void act(async () => {
-                const ct = await encryptJson(
-                  dek,
-                  { teks: note.trim(), penulis: session.member.nama },
-                  AAD_CATATAN,
-                );
-                await api(`satgas/cases/${id}/notes`, {
-                  token: session.token,
-                  body: { catatan_ciphertext: b64u(ct) },
-                });
-                setNote('');
-              })
-            }
-          >
-            Simpan catatan
-          </button>
-        </section>
-      )}
+      {canRead && dek && <CatatanInternal session={session} caseId={id} dek={dek} act={act} />}
     </div>
   );
 }
-void fromUtf8;

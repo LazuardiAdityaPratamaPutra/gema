@@ -1,27 +1,10 @@
 /** Sertifikat Bukti (PDF), Paket Bukti (HTML mandiri), dan Paket Pengungkapan. Semuanya dibuat di perangkat. */
-import {
-  CERT_STATEMENT,
-  DISCLOSURE_NOTE,
-  buildDisclosure,
-  type CanonicalMessage,
-  type DisclosurePackage,
-  type EvidenceCertificate,
-} from '@gema/merkle';
-import { fromB64u } from '@gema/crypto';
+import { CERT_STATEMENT, type DisclosurePackage, type EvidenceCertificate } from '@gema/merkle';
 import { api } from './api';
 
 export async function fetchCertificate(evidenceId: string): Promise<EvidenceCertificate> {
   const p = await api<Omit<EvidenceCertificate, 'statement'>>(`public/evidence/${evidenceId}`);
   return { ...p, statement: CERT_STATEMENT };
-}
-
-export function buildDisclosurePackage(
-  evidenceId: string,
-  messages: CanonicalMessage[],
-  saltsB64: string[],
-  selected: number[],
-): DisclosurePackage {
-  return buildDisclosure(evidenceId, messages, saltsB64.map(fromB64u), selected);
 }
 
 export function triggerDownload(
@@ -242,5 +225,3 @@ export async function buildRecoveryCard(
     page.drawText(siteUrl, { x: 30, y: 36, size: 8, font: sans, color: rgb(0.35, 0.41, 0.52) });
   return pdf.save();
 }
-
-export { DISCLOSURE_NOTE };

@@ -1,6 +1,6 @@
 import type { HybridPublicKey, WrappedKey } from '@gema/pq-kem';
 
-export type FpMode = 'oprf' | 'hmac';
+type FpMode = 'oprf' | 'hmac';
 export type SatgasRole = 'Ketua' | 'Anggota' | 'Auditor' | 'Pimpinan' | 'Pengawas' | 'Admin';
 export const CASE_STATUSES = [
   'Diterima',
@@ -28,21 +28,21 @@ export type Institution = {
   rujukan?: Rujukan[];
 };
 
-export type Rujukan = {
+type Rujukan = {
   nama: string;
   jenis: 'psikolog' | 'hukum' | 'medis' | 'pendamping' | 'lainnya';
   kontak: string;
   catatan?: string;
 };
 
-export type Unit = {
+type Unit = {
   id: string;
   institution_id: string;
   nama: string;
   tipe: 'Fakultas' | 'Prodi' | 'Unit kerja';
 };
 
-export type Reporter = {
+type Reporter = {
   id: string;
   case_code: string;
   created_at: number;
@@ -60,7 +60,7 @@ export type Reporter = {
 };
 
 /** Selalu 2 per akun; yang tak dipakai berisi nilai acak seukuran. Tidak ada kolom yang membedakan slot asli dan umpan. */
-export type AuthSlot = {
+type AuthSlot = {
   slot_id: string;
   reporter_id: string;
   scope_id: string;
@@ -68,7 +68,7 @@ export type AuthSlot = {
   vault_blob: string;
 };
 
-export type ReportSecrets = {
+type ReportSecrets = {
   narasi_ciphertext: string; // b64u
   dek_wrapped_klien: string; // b64u
   bukti_meta_ciphertext: string; // b64u
@@ -92,7 +92,7 @@ export type Report = {
   conditional?: Conditional;
 };
 
-export type Conditional = {
+type Conditional = {
   escalation_id: string;
   wrapped: WrappedKey;
   prioritas: boolean;
@@ -101,7 +101,7 @@ export type Conditional = {
   set_at: number;
 };
 
-export type Evidence = {
+type Evidence = {
   id: string;
   report_id: string;
   sha256_asli: string;
@@ -115,7 +115,7 @@ export type Evidence = {
   anchor_id: string | null;
 };
 
-export type Fingerprint = {
+type Fingerprint = {
   report_id: string;
   varian: 'V1' | 'V2' | 'V3' | 'V4' | 'W1' | 'W2' | 'S1' | 'S2' | 'S3';
   tingkat: 'kuat' | 'lemah' | 'penguat';
@@ -143,7 +143,7 @@ export type Escalation = {
   assigned_at?: number | null;
 };
 
-export type CaseEvent = {
+type CaseEvent = {
   id: string;
   escalation_id: string;
   actor_role: SatgasRole | 'sistem' | 'pelapor';
@@ -152,7 +152,7 @@ export type CaseEvent = {
   catatan_ciphertext: string | null;
   at: number;
 };
-export type LadderEvent = {
+type LadderEvent = {
   id: string;
   escalation_id: string;
   alias: string;
@@ -162,7 +162,7 @@ export type LadderEvent = {
   at: number;
 };
 
-export type Member = {
+type Member = {
   id: string;
   institution_id: string;
   email: string;
@@ -171,7 +171,7 @@ export type Member = {
   pass_hash: string;
 };
 
-export type Anchor = {
+type Anchor = {
   id: string;
   tanggal: string; // YYYY-MM-DD (WIB)
   merkle_root: string;
@@ -191,7 +191,7 @@ export type AuditEntry = {
   prev_hash: string;
   hash: string;
 };
-export type RadarSnapshot = {
+type RadarSnapshot = {
   unit_id: string;
   unit_nama: string;
   institution_id: string;
@@ -200,7 +200,7 @@ export type RadarSnapshot = {
   pola_berulang: boolean;
   epsilon: number;
 };
-export type ComplianceSnapshot = {
+type ComplianceSnapshot = {
   institution_id: string;
   kuartal: string;
   enough: boolean;
@@ -220,14 +220,14 @@ export type Session =
  * (kunci sudah di-hash, garam IP harian tidak disimpan), dan tantangan Bukti Pemilik. Disimpan agar restart
  * server tidak mengeluarkan pengguna atau mengulang hitungan percobaan masuk.
  */
-export type Runtime = {
+type Runtime = {
   sessions: Record<string, Session>;
   hits: Record<string, Record<string, number[]>>;
   challenges: Record<string, number>;
 };
 
 /** Mode Empat Mata: satu anggota meminta akses dosir, anggota lain yang berbeda menyetujuinya. */
-export type Approval = {
+type Approval = {
   id: string;
   escalation_id: string;
   institution_id: string;

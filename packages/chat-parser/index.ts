@@ -4,7 +4,7 @@
  */
 import type { CanonicalMessage } from '@gema/merkle';
 
-export type ParsedMessage = CanonicalMessage & { iso: string | null; system: boolean };
+type ParsedMessage = CanonicalMessage & { iso: string | null; system: boolean };
 export type ParseResult = {
   messages: ParsedMessage[];
   stats: {

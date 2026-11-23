@@ -7,7 +7,8 @@ export type IslandState =
   | { mode: 'progress'; label: string; value?: number; total?: number }
   | { mode: 'toast'; label: string };
 
-let state: IslandState = { mode: 'idle' };
+const IDLE: IslandState = { mode: 'idle' };
+let state: IslandState = IDLE;
 let timer: ReturnType<typeof setTimeout> | undefined;
 const subs = new Set<() => void>();
 const emit = () => subs.forEach((f) => f());
@@ -41,6 +42,6 @@ export function useIslandState(): IslandState {
       };
     },
     () => state,
-    () => ({ mode: 'idle' }) as IslandState,
+    () => IDLE, // snapshot server harus objek yang sama di tiap panggilan
   );
 }

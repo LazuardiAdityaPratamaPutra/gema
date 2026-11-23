@@ -1,4 +1,6 @@
 'use client';
+import { PasswordEye } from '@/components/PasswordEye';
+import { HeaderPhoto } from '@/components/HeaderPhoto';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -36,7 +38,8 @@ export default function SatgasMasuk() {
   }
   return (
     <div className="narrow">
-      <header className="ph" data-tab="Untuk Satgas PPKPT">
+      <header className="ph ph-foto" data-tab="Untuk Satgas PPKPT">
+        <HeaderPhoto />
         <h1>Masuk Satgas</h1>
         <p className="lede">Dosir hanya terbuka setelah penyintas memilih eskalasi.</p>
       </header>
@@ -66,14 +69,7 @@ export default function SatgasMasuk() {
               onChange={(e) => setPw(e.target.value)}
               autoComplete="current-password"
             />
-            <button
-              type="button"
-              className="pw-toggle"
-              aria-pressed={show}
-              onClick={() => setShow((v) => !v)}
-            >
-              {show ? 'Sembunyikan' : 'Tampilkan'}
-            </button>
+            <PasswordEye show={show} onToggle={() => setShow((v) => !v)} />
           </div>
         </div>
         {err && (

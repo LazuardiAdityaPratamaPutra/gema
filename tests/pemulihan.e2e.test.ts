@@ -38,7 +38,9 @@ describe('bagian rahasia', () => {
       expect(secretFromShares([s[i], s[j]])).toEqual(r);
     expect(() => secretFromShares([s[0]])).toThrow(/dua bagian/i);
     expect(() => secretFromShares([s[0], s[0]])).toThrow(/sama/);
-    expect(() => secretFromShares([s[0], s[1].slice(0, -2) + 'AA'])).toThrow(/salah ketik/);
+    // Akhiran pengganti harus berbeda dari aslinya; kalau sama, bagian itu tidak rusak dan tes jadi acak.
+    const rusak = s[1].slice(0, -2) + (s[1].endsWith('AA') ? 'BB' : 'AA');
+    expect(() => secretFromShares([s[0], rusak])).toThrow(/salah ketik/);
     expect(() => secretFromShares([s[0], 'asal'])).toThrow(/tidak dikenali/);
   });
 });

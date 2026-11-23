@@ -18,7 +18,7 @@ const ZERO32 = new Uint8Array(32);
 
 export const leafHash = (data: Uint8Array): Uint8Array =>
   sha256(concat(new Uint8Array([0x00]), data));
-export const nodeHash = (l: Uint8Array, r: Uint8Array): Uint8Array =>
+const nodeHash = (l: Uint8Array, r: Uint8Array): Uint8Array =>
   sha256(concat(new Uint8Array([0x01]), l, r));
 
 function largestPow2Below(n: number): number {
@@ -89,12 +89,12 @@ export function evidenceLeaf(
 
 export type CanonicalMessage = { ts: string; sender: string; text: string; attachment: string };
 
-export function canonicalBytes(m: CanonicalMessage): Uint8Array {
+function canonicalBytes(m: CanonicalMessage): Uint8Array {
   return utf8(JSON.stringify([m.ts, m.sender, m.text, m.attachment]));
 }
 
 /** L_i = SHA-256(0x00 ‖ garam_i ‖ m_i) dengan garam acak 16 byte per pesan. */
-export function messageLeaf(salt: Uint8Array, m: CanonicalMessage): Uint8Array {
+function messageLeaf(salt: Uint8Array, m: CanonicalMessage): Uint8Array {
   return leafHash(concat(salt, canonicalBytes(m)));
 }
 
@@ -117,7 +117,7 @@ export type DisclosurePackage = {
   note: string;
 };
 
-export const DISCLOSURE_NOTE =
+const DISCLOSURE_NOTE =
   'Paket ini membuktikan bahwa pesan-pesan di bawah ada di berkas yang tercatat pada waktu unggah. ' +
   'Ia tidak membuktikan keaslian asal-usul percakapan dan tidak membuktikan konteksnya.';
 
@@ -166,7 +166,7 @@ export function verifyDisclosure(pkg: DisclosurePackage): {
 
 /* ---------- Sertifikat dan verifikasi ---------- */
 
-export type AnchorProof = {
+type AnchorProof = {
   date: string;
   root: string;
   size: number;

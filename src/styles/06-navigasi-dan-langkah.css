@@ -325,7 +325,7 @@ html {
   }
 }
 
-@media (width >= 68.75em) {
+@media (width >= 75em) {
   .nb-links {
     display: flex;
   }
@@ -567,7 +567,7 @@ html {
   color: var(--ink-2);
 }
 
-@media (width >= 68.75em) {
+@media (width >= 75em) {
   .nb-qx-info {
     display: inline-flex;
     align-items: center;

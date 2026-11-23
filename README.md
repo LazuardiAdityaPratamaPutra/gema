@@ -1,153 +1,283 @@
-# Gema
+<div align="center">
 
-Platform web untuk perguruan tinggi yang membantu penyintas kekerasan seksual **menyimpan bukti tanpa harus langsung melapor**, dan membuat **penanganan Satgas PPKPT terlihat tepat waktu**. Subtema Gender Equality, SDG 5. Dibuat untuk SEVENT X Software Development, kategori Website.
+<img src="public/logo/gema-logo.svg" alt="Gema" height="76" />
 
-> Prototipe lomba. Belum diaudit pihak independen. Jangan dipakai untuk kasus nyata sebelum ditinjau.
+# Simpan bukti dulu. Putuskan melapor nanti.
 
-## Masalah yang dijawab
+**Platform web bagi penyintas kekerasan seksual di perguruan tinggi, dan bagi Satgas PPKPT yang menanganinya.**
+Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
 
-Tiap fitur dipetakan ke hambatan nyata, bukan ke teknologinya.
+<br />
 
-| Hambatan                                                          | Fitur Gema                                                                                                                                                                                                                             |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Takut identitas bocor ke pelaku yang berkuasa (dosen, pembimbing) | Brankas tanpa nama/email/telepon (bukan jaminan anonimitas: isi cerita dan jaringan tetap bisa mengungkap identitas); Satgas baru tahu bila penyintas memilih eskalasi, dan eskalasi bisa ditarik selama Satgas belum membuka kasusnya |
-| Ragu apakah yang dialami "termasuk" kekerasan                     | **Pahami dulu** (`/pahami`): cerita bebas dicocokkan dengan bentuk kekerasan di Permendikbudristek 55/2024 Pasal 7 dan Pasal 12 ayat (2)                                                                                               |
-| Bukti chat dihapus atau dibantah                                  | Sertifikat waktu (pohon Merkle harian), Paket Bukti offline, **penanda pesan penting** di ekspor WhatsApp                                                                                                                              |
-| Merasa sendirian                                                  | Pencocokan pola terlapor tanpa membuka identitas siapa pun (OPRF)                                                                                                                                                                      |
-| Bergantung secara akademik pada terlapor                          | **Penanda relasi kuasa**: menjadi tanda _Prioritas_ di daftar kasus Satgas (atas persetujuan saat eskalasi) dan memunculkan draf usulan pelindungan sementara                                                                          |
-| Laporan didiamkan kampus                                          | Tenggat hari kerja (Pasal 53: tindak lanjut ≤ 3 hari kerja), tangga eskalasi T1/T2/T3, papan publik berderau                                                                                                                           |
-| Sulit mengetik saat tertekan                                      | **Bicara saja**: suara jadi teks di perangkat                                                                                                                                                                                          |
-| Satgas kekurangan dukungan dan waktu                              | **Ringkasan dosir otomatis**, draf surat, dan **direktori rujukan** (psikolog, bantuan hukum, SAPA 129, Komnas Perempuan, LPSK)                                                                                                        |
+![Next.js](https://img.shields.io/badge/Next.js_16-0A3F31?style=flat-square&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_19-0E5A45?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript_strict-0E5A45?style=flat-square&logo=typescript&logoColor=white)
+![Tes](https://img.shields.io/badge/tes-208_lolos-0E5A45?style=flat-square)
+![Aksesibilitas](https://img.shields.io/badge/axe--core-0_pelanggaran-0E5A45?style=flat-square)
+![Lisensi](https://img.shields.io/badge/lisensi-MIT-F2A33A?style=flat-square)
 
-## Pendamping di perangkat ("AI yang tidak pernah melihat ceritamu")
+[Alur kerja](#alur-kerja) · [Fitur](#fitur) · [Privasi](#cara-kerja-privasi) · [Mulai cepat](#mulai-cepat) · [Struktur](#struktur-proyek) · [Batas yang jujur](#batas-yang-jujur)
 
-Semua bantuan otomatis berjalan di peramban pengguna. Cerita, suara, dan chat tidak dikirim ke layanan AI mana pun.
+</div>
 
-| Fitur               | Cara kerja                                                                                                              | Batas                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pahami dulu         | Pencocok frasa bahasa Indonesia dengan pemotong imbuhan, 29 bentuk kekerasan (`packages/pendamping/forms.ts`)           | Berbasis kata, bukan model bahasa besar; kata tak umum bisa terlewat. Selalu disebut "petunjuk, bukan keputusan hukum"                                                                                                                                                                                                                                                                                                                   |
-| Penanda pesan chat  | 6 kategori (rahasia, imbalan akademik, ancaman, ajakan berdua, seksual, komentar tubuh) + larut malam                   | Bisa salah tandai; pengguna diminta memeriksa sendiri                                                                                                                                                                                                                                                                                                                                                                                    |
-| Bicara saja         | Whisper (`onnx-community/whisper-base`, q8) lewat transformers.js di Web Worker; runtime WASM di-host sendiri di `/ort` | Model diunduh sekali dari Hugging Face atau host kampus. Jalur lengkap diuji di Chromium (mikrofon tiruan). Pada 4 kalimat sintetis espeak-ng, rata-rata kata keliru: `whisper-base` 54%, `whisper-tiny` 92%; suara manusia belum diukur. Halusinasi umum ("Thank you.") dibuang. Untuk akurasi lebih tinggi, set `NEXT_PUBLIC_GEMA_ASR_MODEL` ke model Whisper yang lebih besar (unduhan lebih berat). Teks hasil selalu bisa disunting |
-| Pengingat kronologi | Aturan sederhana: waktu, tempat, urutan, saksi, dampak                                                                  | Maksimal 2 pertanyaan, boleh diabaikan                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Ringkasan dosir     | Kutipan ekstraktif + templat surat                                                                                      | Tidak mengarang fakta; selalu berlabel "draf otomatis"                                                                                                                                                                                                                                                                                                                                                                                   |
-| Pembacaan nama      | Membuang gelar/sapaan (termasuk sapaan daerah), varian lemah "nama depan + inisial"                                     | "Pak Hendra" saja tetap tidak dicocokkan (terlalu banyak salah cocok)                                                                                                                                                                                                                                                                                                                                                                    |
+> [!WARNING]
+> Gema masih prototipe dan belum diaudit pihak independen. Jangan dipakai untuk kasus nyata sebelum ditinjau ahli keamanan dan hukum.
 
-## Perlindungan lanjutan
+## Kenapa Gema
 
-| Fitur                               | Manfaat bagi penyintas dan Satgas                                                                                                                                                                 | Cara kerja                                                                                                                                                                                                              | Batas jujur                                                                                                                                             |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Eskalasi Bersyarat**              | Penyintas yang takut melapor sendirian memasang syarat: laporan hanya sampai ke Satgas bila 2 sampai 5 pelapor berbeda melaporkan terlapor yang sama. Syarat bisa dicabut selama belum terpenuhi. | Kunci laporan dibungkus untuk Satgas saat syarat dipasang, disimpan tersegel di server, dan baru dijalankan saat klaster pencocokan memenuhi syarat (`logic.ts`, `runConditionals`).                                    | Server melihat bahwa syarat terpasang dan kapan terpenuhi. Menarik eskalasi juga mencabut syarat.                                                       |
-| **Empat Mata** (panel 2-dari-3)     | Tidak ada satu orang pun yang dapat membuka dosir sendirian, jadi penyalahgunaan akses internal lebih sulit.                                                                                      | Kunci Satgas dipecah Shamir 2-dari-3 untuk tiga pemegang (`src/lib/key-shares.ts`). Server juga menahan dosir sampai anggota lain yang berbeda menyetujui (berlaku 30 menit), semua tercatat di audit.                  | Dua pemegang yang berkolusi tetap bisa membuka. Persetujuan server tidak menggantikan pemecahan kunci; keduanya dipasang bersama.                       |
-| **Pemulihan lewat orang tepercaya** | Lupa kata sandi tidak lagi berarti brankas hilang selamanya.                                                                                                                                      | Kunci brankas dibungkus rahasia acak yang dipecah 2-dari-3 untuk tiga orang. Memulihkan butuh Kode Kasus dan dua bagian, lalu kata sandi baru dipasang dan semua kunci laporan dibungkus ulang.                         | Dua orang tepercaya yang berkolusi dan tahu Kode Kasus dapat mengambil alih brankas. Pemulihan sekali pakai: setelah dipakai, pasang yang baru.         |
-| **Passkey (WebAuthn PRF)**          | Masuk dengan sidik jari, PIN perangkat, atau kunci keamanan tanpa mengetik enam kata.                                                                                                             | Rahasia PRF diturunkan perangkat dan tidak pernah dikirim. Ia membungkus kunci brankas dan menurunkan kunci masuk (`src/lib/passkey.ts`). Diuji di Chromium dengan autentikator virtual berdukungan PRF.                | Passkey membuka brankas asli langsung, melewati Kode Paksa, dan ditandai begitu di layar pengaturan. Butuh peramban dan perangkat yang mendukung PRF.   |
-| **Bukti Pemilik** (nol-pengetahuan) | Satgas dapat memastikan orang yang mengaku pelapor benar-benar pemilik laporan, tanpa tahu identitasnya. Mencegah penyamaran.                                                                     | Bukti Schnorr non-interaktif (Fiat-Shamir, P-256) atas tantangan Satgas dan alias kasus; kunci publik diturunkan dari kunci laporan (`packages/zk`). Tantangan sekali pakai, berlaku 15 menit, tersimpan di basis data. | Bukti hanya menyatakan "memegang kunci laporan ini". Belum diaudit.                                                                                     |
-| **CSP berbasis nonce**              | Mengurangi risiko skrip sisipan (XSS) mencuri kunci di peramban.                                                                                                                                  | `src/proxy.ts` membuat nonce acak per permintaan; skrip tanpa nonce diblokir, tanpa `unsafe-inline` untuk skrip dan elemen gaya. Semua halaman dirender dinamis.                                                        | Atribut `style=""` masih diizinkan (`style-src-attr`), karena tidak dapat menjalankan kode. Diuji di Chromium tanpa satu pun pelanggaran.               |
-| **Penyimpanan PostgreSQL**          | Bisa dipasang di hosting tanpa disk persisten dan di-backup dengan alat basis data biasa.                                                                                                         | Adapter `src/server/backends/postgres.ts`: satu baris per koleksi (hanya yang berubah yang ditulis), blob terenkripsi sebagai `bytea`. Diuji di Postgres sungguhan (PGlite).                                            | Penyimpanan dokumen, bukan skema relasional dengan RLS. Hanya satu instans penulis. Kunci OPRF wajib dari secret manager, tidak disimpan di basis data. |
+Banyak penyintas tidak melapor karena takut identitasnya sampai ke pelaku yang berkuasa, ragu apakah pengalamannya termasuk kekerasan, atau khawatir buktinya hilang. Gema menjawab hambatan itu satu per satu.
 
-## Navigasi
+| Hambatan                                 | Yang Gema lakukan                                                                                                                                          |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Takut identitas bocor                    | Brankas tanpa nama, email, atau telepon. Satgas baru tahu bila penyintas memilih eskalasi, dan eskalasi bisa ditarik selama Satgas belum membuka kasusnya. |
+| Ragu apakah ini termasuk kekerasan       | **Pahami dulu**: cerita bebas dicocokkan dengan bentuk kekerasan di Permendikbudristek 55/2024, sebagai petunjuk, bukan putusan.                           |
+| Bukti chat dihapus atau dibantah         | Sertifikat waktu berbasis pohon Merkle harian, Paket Bukti offline, dan penanda pesan penting pada ekspor WhatsApp.                                        |
+| Merasa sendirian                         | Pencocokan pola terlapor tanpa membuka identitas siapa pun.                                                                                                |
+| Bergantung secara akademik pada terlapor | Penanda relasi kuasa menandai kasus sebagai _Prioritas_ dan menyiapkan draf usulan pelindungan sementara.                                                  |
+| Laporan didiamkan kampus                 | Tenggat hari kerja, tangga eskalasi T1 sampai T3, dan papan kepatuhan publik.                                                                              |
+| Sulit mengetik saat tertekan             | **Bicara saja**: suara menjadi teks di perangkat.                                                                                                          |
 
-Navbar tetap di atas semua halaman. Tautannya mengikuti peran: tamu (Pahami dulu, Periksa bukti, Papan, Bantuan, Demo, Untuk Satgas), pelapor (Brankasmu, Kode Paksa, dan seterusnya), dan Satgas (Kasus, Radar, Jejak audit, Kunci sesuai peran). Di layar kecil tautan masuk ke menu lipat; tombol aksi utama dan "Keluar cepat" tetap terlihat di bilah. Di brankas tiruan (Kode Paksa) menu dikosongkan agar tidak membocorkan fitur lain. Kemajuan dan pesan singkat (misalnya "Tersimpan dan terkunci") muncul sebagai pil di bawah navbar. Setiap halaman berakhir dengan langkah berikutnya yang jelas.
+## Alur kerja
 
-### Alur pelaporan yang tidak memaksa
+Gema punya tiga pihak: **penyintas** yang menyimpan bukti, **Satgas** kampus yang menangani, dan **publik** yang bisa memeriksa bukti serta ketepatan waktu penanganan. Server di tengah hanya memegang data terkunci.
 
-- **Berhenti dan lanjut nanti.** Setiap langkah punya panel "Kamu tidak harus selesai sekarang": simpan draf terenkripsi lalu keluar, atau hapus draf (dua langkah). `/brankas` menampilkan kartu "Ada laporan yang belum selesai" dan draf pulih di langkah tempat pengguna berhenti.
-- **Tinjau dan ubah per bagian.** Langkah terakhir menampilkan kampus, terlapor, kejadian, bukti, dan detail tambahan dengan tombol Ubah masing-masing. Fokus berpindah ke kolom yang dimaksud, dan tombol "Kembali ke tinjauan" membawa pengguna pulang.
-- **Istilah teknis dijelaskan di tempatnya.** Komponen `Term` (tombol, bisa dibuka dengan keyboard dan layar sentuh) memakai glosarium tunggal di `src/lib/glosarium.ts`.
-- **Nama terlapor.** Dijelaskan sebagai nama pihak yang dilaporkan, bukan identitas pelapor, termasuk apa yang terjadi bila nama lengkapnya tidak diketahui.
+### 1. Perjalanan penyintas
 
-### UX hardening (ulasan kedua)
-
-- **Penjelasan sebelum formulir.** Langkah pertama menjelaskan empat hal: apa yang diminta, mengapa, apa yang dipakai untuk pencocokan, dan apa yang terlihat saat eskalasi. Tidak hanya bergantung pada istilah "disamarkan" atau "terenkripsi".
-- **Lampiran dari draf.** Isi berkas tidak ikut tersimpan, tetapi namanya ya. Setelah draf dipulihkan, setiap berkas yang belum terlampir dicantumkan dengan statusnya, dan tombol kunci menunggu sampai berkas dipilih ulang atau dilewati dengan sadar.
-- **Indikator simpan tetap.** "Menyimpan…", "Tersimpan pukul …", atau "Belum tersimpan" dengan tombol coba lagi (`role="alert"` hanya saat gagal). Tidak ada toast berulang.
-- **Mode demo permanen.** Selama `GEMA_DEMO` tidak `off`, semua halaman menampilkan strip "Mode demo: semua data di sini fiktif" di dalam header yang menempel. Memilih kampus demo di formulir menambah catatan sendiri.
-- **Kondisi gagal yang menenangkan.** `LoadError` selalu menyatakan bahwa tidak ada yang terhapus atau berubah dan menyediakan Coba lagi. Koneksi terputus menampilkan strip yang menegaskan draf tetap tersimpan. Hasil verifikasi "Tidak cocok" menjelaskan dua kemungkinan tanpa menakut-nakuti.
-- **Shoulder surfing.** Isi laporan dan bukti (pelapor dan Satgas) tersamar secara bawaan dan baru terbuka setelah tombol Tampilkan isi; tersamar lagi otomatis saat tab disembunyikan. Sesi dikunci setelah 5 menit tanpa aktivitas, dengan peringatan 30 detik, dan formulir laporan menyimpan drafnya lebih dulu. Samaran hanya efek visual: pembaca layar tetap membaca isinya. Gema tidak memakai notifikasi sistem, jadi tidak ada kronologi yang bisa bocor lewat notifikasi.
-- **Keluar cepat.** Disembunyikan seketika sebelum penghapusan, tanpa header Referer, tidak memicu saat IME sedang menyusun teks atau bersama tombol pengubah. Esc dua kali tetap berlaku di dalam kolom teks, dengan konsekuensi draf yang belum tersimpan ikut terhapus. Ponsel tidak punya Esc, jadi tombol di navbar (target 44 px) adalah jalur utamanya.
-
-### Aksesibilitas: yang sudah diuji dan yang belum
-
-Diuji otomatis di peramban (Chromium + axe-core, WCAG 2.0/2.1/2.2 A dan AA): 1280 px, 640 px (setara zoom 200%), 390 px, 320 px, dan ukuran font bawaan peramban 200% pada semua halaman publik, brankas, pengaturan, dan tiga langkah pelaporan. Alur pelaporan juga dijalankan hanya dengan keyboard. Breakpoint memakai `em` agar tata letak ikut berubah saat pengguna membesarkan teks.
-
-Belum diuji: pembaca layar sungguhan (NVDA, TalkBack, VoiceOver) dan pengguna nyata. Itu perlu dilakukan manusia sebelum klaim aksesibel penuh.
-
-## Jalankan
-
-```bash
-npm install                       # bila gagal mengunduh biner onnxruntime-node: npm install --ignore-scripts
-npm run build && npm start        # http://localhost:3000
-npm run dev                       # pengembangan
-npm test                          # 198 uji (hasil `npm test`, 23 Nov 2026): kripto, OPRF, KEM, Merkle, parser, DP, ZK, pendamping, API e2e, Postgres
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','secondaryColor':'#FFF1D6','tertiaryColor':'#F4F8F5'}}}%%
+flowchart TD
+    A([Buka Gema]) --> B{Sudah punya<br/>brankas?}
+    B -- Belum --> C[Buat brankas<br/>Kode Kasus + 6 kata<br/>dibuat di perangkat]
+    B -- Sudah --> D[Masuk dengan kode,<br/>kata sandi, atau passkey]
+    C --> E
+    D --> E[Brankasmu]
+    A -. ragu .-> P[Pahami dulu<br/>cerita dicocokkan dengan<br/>Permendikbudristek 55/2024]
+    P --> C
+    E --> F[Laporan baru, 3 langkah:<br/>siapa dan di mana, kejadian dan bukti<br/>boleh bicara saja, lalu tinjau dan kunci]
+    F --> G[(Terkunci di perangkat<br/>lalu dikirim terenkripsi)]
+    G --> H{Ada laporan lain<br/>tentang terlapor yang sama?}
+    H -- Belum --> I[Tetap tersimpan,<br/>tambah bukti kapan saja]
+    H -- Ya, sudah k laporan --> J[Pemberitahuan pola<br/>tanpa identitas siapa pun]
+    I --> K
+    J --> K{Pilihan penyintas}
+    K --> L[Eskalasi sekarang<br/>sendiri atau bersama]
+    K --> M[Eskalasi bersyarat<br/>otomatis bila 2 sampai 5<br/>pelapor cocok]
+    K --> N[Simpan saja]
+    L --> O([Satgas menangani])
+    M --> O
+    O -. selama belum dibuka .-> Q[Tarik eskalasi]
+    Q --> E
 ```
 
-Data tersimpan di `.data/` (JSON + blob terenkripsi). Variabel lingkungan:
+Beberapa hal yang sengaja dibuat begitu:
 
-| Variabel                      | Fungsi                                                                                                                                       |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GEMA_DEMO`                   | `on` mengaktifkan Mode Demo, `off` mematikan. Di produksi, tanpa nilai = **mati** (aman bawaan). Di pengembangan, tanpa nilai = aktif        |
-| `GEMA_TRUSTED_PROXIES`        | Jumlah proksi tepercaya di depan server (bawaan 1). Alamat klien diambil dari kanan `x-forwarded-for`, bukan entri kiri yang bisa dipalsukan |
-| `DATABASE_URL`                | `postgres://…`: simpan data di PostgreSQL, bukan berkas. Hanya satu instans penulis (kunci penasihat)                                        |
-| `GEMA_OPRF_MASTER`            | 64 heksadesimal, kunci induk OPRF/HMAC dari secret manager. Wajib bila `DATABASE_URL` diisi                                                  |
-| `NEXT_PUBLIC_GEMA_MODEL_HOST` | Host model suara (default `https://huggingface.co/`). Kampus bisa meng-host sendiri; struktur `{host}{model}/resolve/main/…`                 |
-| `NEXT_PUBLIC_GEMA_ASR_MODEL`  | ID model Whisper (default `onnx-community/whisper-base`)                                                                                     |
+- **Draf tersimpan terenkripsi di perangkat** tiap 10 detik, jadi pelapor boleh berhenti kapan saja. Isi berkas bukti perlu dipilih ulang saat lanjut.
+- **Keluar cepat** tersedia di setiap halaman (juga lewat Esc dua kali): menghapus draf dan sesi di perangkat lalu membuka situs netral.
+- **Kode Paksa** membuka brankas tiruan bila pelapor dipaksa membuka brankasnya.
 
-Tanpa disk persisten (mis. Vercel), pakai PostgreSQL: set `DATABASE_URL` dan `GEMA_OPRF_MASTER`; lihat `docs/DEPLOY.md`.
+### 2. Dari penyimpanan sampai eskalasi
 
-## Demo 5 menit (buka `/demo`)
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','actorBkg':'#E3F0E8','actorBorder':'#0E5A45','noteBkgColor':'#FFF1D6','noteTextColor':'#0F2D24'}}}%%
+sequenceDiagram
+    autonumber
+    actor P as Penyintas
+    participant D as Perangkat<br/>(peramban)
+    participant S as Server Gema
+    actor T as Satgas
 
-1. **Pahami dulu** (`/pahami`): ketuk contoh "Pembimbing bilang skripsi saya tidak akan di-acc…". Muncul bentuk huruf j dan l Pasal 12 ayat (2). Tekan **Simpan dulu, tanpa nama**: cerita terbawa ke formulir.
-2. **Laporan baru** (3 langkah): tulis "Dr. Hendra W., M.T." dan lihat cara nama dibaca; pilih relasi "Pembimbing". Unggah ekspor WhatsApp `.txt`, lihat pesan penting ditandai. Coba **Bicara saja**.
-3. Buka laporan: unduh **Sertifikat (PDF)** dan **Paket Bukti (HTML offline)**. **Eskalasi** dengan "Minta diprioritaskan" tercentang.
-4. Masuk sebagai **Ketua**: kasus berlabel **Prioritas** di atas. Buka dosir: **Ringkasan otomatis**, draf "Usulan pelindungan sementara", rujukan.
-5. `/demo` → **Jam Demo +7 hari** → lihat tangga T1/T2/T3. **Terbitkan akar harian**, lalu `/verifikasi` dan `/papan`.
+    P->>D: Tulis cerita, lampirkan bukti
+    D->>D: Enkripsi AES-GCM dengan kunci laporan
+    D->>D: Samarkan nama terlapor (OPRF)
+    D->>S: Data terenkripsi + sidik pencocokan + hash bukti
+    S->>S: Cocokkan sidik antar laporan, catat hash di pohon Merkle harian
+    S-->>D: Sertifikat waktu, dan pemberitahuan bila ada pola
+    Note over S: Server tidak pernah memegang kunci<br/>dan tidak melihat nama terlapor
 
-## Struktur
+    P->>D: Pilih eskalasi
+    D->>D: Bungkus kunci laporan untuk Satgas<br/>(ECDH P-256 + ML-KEM-768)
+    D->>S: Kunci terbungkus, tenggat 3 hari kerja berjalan
+    S-->>T: Kasus baru dengan nama samaran KS-XXXXXX
+    T->>T: Buka dosir dengan kunci Satgas
+    T->>S: Ubah status, tambah catatan terenkripsi
+    S-->>D: Penyintas memantau status dan tenggat
+```
 
-| Jalur                                                            | Isi                                                                                                                                                                                                                                                                                                                                                         |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/pendamping`                                            | Pemahaman cerita, penanda chat, pengingat kronologi, ringkasan dosir                                                                                                                                                                                                                                                                                        |
-| `packages/crypto`                                                | AES-GCM, PBKDF2, HKDF, kode kasus, pembungkus kunci                                                                                                                                                                                                                                                                                                         |
-| `packages/oprf`                                                  | OPRF P256-SHA256 (tervalidasi vektor RFC 9497)                                                                                                                                                                                                                                                                                                              |
-| `packages/pq-kem`                                                | KEM hibrida ECDH P-256 + ML-KEM-768                                                                                                                                                                                                                                                                                                                         |
-| `packages/merkle`                                                | Pohon Merkle RFC 6962/9162, Bukti per Pesan, sertifikat                                                                                                                                                                                                                                                                                                     |
-| `packages/matching`, `chat-parser`, `shamir`, `dp`, `passphrase` | Varian nama, parser WhatsApp, Shamir GF(256), privasi diferensial, kata sandi 6 kata                                                                                                                                                                                                                                                                        |
-| `src/workers/asr.worker.ts`, `src/lib/asr*.ts`                   | Pengenal suara di perangkat                                                                                                                                                                                                                                                                                                                                 |
-| `src/lib/rujukan.ts`                                             | Layanan rujukan nasional (kampus mengisi layanannya sendiri di data institusi)                                                                                                                                                                                                                                                                              |
-| `src/server`                                                     | Router API; logika inti (`logic.ts`), akun (`logic-akun.ts`: pemulihan, passkey), Satgas (`logic-satgas.ts`: Empat Mata, Bukti Pemilik); `backends/` berkas dan Postgres; seed demo                                                                                                                                                                         |
-| `src/proxy.ts`                                                   | CSP nonce per permintaan                                                                                                                                                                                                                                                                                                                                    |
-| `packages/zk`                                                    | Bukti Schnorr nol-pengetahuan (P-256)                                                                                                                                                                                                                                                                                                                       |
-| `src/app`, `src/components`, `src/lib`                           | UI dan logika klien                                                                                                                                                                                                                                                                                                                                         |
-| `src/styles/00-08-*.css`                                         | CSS berurutan (urutan impor di `layout.tsx` menentukan cascade): `00-token` semua token warna/tipografi, `01-dasar`, `02-beranda-dan-bagian-umum`, `03-pendamping`, `04-brankas-dan-panduan`, `05-tata-usaha-kampus`, `06-navigasi-dan-langkah`, `07-palet-dan-pita` (zona dan pita warna), `08-utilitas` (kelas jarak/judul kecil, pengganti style inline) |
-| `scripts/verifier.src.html`                                      | Sumber Verifier Mandiri (satu HTML tanpa dependensi)                                                                                                                                                                                                                                                                                                        |
+### 3. Penanganan oleh Satgas
 
-## Standar kode
+Setiap kasus melewati lima status, dan hanya boleh maju satu langkah. Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Ambang T2 dan T3 di bawah adalah nilai bawaan dan bisa diatur per kampus.
 
-Satu perintah memeriksa semuanya: `npm run check` (typecheck ketat, ESLint, Stylelint, Prettier, lalu tes).
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','noteBkgColor':'#FFF1D6','noteTextColor':'#0F2D24'}}}%%
+stateDiagram-v2
+    direction LR
+    state "Tindak lanjut pimpinan" as TindakLanjut
+    [*] --> Diterima: eskalasi
+    Diterima --> Verifikasi
+    Verifikasi --> Rekomendasi
+    Rekomendasi --> TindakLanjut
+    TindakLanjut --> Selesai
+    Selesai --> [*]
 
-| Perintah               | Fungsi                                                               |
-| ---------------------- | -------------------------------------------------------------------- |
-| `npm run typecheck`    | `tsc --noEmit` dengan `noUnusedLocals` dan `noUnusedParameters`      |
-| `npm run lint`         | ESLint (Next core-web-vitals, typescript-eslint, aturan React Hooks) |
-| `npm run lint:css`     | Stylelint (`stylelint-config-standard`) untuk `src/styles/*.css`     |
-| `npm run format`       | Prettier menulis ulang berkas (lebar 100, kutip tunggal, titik koma) |
-| `npm run format:check` | Prettier hanya memeriksa                                             |
+    note right of Diterima
+        Lewat tenggat:
+        T1 Ketua Satgas
+        T2 Pimpinan (3 hari kerja terlambat)
+        T3 LLDIKTI, hanya agregat (10 hari kerja)
+    end note
+```
 
-Aturan praktis: token warna dan tipografi hanya didefinisikan di `00-token.css`; jangan memakai `style={{...}}` untuk jarak atau ukuran judul, pakai kelas di `08-utilitas.css`; ambil data di fungsi murni (`fetchReport`, `fetchDosir`) lalu terapkan ke state, bukan `setState` langsung di efek.
+| Peran    | Yang bisa dilakukan                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| Ketua    | Membaca dosir, memajukan dan menutup kasus, menugaskan penanggung jawab, mengelola kunci dan Empat Mata |
+| Anggota  | Membaca dosir, menulis catatan terenkripsi, memajukan status sampai Tindak lanjut pimpinan              |
+| Pimpinan | Melihat daftar kasus dan radar pola per unit, menandai kasus selesai                                    |
+| Auditor  | Memeriksa jejak audit berantai hash                                                                     |
+| Pengawas | Melihat angka agregat tingkat 3, tanpa isi kasus                                                        |
 
-## Batas jujur
+Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui permintaan pembukaan (berlaku 30 menit), dan kunci Satgas dipecah 2-dari-3 sehingga satu orang tidak bisa membukanya sendirian.
 
-- ML-KEM-768 lulus 60 vektor resmi NIST ACVP (`tests/mlkem-acvp.test.ts`); OPRF lulus vektor RFC 9497. Pustaka kripto memakai `@noble/*` yang belum diaudit formal untuk proyek ini.
-- Recall/false-positive pencocokan nama dan pemahaman cerita diukur pada contoh buatan sendiri, bukan data nyata.
-- Nomor layanan rujukan diperiksa November 2026 dari sumber resmi/berita; harus diperiksa ulang sebelum peluncuran.
-- Permendikbudristek 55/2024 mengatur tahapan lain (pemeriksaan ≤ 30 hari kerja, kesimpulan ≤ 7 hari kerja). Gema baru menghitung tenggat tindak lanjut awal; tahap berikutnya dicatat sebagai status.
-- Fitur di bagian "Perlindungan lanjutan" belum diaudit pihak independen. Passkey diuji dengan autentikator virtual, bukan perangkat keras sungguhan.
-- Kampus sungguhan: Ketua membuat kunci Satgas di `/satgas/kunci` dan wajib menyimpan cadangannya; Gema tidak dapat memulihkannya. Kunci rahasia hanya hidup di sessionStorage tab.
-- Anchor: `.github/workflows/anchor.yml` mengarsipkan akar harian ke repo dan mencatat SHA komit ke server (butuh secrets `GEMA_URL`, `GEMA_CRON_SECRET`). Belum pernah dijalankan pada repo sungguhan.
-- Sesi (hanya hash token), hitungan pembatas laju, dan tantangan disimpan di basis data, jadi restart server tidak mengeluarkan pengguna. Garam IP harian hanya di memori, jadi kuota per jaringan mulai dari nol setelah restart. Tetap hanya cocok untuk satu instans.
-- Penyimpanan berkas JSON hanya cocok untuk satu instans. Backend Postgres tersedia, tetapi masih penyimpanan dokumen dan satu instans penulis; sesi dan pembatas laju ikut tersimpan di basis data tetapi belum aman dibagi antarinstans.
-- CSP memakai nonce (tanpa `unsafe-inline` untuk skrip). `connect-src` mengizinkan Hugging Face untuk unduhan model suara; hapus bila model di-host sendiri.
-- Keluar Cepat menghapus draf dan sesi di perangkat ini (laporan yang sudah tersimpan tetap aman di brankas), tetapi tidak menghapus riwayat peramban. Batas ini ditulis di samping tombolnya.
+### 4. Yang bisa dilihat siapa saja
 
-## Penyempurnaan presisi UI (v14)
+- **Periksa bukti** (`/verifikasi`): unggah berkas dan Paket Bukti, lalu cek apakah berkas masih utuh sejak waktu pengunggahan. Tanpa akun, bahkan bisa offline lewat berkas HTML mandiri.
+- **Papan Kepatuhan** (`/papan`): persentase ketepatan waktu tiap kampus per kuartal. Angkanya diberi derau privasi diferensial supaya satu kasus tidak bisa ditebak.
+- **Coba demo** (`/demo`): semua peran dengan data fiktif, dalam sekitar lima menit.
 
-Fondasi desain tidak berubah (palet, tiga font, pita warna, warna zona). Lapisan `src/styles/07b-presisi.css` memakai token skala di `00-token.css` (radius, tipe, tinggi kontrol, ritme). Temuan, pengukuran sebelum/sesudah, dan batasan ada di `docs/AUDIT-UI.md`.
+## Fitur
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+**Untuk penyintas**
+
+- Brankas terenkripsi di perangkat
+- Kode Kasus dan kata sandi enam kata
+- Kode Paksa (brankas tiruan)
+- Passkey (WebAuthn PRF) dan pemulihan lewat tiga orang tepercaya
+- Bicara saja: suara jadi teks di perangkat
+- Eskalasi, eskalasi bersyarat, dan penarikan
+
+</td>
+<td width="33%" valign="top">
+
+**Untuk Satgas**
+
+- Daftar kasus dengan tenggat dan label Prioritas
+- Penugasan penanggung jawab
+- Mode Empat Mata dengan kunci terpecah
+- Bukti Pemilik nol-pengetahuan
+- Jejak audit berantai hash
+- Radar pola berderau dan direktori rujukan
+
+</td>
+<td width="33%" valign="top">
+
+**Untuk semua orang**
+
+- Verifikasi bukti mandiri
+- Papan Kepatuhan publik
+- Pendamping di peramban, tanpa layanan AI
+- Penanda pesan penting pada ekspor WhatsApp
+- Bantuan segera: SAPA 129, Komnas Perempuan, LPSK
+
+</td>
+</tr>
+</table>
+
+## Cara kerja privasi
+
+```
+Perangkat pelapor                         Server Gema
+─────────────────                         ───────────
+cerita + bukti ──enkripsi AES-GCM──▶      hanya menerima data terenkripsi
+kunci brankas  (tidak pernah dikirim)     tidak memegang kunci apa pun
+sidik pencocokan ──OPRF──▶                mencocokkan tanpa melihat nama
+sertifikat waktu ◀── akar Merkle harian ──┘  diarsipkan ke repositori publik
+```
+
+- Kripto: AES-GCM, PBKDF2, HKDF, ECDH P-256 + ML-KEM-768 (hibrida), OPRF RFC 9497, pohon Merkle RFC 6962, Shamir GF(256), bukti Schnorr.
+- CSP berbasis nonce per permintaan, tanpa `unsafe-inline` untuk skrip.
+- Sesi pelapor dikunci setelah 5 menit tanpa aktivitas; isi laporan tersamar sampai dibuka.
+
+## Mulai cepat
+
+Prasyarat: Node.js 22 atau lebih baru.
+
+```bash
+npm install     # bila unduhan biner onnxruntime-node gagal: npm install --ignore-scripts
+npm run dev     # http://localhost:3000
+```
+
+Buka `/demo` untuk mencoba semua peran dengan data fiktif. Data tersimpan di `.data/`.
+
+<details>
+<summary><b>Perintah yang tersedia</b></summary>
+
+<br />
+
+| Perintah            | Fungsi                                                              |
+| ------------------- | ------------------------------------------------------------------- |
+| `npm run check`     | Semua pemeriksaan sekaligus: tipe, ESLint, Stylelint, Prettier, tes |
+| `npm test`          | Vitest: kripto, OPRF, KEM, Merkle, parser, API, Postgres            |
+| `npm run typecheck` | `tsc --noEmit` dengan `noUnusedLocals` dan `noUnusedParameters`     |
+| `npm run lint`      | ESLint                                                              |
+| `npm run lint:css`  | Stylelint untuk `src/styles/*.css`                                  |
+| `npm run format`    | Prettier menulis ulang berkas                                       |
+
+</details>
+
+## Struktur proyek
+
+<details>
+<summary><b>Peta folder</b></summary>
+
+<br />
+
+```
+gema/
+├─ src/
+│  ├─ app/             halaman dan rute API (Next.js App Router)
+│  ├─ components/      komponen UI
+│  ├─ lib/             logika klien: brankas, bukti, passkey, format
+│  ├─ server/
+│  │  ├─ routes/       rute API per domain: publik, akun, pelapor, satgas, demo, cron
+│  │  ├─ logic/        aturan inti: sesi, akun, laporan, klaster, eskalasi, SLA, anchor
+│  │  ├─ seed/         data fiktif Mode Demo
+│  │  └─ backends/     penyimpanan berkas dan PostgreSQL
+│  ├─ styles/          CSS berlapis, urutan impor di layout.tsx menentukan cascade
+│  └─ proxy.ts         CSP nonce
+├─ packages/           pustaka tanpa dependensi UI
+│  ├─ crypto  oprf  pq-kem  merkle  zk  shamir
+│  └─ matching  chat-parser  pendamping  dp  passphrase
+├─ tests/              uji unit, API end-to-end, dan klaim teks
+├─ scripts/            pembangun Verifier Mandiri, penyalin runtime WASM
+├─ docs/               panduan, catatan desain, arsip
+└─ public/             logo, gambar, runtime WASM
+```
+
+</details>
+
+## Dokumentasi
+
+| Dokumen                                                                      | Isi                                          |
+| ---------------------------------------------------------------------------- | -------------------------------------------- |
+| [`docs/panduan/NASKAH-DEMO.md`](docs/panduan/NASKAH-DEMO.md)                 | Alur demo lima menit                         |
+| [`docs/desain/PENYEMPURNAAN-VISUAL.md`](docs/desain/PENYEMPURNAAN-VISUAL.md) | Keputusan visual, pengukuran, dan batasannya |
+| [`docs/desain/AUDIT-UI.md`](docs/desain/AUDIT-UI.md)                         | Audit antarmuka dan aksesibilitas            |
+| [`docs/desain/KREDIT-FOTO.md`](docs/desain/KREDIT-FOTO.md)                   | Kredit foto latar                            |
+
+## Batas yang jujur
+
+- Kripto memakai pustaka `@noble/*` yang belum diaudit formal untuk proyek ini. ML-KEM-768 lulus 60 vektor resmi NIST ACVP dan OPRF lulus vektor RFC 9497.
+- Fitur lanjutan (Empat Mata, Bukti Pemilik, passkey, pemulihan) belum ditinjau pihak independen. Passkey diuji dengan autentikator virtual, bukan perangkat keras.
+- Brankas tanpa nama bukan jaminan anonimitas: isi cerita dan jaringan tetap dapat mengungkap identitas.
+- Aksesibilitas diuji otomatis (axe-core) dan dengan keyboard di emulasi peramban. Pembaca layar sungguhan (NVDA, TalkBack, VoiceOver) dan pengguna nyata belum diuji.
+- Pendamping berbasis kata, bukan model bahasa besar, dan selalu menyebut hasilnya "petunjuk, bukan keputusan hukum". Akurasi suara pada ucapan manusia belum diukur.
+- Nomor layanan rujukan perlu diperiksa ulang sebelum peluncuran.
+- Penyimpanan hanya cocok untuk satu instans server.
+- Keluar cepat menghapus draf dan sesi di perangkat ini, tetapi tidak menghapus riwayat peramban.
+
+## Lisensi
+
+MIT.

@@ -1,4 +1,5 @@
 'use client';
+import { HeaderPhoto } from '@/components/HeaderPhoto';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
@@ -67,7 +68,8 @@ export default function Kasus() {
     );
   return (
     <div className="wrap">
-      <header className="ph">
+      <header className="ph ph-foto">
+        <HeaderPhoto />
         <SatgasBar s={session} />
         <h1>{session.member.role === 'Pengawas' ? 'Pengawasan' : 'Kasus tereskalasi'}</h1>
       </header>

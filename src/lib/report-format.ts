@@ -50,9 +50,4 @@ export const MAX_FILES = 10;
 
 export type Vault = { t: 'real' } | { t: 'decoy'; judul: string; isi: string };
 
-export const STATUS_LABEL: Record<string, string> = {
-  tersimpan: 'Tersimpan, hanya kamu yang bisa membaca',
-  tereskalasi: 'Dieskalasi ke Satgas',
-};
-
 export const AAD_CATATAN = 'gema/catatan/v1';

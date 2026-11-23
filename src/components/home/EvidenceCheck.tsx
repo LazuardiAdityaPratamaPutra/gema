@@ -1,8 +1,9 @@
 'use client';
+import { Words } from '@/components/motion/Words';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { sha256Async, toHex } from '@gema/crypto';
-import { CERT_STATEMENT, verifyCertificate, type EvidenceCertificate } from '@gema/merkle';
+import type { EvidenceCertificate } from '@gema/merkle';
 import { api } from '@/lib/api';
 import { fmtBytes } from '@/lib/format';
 
@@ -16,6 +17,11 @@ export function EvidenceCheck() {
     if (!f) return;
     setRes({ kind: 'wait' });
     try {
+      // Pustaka kripto hanya dimuat saat dipakai, supaya tidak membebani muat awal beranda.
+      const [{ sha256Async, toHex }, { CERT_STATEMENT, verifyCertificate }] = await Promise.all([
+        import('@gema/crypto'),
+        import('@gema/merkle'),
+      ]);
       const hash = toHex(await sha256Async(new Uint8Array(await f.arrayBuffer())));
       const r = await api<{ found: boolean; proof?: Omit<EvidenceCertificate, 'statement'> }>(
         `public/lookup/${hash}`,
@@ -48,9 +54,17 @@ export function EvidenceCheck() {
   }
   return (
     <section className="verify" aria-labelledby="cek">
+      <Image
+        src="/gambar/amplop-kertas.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        quality={60}
+        className="t-bg"
+      />
       <div className="wrap">
         <div>
-          <h2 id="cek">Ada yang bilang buktimu diedit?</h2>
+          <Words as="h2" id="cek" text="Ada yang bilang buktimu diedit?" />
           <p>
             Masukkan berkasnya ke amplop ini. Sidiknya dihitung di perangkatmu lalu dicocokkan
             dengan catatan Gema. Berkasnya tidak dikirim ke mana pun, dan tidak perlu akun.

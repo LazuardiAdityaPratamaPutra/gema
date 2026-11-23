@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Words } from '@/components/motion/Words';
 
 const DUE = 3,
   T2 = 3,
@@ -24,7 +25,7 @@ export function DeadlineClock() {
     <div className="band band-clock">
       <section className="clock wrap" aria-labelledby="jam">
         <div className="clock-copy">
-          <h2 id="jam">Kalau Satgas diam, pimpinan tahu.</h2>
+          <Words as="h2" id="jam" text="Kalau Satgas diam, pimpinan tahu." />
           <p>
             Laporan harus ditindaklanjuti paling lambat {DUE} hari kerja setelah diterima
             (Permendikbudristek 55/2024 Pasal 53). Lewat dari itu, Gema meneruskan pemberitahuan ke

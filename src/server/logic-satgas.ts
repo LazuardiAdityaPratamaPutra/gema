@@ -7,7 +7,7 @@ import type { DB, Institution, SatgasRole } from './types';
 import { HttpError, uid } from './util';
 
 /* ---------- mode Empat Mata (panel 2-dari-3) ---------- */
-export const APPROVAL_TTL = 30 * 60_000;
+const APPROVAL_TTL = 30 * 60_000;
 const PANEL_ROLES: SatgasRole[] = ['Ketua', 'Anggota', 'Pimpinan'];
 
 export function setPanelMode(
@@ -115,7 +115,7 @@ export function approvalsFor(db: DB, s: Extract<Session, { kind: 'satgas' }>) {
 }
 
 /* ---------- bukti pemilik (nol-pengetahuan) ---------- */
-export const CHALLENGE_TTL = 15 * 60_000;
+const CHALLENGE_TTL = 15 * 60_000;
 
 /** Laporan lama (sebelum Bukti Pemilik) mendaftarkan kunci sekali saja; setelah itu tidak bisa diganti. */
 export function registerOwnerKey(

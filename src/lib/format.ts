@@ -16,12 +16,6 @@ const dateTimeFmt = new Intl.DateTimeFormat('id-ID', {
   hourCycle: 'h23',
   timeZone: TZ,
 });
-const timeFmt = new Intl.DateTimeFormat('id-ID', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-  timeZone: TZ,
-});
 const num = new Intl.NumberFormat('id-ID');
 
 /** Relatif hanya sampai seminggu; setelah itu tanggal absolut (tidak ada "340 hari lalu"). */
@@ -37,8 +31,6 @@ export function fmtWhen(ts: number, now = Date.now()): string {
 
 export const fmtDate = (ts: number) => dateFmt.format(ts);
 export const fmtDateTime = (ts: number) => dateTimeFmt.format(ts);
-export const fmtTime = (ts: number) => timeFmt.format(ts);
-export const fmtNum = (n: number) => num.format(n);
 
 export function fmtBytes(n: number): string {
   if (n < 1024) return `${n} B`;

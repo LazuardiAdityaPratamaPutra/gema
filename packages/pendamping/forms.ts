@@ -5,7 +5,7 @@
  */
 import { cues, hasCue, stems, type Cue } from './text';
 
-export type Form = {
+type Form = {
   id: string;
   pasal: string;
   label: string;
@@ -31,7 +31,7 @@ const F = (
   cues: [...cues(strong, 3), ...cues(weak, 1)],
 });
 
-export const FORMS: Form[] = [
+const FORMS: Form[] = [
   F(
     'a',
     'Pasal 12 ayat (2) huruf a',

@@ -9,7 +9,6 @@ import { p256_oprf } from '@noble/curves/nist.js';
 import { p256 } from '@noble/curves/nist.js';
 import { fromHex, toHex, utf8 } from '@gema/crypto';
 
-export const OPRF_SUITE = 'P256-SHA256';
 export const MAX_EVALUATIONS_PER_REPORT = 8;
 
 export type BlindedInput = { input: string; blind: Uint8Array; blinded: Uint8Array };

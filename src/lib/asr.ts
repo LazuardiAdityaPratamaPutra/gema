@@ -51,6 +51,17 @@ export function transcribe(audio: Float32Array, on: (e: AsrEvent) => void): Prom
   });
 }
 
+/** Mulai mengunduh model lebih awal (mis. saat merekam) agar tidak menunggu setelah selesai bicara. */
+export function warmUp(on: (e: AsrEvent) => void): void {
+  const w = getWorker();
+  const h = (e: MessageEvent<AsrEvent>) => {
+    on(e.data);
+    if (e.data.type === 'ready' || e.data.type === 'error') w.removeEventListener('message', h);
+  };
+  w.addEventListener('message', h);
+  w.postMessage({ type: 'load' });
+}
+
 /** Apakah berkas model sudah ada di cache peramban (artinya dikte bisa jalan tanpa internet). */
 export async function modelCached(): Promise<boolean> {
   try {

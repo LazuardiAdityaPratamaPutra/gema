@@ -121,6 +121,11 @@ export default function Mulai() {
           {error}
         </p>
       )}
+      <p className="small muted mulai-next">
+        Berikutnya: tiga langkah singkat untuk menulis laporan (siapa dan di mana, kejadian dan
+        bukti, tinjau dan kunci). Isianmu disimpan sebagai draf di perangkat ini, jadi boleh
+        berhenti kapan saja.
+      </p>
       <button
         className="btn teal"
         type="button"

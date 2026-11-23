@@ -1,4 +1,5 @@
 'use client';
+import { HeaderPhoto } from '@/components/HeaderPhoto';
 import { useEffect, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
@@ -34,7 +35,8 @@ export default function Radar() {
   const cell = (u: string, p: string) => s?.find((x) => x.unit === u && x.periode === p);
   return (
     <div className="wrap">
-      <header className="ph">
+      <header className="ph ph-foto">
+        <HeaderPhoto />
         <SatgasBar s={session} />
         <h1>Radar pola</h1>
         <p className="lede">

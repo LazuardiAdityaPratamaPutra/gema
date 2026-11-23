@@ -13,7 +13,7 @@ export function SatgasBar({ s }: { s: SatgasSession }) {
           <b>{s.member.nama}</b>
           <small>
             {r}
-            {s.institution.demo ? ', Mode demo, data fiktif' : `, ${s.institution.nama}`}
+            {`, ${s.institution.nama}`}
           </small>
         </span>
       </p>

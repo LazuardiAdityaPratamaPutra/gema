@@ -1,0 +1,374 @@
+/*
+  Palet Pinus (tema cerah) dan tata letak baru. Menggantikan 07d; dimuat terakhir.
+  Hijau pinus = aksi dan merek. Putih kehijauan = latar. Tinta hijau tua = teks. Madu = hanya tenggat dan penutup.
+  Hapus impor berkas ini di layout.tsx untuk kembali ke 07c.
+*/
+:root {
+  --paper: #f3f7f4;
+  --paper-2: #e6eee9;
+  --card: #fff;
+  --ink: #10241d;
+  --ink-2: #2d4339;
+  --muted: #4a6157;
+  --line: #c9d9cf;
+  --pen: #0e5a45;
+  --pen-dark: #0a4636;
+  --stempel: #0e5a45;
+  --focus: #0e5a45;
+  --malam: #0e5a45;
+  --tint: #ddebe3;
+  --tint-2: #c9ddd1;
+  --soft: rgb(16 36 29 / 8%);
+  --soft-hover: rgb(16 36 29 / 14%);
+  --aksen: #0e5a45;
+  --aksen-hover: #0a4636;
+  --madu: #f2a33a;
+  --madu-lembut: #fbe6c2;
+  --map-biru: #d3e5ea;
+  --map-hijau: #cfe6d8;
+  --map-oranye: #f6d9a8;
+  --map-merah: #f1cdc6;
+  --map-kuning: #f6e4a8;
+  --map-pink: #ecd6de;
+  --zone: #0e5a45;
+  --on: var(--ink);
+  --on-2: var(--ink-2);
+  color-scheme: light;
+}
+
+html[data-zone] {
+  --zone: #0e5a45;
+  --paper: #f3f7f4;
+  --on: var(--ink);
+  --on-2: var(--ink-2);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ---------- tombol ---------- */
+.btn,
+.btn.teal,
+.band-hero .btn.teal,
+.panel .btn.teal,
+.nb-cta,
+html[data-zone] .ph .btn:not(.ghost):not(.teal):not(.danger):not(.light) {
+  background: #0e5a45;
+  color: #fff;
+  border: 0;
+}
+
+.btn.ghost,
+.nb-ghost,
+.ph .btn.ghost,
+.band-hero .btn.ghost,
+.band-clock .btn.ghost,
+html[data-zone] .ph .btn.ghost {
+  background: var(--soft);
+  color: var(--ink);
+  border: 0;
+}
+
+.btn.danger,
+.nb-qx {
+  background: #fadadd;
+  color: #8f1226;
+}
+
+.btn.light {
+  background: #fff;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .btn:hover:not([disabled]):not(.ghost):not(.danger):not(.light),
+  .nb-cta:hover {
+    background: #0a4636;
+    color: #fff;
+  }
+
+  .btn.ghost:hover:not([disabled]),
+  .nb-ghost:hover,
+  .ph .btn.ghost:hover:not([disabled]),
+  .band-hero .btn.ghost:hover:not([disabled]),
+  .band-clock .btn.ghost:hover:not([disabled]) {
+    background: var(--soft-hover);
+    color: var(--ink);
+  }
+}
+
+/* ---------- navigasi, banner, merek, kaki ---------- */
+.nb {
+  background: rgb(243 247 244 / 94%);
+  color: var(--ink);
+}
+
+.nb-links a {
+  color: var(--ink);
+}
+
+.nb-links a[aria-current='page'] {
+  background: var(--tint);
+}
+
+.nb-demo {
+  background: var(--tint-2);
+  color: var(--ink);
+}
+
+.footer {
+  background: var(--tint);
+  color: var(--ink-2);
+  margin-top: clamp(3rem, 7vw, 6rem);
+}
+
+.footer a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer a:hover {
+  background: #0e5a45;
+  color: #fff;
+}
+
+/* ---------- tautan teks ---------- */
+main a:not([class]),
+.rj-links a,
+.small a {
+  color: #0e5a45;
+}
+
+.ph a:not(.btn),
+.band-hero a:not(.btn),
+.band-clock a:not(.btn) {
+  color: #0e5a45;
+}
+
+/* ---------- kolom isian ---------- */
+input,
+select,
+textarea {
+  background: #fff;
+  color: var(--ink);
+  border-color: #5f7a6d;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #566c62;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: #fff;
+}
+
+/* ---------- kartu: putih di atas putih kehijauan ---------- */
+.card,
+.receipt,
+.cal,
+.hasil-card,
+details.fold,
+.assist {
+  background: #fff;
+}
+
+tbody tr:nth-child(even) > * {
+  background: rgb(221 235 227 / 55%);
+}
+
+thead th {
+  background: var(--tint);
+}
+
+/* ---------- kepala halaman dalam: tanpa panel, tipografi yang bekerja ---------- */
+.ph,
+html[data-zone] .ph {
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0;
+  margin: 0;
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(1.4rem, 3vw, 2.4rem);
+  border-bottom: 0;
+}
+
+.ph h1 {
+  color: var(--ink);
+  font-size: clamp(2.3rem, 6.2vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.ph .lede,
+.ph .muted,
+.ph > p {
+  color: var(--ink-2);
+}
+
+.ph::before,
+html[data-zone] .ph:not([data-tab])::before {
+  background: var(--tint);
+  color: #0e5a45;
+}
+
+/* ---------- beranda: hero ---------- */
+.band-hero {
+  background: var(--paper);
+  color: var(--ink);
+  padding-block: clamp(2.5rem, 6vw, 5rem) clamp(3rem, 7vw, 6rem);
+}
+
+.band-hero .hero-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: end;
+}
+
+@media (width >= 62em) {
+  .band-hero .hero-top {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  }
+}
+
+.band-hero h1 {
+  color: var(--ink);
+  font-size: clamp(3rem, 9vw, 6.8rem);
+  line-height: 0.93;
+  letter-spacing: -0.045em;
+  max-width: 10ch;
+}
+
+.band-hero .sub {
+  color: var(--ink-2);
+}
+
+.orb-sun {
+  background: var(--tint);
+}
+
+.orb-ring {
+  display: none;
+}
+
+.receipt {
+  background: #fff;
+}
+
+.rc-stamp {
+  color: #0e5a45;
+}
+
+/* ---------- beranda: pemilih peran sebagai blok hijau muda berbulatan besar ---------- */
+.chooser .panel {
+  background: var(--tint);
+  color: var(--ink);
+}
+
+.chooser .tabs {
+  background: transparent;
+}
+
+/* ---------- beranda: jam tenggat sebagai momen utama ---------- */
+.band-clock {
+  background: var(--tint);
+  color: var(--ink);
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.band-clock h2,
+.band-clock .clock-copy,
+.band-clock .clock-copy p,
+.band-clock .label,
+.band-clock .lamps,
+.band-clock .lamps li,
+.band-clock .small {
+  color: var(--ink);
+}
+
+.band-clock h2 {
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.band-clock .lamps li > span:last-child,
+.band-clock .lamps small {
+  color: var(--ink-2);
+}
+
+.band-clock .slider {
+  accent-color: #0e5a45;
+}
+
+.band-clock .cal {
+  background: #fff;
+  color: var(--ink);
+}
+
+/* ---------- penutup: blok madu ---------- */
+.next {
+  background: var(--madu-lembut);
+  color: var(--ink);
+}
+
+/* ---------- veil dan status tetap fungsional ---------- */
+.verify {
+  background: transparent;
+}
+
+html[data-zone='demo'] .ph,
+html[data-zone='demo'] .ph .lede {
+  color: var(--ink-2);
+}
+
+html[data-zone='demo'] .ph h1 {
+  color: var(--ink);
+}
+
+/* ---------- amplop bukti ---------- */
+.drop.envelope {
+  background: var(--tint-2);
+  color: var(--ink);
+}
+
+.drop.envelope .env-flap {
+  background: var(--tint);
+}
+
+.drop.envelope .env-text,
+.drop.envelope .env-text small {
+  color: var(--ink);
+}
+
+/* ---------- jam tenggat: salinan dan kalender berdampingan, tiga lampu satu baris ---------- */
+@media (width >= 62em) {
+  .band-clock .clock {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    padding-block: 0;
+  }
+
+  .band-clock .lamps {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 0.5rem;
+  }
+}
+
+.cal-day {
+  background: var(--paper);
+}
+
+.cal-day[data-past='true'] {
+  background: var(--tint-2);
+}
+
+.cal-day[data-past='true'][style] {
+  background: var(--lv);
+}

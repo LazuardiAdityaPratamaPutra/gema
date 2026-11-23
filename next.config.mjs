@@ -4,6 +4,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: { qualities: [60, 70, 75, 78] },
+  devIndicators: false, // lencana alat pengembang Next (tampil acak karena CSP nonce)
   async headers() {
     return [
       {
