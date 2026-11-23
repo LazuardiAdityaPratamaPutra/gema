@@ -2,7 +2,7 @@
 
 <img src="public/logo/gema-logo.svg" alt="Gema" height="76" />
 
-# Simpan bukti dulu. Putuskan melapor nanti.
+# Ceritamu aman. Penanganannya terpantau.
 
 **Platform web bagi penyintas kekerasan seksual di perguruan tinggi, dan bagi Satgas PPKPT yang menanganinya.**
 Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
@@ -44,28 +44,27 @@ Gema punya tiga pihak: **penyintas** yang menyimpan bukti, **Satgas** kampus yan
 ### 1. Perjalanan penyintas
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','secondaryColor':'#FFF1D6','tertiaryColor':'#F4F8F5'}}}%%
 flowchart TD
-    A([Buka Gema]) --> B{Sudah punya<br/>brankas?}
+    A[Buka Gema] --> B{Sudah punya<br/>brankas?}
     B -- Belum --> C[Buat brankas<br/>Kode Kasus + 6 kata<br/>dibuat di perangkat]
     B -- Sudah --> D[Masuk dengan kode,<br/>kata sandi, atau passkey]
-    C --> E
-    D --> E[Brankasmu]
-    A -. ragu .-> P[Pahami dulu<br/>cerita dicocokkan dengan<br/>Permendikbudristek 55/2024]
+    C --> E[Brankasmu]
+    D --> E
+    A -.->|ragu| P[Pahami dulu<br/>cerita dicocokkan dengan<br/>Permendikbudristek 55/2024]
     P --> C
     E --> F[Laporan baru, 3 langkah:<br/>siapa dan di mana, kejadian dan bukti<br/>boleh bicara saja, lalu tinjau dan kunci]
-    F --> G[(Terkunci di perangkat<br/>lalu dikirim terenkripsi)]
+    F --> G[Terkunci di perangkat<br/>lalu dikirim terenkripsi]
     G --> H{Ada laporan lain<br/>tentang terlapor yang sama?}
     H -- Belum --> I[Tetap tersimpan,<br/>tambah bukti kapan saja]
-    H -- Ya, sudah k laporan --> J[Pemberitahuan pola<br/>tanpa identitas siapa pun]
-    I --> K
-    J --> K{Pilihan penyintas}
+    H -- Ya --> J[Pemberitahuan pola<br/>tanpa identitas siapa pun]
+    I --> K{Pilihan penyintas}
+    J --> K
     K --> L[Eskalasi sekarang<br/>sendiri atau bersama]
     K --> M[Eskalasi bersyarat<br/>otomatis bila 2 sampai 5<br/>pelapor cocok]
     K --> N[Simpan saja]
-    L --> O([Satgas menangani])
+    L --> O[Satgas menangani]
     M --> O
-    O -. selama belum dibuka .-> Q[Tarik eskalasi]
+    O -.->|selama belum dibuka| Q[Tarik eskalasi]
     Q --> E
 ```
 
@@ -78,7 +77,6 @@ Beberapa hal yang sengaja dibuat begitu:
 ### 2. Dari penyimpanan sampai eskalasi
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','actorBkg':'#E3F0E8','actorBorder':'#0E5A45','noteBkgColor':'#FFF1D6','noteTextColor':'#0F2D24'}}}%%
 sequenceDiagram
     autonumber
     actor P as Penyintas
@@ -105,26 +103,18 @@ sequenceDiagram
 
 ### 3. Penanganan oleh Satgas
 
-Setiap kasus melewati lima status, dan hanya boleh maju satu langkah. Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Ambang T2 dan T3 di bawah adalah nilai bawaan dan bisa diatur per kampus.
+Setiap kasus melewati lima status, dan hanya boleh maju satu langkah (Tindak_lanjut berarti tindak lanjut pimpinan). Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Kalau tenggat terlewat, naik ke T1 Ketua Satgas; lalu T2 Pimpinan (terlambat 3 hari kerja); lalu T3 LLDIKTI, hanya agregat (10 hari kerja). Ambang T2 dan T3 adalah nilai bawaan dan bisa diatur per kampus.
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#E3F0E8','primaryBorderColor':'#0E5A45','primaryTextColor':'#0F2D24','lineColor':'#0E5A45','noteBkgColor':'#FFF1D6','noteTextColor':'#0F2D24'}}}%%
 stateDiagram-v2
     direction LR
-    state "Tindak lanjut pimpinan" as TindakLanjut
     [*] --> Diterima: eskalasi
     Diterima --> Verifikasi
     Verifikasi --> Rekomendasi
-    Rekomendasi --> TindakLanjut
-    TindakLanjut --> Selesai
+    Rekomendasi --> Tindak_lanjut
+    Tindak_lanjut --> Selesai
     Selesai --> [*]
 
-    note right of Diterima
-        Lewat tenggat:
-        T1 Ketua Satgas
-        T2 Pimpinan (3 hari kerja terlambat)
-        T3 LLDIKTI, hanya agregat (10 hari kerja)
-    end note
 ```
 
 | Peran    | Yang bisa dilakukan                                                                                     |
