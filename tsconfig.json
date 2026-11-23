@@ -20,10 +20,9 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
-      "@gema/*": ["packages/*/index.ts"],
-      "@/*": ["src/*"]
+      "@gema/*": ["./packages/*/index.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
