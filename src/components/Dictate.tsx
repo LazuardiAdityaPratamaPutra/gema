@@ -1,6 +1,14 @@
 'use client';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { asrSupported, startRecording, toPcm16k, transcribe, type Recorder } from '@/lib/asr';
+import { describeAsrError, canDictateNow } from '@/lib/asr-config';
+import {
+  asrSupported,
+  modelCached,
+  startRecording,
+  toPcm16k,
+  transcribe,
+  type Recorder,
+} from '@/lib/asr';
 import { island } from '@/lib/island-bus';
 
 type St = 'idle' | 'rec' | 'load' | 'work' | 'err';
@@ -33,6 +41,11 @@ export function Dictate({
 
   async function start() {
     setMsg('');
+    if (!canDictateNow(navigator.onLine, navigator.onLine || (await modelCached()))) {
+      setSt('err');
+      setMsg(describeAsrError('', false));
+      return;
+    }
     try {
       rec.current = await startRecording();
       setSecs(0);
@@ -71,16 +84,20 @@ export function Dictate({
     } catch (e) {
       island.clear();
       setSt('err');
-      setMsg(
-        `Pengenal suara gagal dimuat${e instanceof Error && e.message ? ` (${e.message.slice(0, 80)})` : ''}. Kamu tetap bisa mengetik.`,
-      );
+      setMsg(describeAsrError(e instanceof Error ? e.message : String(e), navigator.onLine));
     }
   }
   const busy = st === 'load' || st === 'work';
   return (
     <div className="dictate">
       {st !== 'rec' ? (
-        <button type="button" className="btn ghost sm mic" onClick={start} disabled={busy}>
+        <button
+          type="button"
+          className="btn ghost sm mic"
+          onClick={start}
+          disabled={busy}
+          aria-busy={busy}
+        >
           <span className="mic-dot" aria-hidden="true" />
           {busy ? 'Memproses…' : label}
         </button>
@@ -92,7 +109,7 @@ export function Dictate({
       )}
       <p className="small muted m-0" role="status" aria-live="polite">
         {msg ||
-          'Suaramu diubah jadi teks di perangkat ini dan tidak dikirim ke mana pun. Pertama kali, model sekitar 80 MB diunduh sekali.'}
+          'Suaramu diubah jadi teks di perangkat ini dan tidak dikirim ke mana pun. Pertama kali, model pengenal suara diunduh sekali dan butuh koneksi.'}
       </p>
     </div>
   );

@@ -32,6 +32,8 @@ export type Draft = {
   step: number;
   savedAt: number;
   relasi?: string;
+  /** Nama dan ukuran berkas yang pernah dipilih. Isinya tidak disimpan, jadi harus dipilih ulang. */
+  fileMeta?: { nama: string; size: number }[];
 };
 
 function open(): Promise<IDBDatabase> {

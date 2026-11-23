@@ -85,8 +85,9 @@ export default function Panduan() {
           </li>
           <li>
             <strong>Bicara saja</strong>: suara diubah jadi teks oleh model Whisper yang berjalan di
-            peramban. Model (sekitar 80 MB) diunduh sekali dari Hugging Face atau server kampus;
-            rekamanmu tidak ikut terkirim.
+            peramban. Model pengenal suara perlu diunduh terlebih dahulu (dari Hugging Face atau
+            server kampus) dan dapat digunakan kembali ketika tersedia di perangkat; rekamanmu tidak
+            ikut terkirim.
           </li>
           <li>
             <strong>Pengingat kronologi</strong>: pertanyaan lembut bila waktu, tempat, atau saksi
@@ -110,17 +111,25 @@ export default function Panduan() {
       <details className="fold" id="batas">
         <summary>
           <h2>Batas jujur</h2>
-          <span>7 batas</span>
+          <span>8 batas</span>
         </summary>
         <ul>
           <li>
-            <strong>Lupa kata sandi berarti isi hilang.</strong> Tidak ada pemulihan, dan itu
-            disengaja.
+            <strong>Isi laporan bisa mengungkap identitas.</strong> Cerita, dokumen, tangkapan
+            layar, tanggal, tempat, dan detail lain bisa menunjukkan siapa pelapor atau orang lain,
+            walau Gema tidak meminta nama, email, atau telepon. Periksa apa yang kamu tulis dan
+            unggah sebelum eskalasi, karena setelah itu Satgas dapat membacanya.
           </li>
           <li>
-            <strong>Keluar Cepat</strong> menghapus data lokal dan mengalihkan halaman. Ia tidak
-            menghapus riwayat peramban yang sudah merekam kunjungan ke situs ini. Gunakan jendela
-            privat bila perangkat dipakai bersama.
+            <strong>Lupa kata sandi berarti isi hilang.</strong> Tidak ada tombol &ldquo;lupa
+            sandi&rdquo; yang bisa dipakai siapa saja, dan itu disengaja. Satu-satunya jalan adalah
+            pemulihan lewat dua orang tepercaya yang harus kamu siapkan sebelumnya di Pengaturan.
+          </li>
+          <li>
+            <strong>Keluar Cepat</strong> menghapus draf dan sesi di perangkat ini lalu mengalihkan
+            halaman. Laporan yang sudah tersimpan tetap aman di brankas. Ia tidak menghapus riwayat
+            peramban yang sudah merekam kunjungan ke situs ini. Gunakan jendela privat bila
+            perangkat dipakai bersama.
           </li>
           <li>
             <strong>Pencocokan hanya sebaik nama yang ditulis.</strong> Ejaan yang sangat berbeda
@@ -148,11 +157,12 @@ export default function Panduan() {
       <NextStep
         title="Sudah cukup jelas?"
         acts={[
-          { href: '/mulai', label: 'Buat brankas anonim' },
+          { href: '/mulai', label: 'Buat brankas tanpa nama' },
           { href: '/pahami', label: 'Pahami dulu', ghost: true },
         ]}
       >
-        Kamu bisa mulai tanpa nama, dan menghapus semuanya dengan Keluar cepat.
+        Kamu bisa mulai tanpa nama. Keluar cepat menghapus draf dan sesi di perangkat ini, tetapi
+        tidak riwayat peramban.
       </NextStep>
     </div>
   );

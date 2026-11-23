@@ -138,6 +138,9 @@ export type Escalation = {
   tingkat_tangga: 0 | 1 | 2 | 3;
   opened_at: number | null;
   selesai_at: number | null;
+  /** anggota Satgas yang bertanggung jawab atas kasus (ditetapkan Ketua); null = belum ditugaskan */
+  assignee_id?: string | null;
+  assigned_at?: number | null;
 };
 
 export type CaseEvent = {

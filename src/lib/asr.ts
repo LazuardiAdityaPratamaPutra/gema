@@ -1,6 +1,8 @@
 'use client';
 /** Merekam suara dan mengubahnya menjadi teks sepenuhnya di perangkat (Whisper di Web Worker). */
 
+import { ASR_MODEL } from './asr-config';
+
 export type AsrEvent =
   | { type: 'progress'; loaded: number; total: number }
   | { type: 'ready' }
@@ -47,6 +49,18 @@ export function transcribe(audio: Float32Array, on: (e: AsrEvent) => void): Prom
     w.addEventListener('message', h);
     w.postMessage({ type: 'run', audio }, [audio.buffer]);
   });
+}
+
+/** Apakah berkas model sudah ada di cache peramban (artinya dikte bisa jalan tanpa internet). */
+export async function modelCached(): Promise<boolean> {
+  try {
+    if (typeof caches === 'undefined' || !(await caches.has('transformers-cache'))) return false;
+    const c = await caches.open('transformers-cache');
+    const keys = await c.keys();
+    return keys.some((k) => k.url.includes(ASR_MODEL) && k.url.endsWith('.onnx'));
+  } catch {
+    return false;
+  }
 }
 
 export type Recorder = { stop: () => Promise<Blob>; cancel: () => void };

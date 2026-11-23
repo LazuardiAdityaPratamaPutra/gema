@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { satgasStore, type SatgasSession } from '@/lib/store';
+import { clearLockNote, useLockNote } from '@/lib/lock-note';
 
 export default function SatgasMasuk() {
   const router = useRouter();
+  const locked = useLockNote();
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
@@ -19,6 +21,7 @@ export default function SatgasMasuk() {
     try {
       const r = await api<SatgasSession>('satgas/login', { body: { email, password: pw } });
       satgasStore.set(r);
+      clearLockNote();
       router.push(
         r.member.role === 'Auditor'
           ? '/satgas/audit'
@@ -37,6 +40,11 @@ export default function SatgasMasuk() {
         <h1>Masuk Satgas</h1>
         <p className="lede">Dosir hanya terbuka setelah penyintas memilih eskalasi.</p>
       </header>
+      {locked && (
+        <p className="card tint small" role="status">
+          Layar dikunci karena lama tidak aktif. Masuk lagi untuk melanjutkan.
+        </p>
+      )}
       <form onSubmit={go}>
         <div className="field">
           <label htmlFor="e">Email</label>
@@ -73,7 +81,7 @@ export default function SatgasMasuk() {
             {err}
           </p>
         )}
-        <button className="btn teal" disabled={busy || !email || !pw}>
+        <button className="btn teal" disabled={busy || !email || !pw} aria-busy={busy}>
           {busy ? 'Masuk…' : 'Masuk'}
         </button>
       </form>

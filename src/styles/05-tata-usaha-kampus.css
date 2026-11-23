@@ -309,7 +309,7 @@ html[data-zone='demo'] .ph {
   font: 600 0.62rem var(--sans);
 }
 
-@media (width <= 980px) {
+@media (width <= 61.25em) {
   .rc-folder {
     display: none;
   }
@@ -351,7 +351,7 @@ html[data-zone='demo'] .ph {
   display: block;
 }
 
-@media (width <= 800px) {
+@media (width <= 50em) {
   .tabs {
     border-bottom: 0;
   }
@@ -541,7 +541,7 @@ html[data-zone='demo'] .ph {
   font-size: 0.9rem;
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .clock {
     grid-template-columns: 1fr;
     grid-template-areas: 'copy' 'cal' 'lamps';
@@ -552,7 +552,7 @@ html[data-zone='demo'] .ph {
   }
 }
 
-@media (width <= 420px) {
+@media (width <= 26.25em) {
   .cal {
     padding: 0.8rem;
   }
@@ -655,7 +655,7 @@ html[data-zone='demo'] .ph {
   border-color: var(--ink-2);
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .file {
     grid-template-columns: 1fr;
   }

@@ -4,6 +4,7 @@ import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
 import { fmtDateTime, shortHash } from '@/lib/format';
+import { LoadError } from '@/components/LoadError';
 
 type Entry = {
   id: string;
@@ -45,11 +46,7 @@ export default function Audit() {
           satu entri lama akan memutus rantai.
         </p>
       </header>
-      {err && (
-        <p className="err" role="alert">
-          {err}
-        </p>
-      )}
+      {err && <LoadError what="jejak audit" message={err} />}
       {e && (
         <p className={`card ${broken ? 'alert' : 'tint'}`} role="status">
           {broken
@@ -57,7 +54,13 @@ export default function Audit() {
             : `Rantai utuh pada ${e.entries.length} entri terakhir dari ${e.total}.`}
         </p>
       )}
-      <div className="tablewrap card" style={{ padding: 0, marginTop: '1rem' }}>
+      <div
+        className="tablewrap card"
+        style={{ padding: 0, marginTop: '1rem' }}
+        role="region"
+        aria-label="Entri jejak audit"
+        tabIndex={0}
+      >
         <table>
           <caption className="sr">Entri jejak audit</caption>
           <thead>

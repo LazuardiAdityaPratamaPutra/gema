@@ -6,6 +6,7 @@ import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
 import { fmtDate, fmtDateTime } from '@/lib/format';
 import type { SlaView } from '@/lib/vault-client';
+import { LoadError } from '@/components/LoadError';
 
 type Case = {
   id: string;
@@ -14,6 +15,7 @@ type Case = {
   status: string;
   escalatedAt: number;
   prioritas?: boolean;
+  penanggungJawab?: string | null;
   sumber?: string;
   unit?: string;
   cluster?: { total: number; tereskalasi: number; tersegel: number };
@@ -69,11 +71,7 @@ export default function Kasus() {
         <SatgasBar s={session} />
         <h1>{session.member.role === 'Pengawas' ? 'Pengawasan' : 'Kasus tereskalasi'}</h1>
       </header>
-      {err && (
-        <p className="err" role="alert">
-          {err}
-        </p>
-      )}
+      {err && <LoadError what="daftar kasus" message={err} />}
       {waiting.length > 0 && session && (
         <section className="card alert my-md" aria-labelledby="menunggu">
           <h2 className="title-sm" id="menunggu">
@@ -158,13 +156,20 @@ export default function Kasus() {
           );
         })()}
       {cases && (
-        <div className="tablewrap card" style={{ padding: 0, marginTop: '1rem' }}>
-          <table>
+        <div
+          className="tablewrap card"
+          style={{ padding: 0, marginTop: '1rem' }}
+          role="region"
+          aria-label="Daftar kasus tereskalasi"
+          tabIndex={0}
+        >
+          <table data-row-title>
             <caption className="sr">Daftar kasus tereskalasi</caption>
             <thead>
               <tr>
                 <th scope="col">Kasus</th>
                 <th scope="col">Status</th>
+                <th scope="col">Penanggung jawab</th>
                 <th scope="col">Tenggat</th>
                 {session.member.role !== 'Pimpinan' && <th scope="col">Pola</th>}
                 <th scope="col">
@@ -186,6 +191,7 @@ export default function Kasus() {
                     {c.unit && <div className="muted small">{c.unit}</div>}
                   </td>
                   <td>{c.status}</td>
+                  <td>{c.penanggungJawab ?? <span className="muted">Belum ditugaskan</span>}</td>
                   <td>
                     {fmtDate(c.sla.due)}{' '}
                     {c.sla.terlambat ? (
@@ -212,7 +218,7 @@ export default function Kasus() {
               ))}
               {cases.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="muted">
+                  <td colSpan={6} className="muted">
                     Belum ada kasus. Penyintas yang memilih eskalasi akan muncul di sini.
                   </td>
                 </tr>

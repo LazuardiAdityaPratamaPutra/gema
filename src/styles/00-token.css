@@ -58,6 +58,35 @@
   --sans: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+  /* Skala radius: input dan tombol kecil, kartu, panel besar, pil */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  /* Skala tipe isi: teks bantu, label, isi, pembuka */
+  --t-xs: 0.8rem;
+  --t-sm: 0.9rem;
+  --t-label: 0.95rem;
+  --t-md: 1.0625rem;
+  --t-lg: 1.2rem;
+
+  /* Skala judul di dalam halaman (judul pita dan hero punya ukuran sendiri) */
+  --h-feature: clamp(1.7rem, 3vw + 0.6rem, 3rem);
+  --h-block: clamp(1.4rem, 1.4vw + 1rem, 1.7rem);
+  --h-card: 1.3rem;
+  --h-sub: 1.0625rem;
+
+  /* Tinggi kontrol: dua ukuran saja. Utama 52, biasa 44 (sasaran sentuh minimum) */
+  --ctl-lg: 52px;
+  --ctl: 44px;
+
+  /* Ritme jarak */
+  --gap-card: 1.25rem;
+  --gap-section: clamp(2.5rem, 6vw, 4.5rem);
+  --measure: 65ch;
+  --measure-wide: 62ch;
+
   /* Tata letak */
   --nb-h: 64px;
   color-scheme: light;

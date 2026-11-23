@@ -31,12 +31,9 @@
   margin-block: 2rem !important;
 }
 
-.title-sm {
-  font-size: 1.25rem !important;
-}
-
+.title-sm,
 .title-md {
-  font-size: 1.4rem !important;
+  font-size: var(--h-card) !important;
 }
 
 .row-between {

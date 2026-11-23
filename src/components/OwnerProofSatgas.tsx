@@ -45,8 +45,8 @@ export function OwnerProofSatgas({ session, caseId }: { session: SatgasSession; 
       <p>
         Bila seseorang menghubungimu mengaku sebagai pelapor kasus ini, buat tantangan lalu kirim
         lewat jalur kontaknya. Pelapor membalas dengan bukti dari brankasnya. Hasilnya hanya
-        &quot;sah&quot; atau &quot;tidak sah&quot;; identitasnya tetap anonim. Tantangan berlaku 15
-        menit dan sekali pakai.
+        &quot;sah&quot; atau &quot;tidak sah&quot;; pemeriksaan ini tidak membuka identitas pelapor.
+        Tantangan berlaku 15 menit dan sekali pakai.
       </p>
       <button className="btn ghost" onClick={() => void ask()}>
         Buat tantangan

@@ -32,7 +32,10 @@ export function EvidenceCheck() {
       setRes({
         kind: v.summary === 'cocok' ? 'ok' : 'bad',
         title: v.summary === 'cocok' ? 'Utuh dan tercatat' : 'Tidak cocok',
-        detail: v.detail,
+        detail:
+          v.summary === 'cocok'
+            ? v.detail
+            : `${v.detail} Ini belum berarti buktimu hilang: mungkin berkas yang dipilih bukan versi aslinya, atau isinya memang berubah. Catatan di Gema tidak terpengaruh.`,
         id: r.proof.evidenceId,
       });
     } catch (e) {

@@ -34,6 +34,7 @@ import { AAD, AAD_CATATAN, VAULT_SIZE } from '@/lib/report-format';
 import { buildReport } from '@/lib/report-build';
 import { blobWrite, secretSeed } from './db';
 import { audit, sealAnchors, tick } from './logic';
+import { demoEnabled } from './demo-flag';
 import type { DB, Report, Escalation } from './types';
 import { DAY, addBusinessDays, uid } from './util';
 import type { Relasi } from '@gema/pendamping';
@@ -124,7 +125,10 @@ export async function seedDemo(db: DB) {
       email: m.email,
       nama: m.nama,
       role: m.role,
-      pass_hash: hashPassword(DEMO_PASSWORD),
+      // kata sandi publik hanya bila demo aktif; selain itu acak sehingga tidak ada kredensial yang diketahui umum
+      pass_hash: hashPassword(
+        demoEnabled() ? DEMO_PASSWORD : crypto.randomBytes(18).toString('hex'),
+      ),
     };
   }
 

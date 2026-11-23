@@ -1,7 +1,7 @@
 import { fromB64u } from '@gema/crypto';
 import { DEMO_ACCOUNTS, DEMO_INSTITUTION_ID, DEMO_MEMBERS, DEMO_PASSWORD } from '@/lib/demo';
 import { MAX_FILE } from '@/lib/report-format';
-import { blobRead, blobWrite, getDb, persist, resetDb } from './db';
+import { blobRead, blobWrite, flush, getDb, loadedDb, persist, resetDb } from './db';
 import {
   advanceStatus,
   anchorProof,
@@ -54,7 +54,8 @@ import {
 } from './logic-satgas';
 import { checkPassword } from './seed';
 import { CASE_STATUSES, type CaseStatus, type DB, type SatgasRole } from './types';
-import { DAY, HttpError, uid } from './util';
+import { demoEnabled } from './demo-flag';
+import { DAY, HttpError, clientIpFrom, uid } from './util';
 
 type Ctx = { method: string; seg: string[]; req: Request; url: URL };
 
@@ -88,7 +89,10 @@ function satgasSession(req: Request, roles?: SatgasRole[]): Extract<Session, { k
 }
 
 const clientIp = (req: Request) =>
-  req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'lokal';
+  clientIpFrom(
+    req.headers.get('x-forwarded-for'),
+    Number(process.env.GEMA_TRUSTED_PROXIES ?? 1) || 1,
+  );
 
 function memberOf(db: DB, s: Extract<Session, { kind: 'satgas' }>) {
   const m = db.members[s.member_id];
@@ -195,8 +199,17 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
     }
     if (b === 'lookup' && c && method === 'GET') {
       if (!/^[0-9a-f]{64}$/.test(c)) throw new HttpError(400, 'Hash tidak valid');
+      if (!limiters.misc.check('lk:' + ipHash(clientIp(req)), 60, 60_000))
+        throw new HttpError(429, 'Terlalu cepat.');
+      // Pencarian lewat sidik hanya untuk bukti institusi demo. Pada institusi nyata ia akan menjadi
+      // "oracle keberadaan": siapa pun yang memegang salinan berkas (mis. terlapor) bisa memastikan
+      // berkas itu pernah disimpan. Pemeriksaan data nyata memakai sertifikat milik pelapor.
       const hits = Object.values(db.evidence)
-        .filter((e) => e.sha256_asli === c)
+        .filter(
+          (e) =>
+            e.sha256_asli === c &&
+            db.institutions[db.reports[e.report_id]?.institution_id ?? '']?.demo,
+        )
         .sort((x, y) => y.uploaded_at - x.uploaded_at);
       if (!hits.length) return json({ found: false });
       return json({ found: true, proof: anchorProof(db, hits[0].id) });
@@ -229,8 +242,11 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
   if (a === 'auth') {
     if (b === 'register' && method === 'POST')
       return json(registerReporter(db, (await body(req)) as never, clientIp(req)), 201);
-    if (b === 'login' && method === 'POST')
+    if (b === 'login' && method === 'POST') {
+      if (!limiters.misc.check('rl:' + ipHash(clientIp(req)), 120, 15 * 60_000))
+        throw new HttpError(429, 'Terlalu banyak percobaan dari jaringan ini. Coba lagi nanti.');
       return json(loginReporter(db, (await body(req)) as never));
+    }
     if (b === 'logout' && method === 'POST') {
       endSession(req.headers.get('authorization'));
       return json({ ok: true });
@@ -290,6 +306,9 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
       const rep = ev && db.reports[ev.report_id];
       if (!ev || !rep || rep.scope_id !== s.scope_id)
         throw new HttpError(404, 'Bukti tidak ditemukan');
+      // tolak lewat Content-Length sebelum membaca badan ke memori
+      const declared = Number(req.headers.get('content-length') ?? 0);
+      if (declared > MAX_FILE + 1024) throw new HttpError(413, 'Berkas melebihi 20 MB');
       const buf = new Uint8Array(await req.arrayBuffer());
       if (buf.length > MAX_FILE + 1024) throw new HttpError(413, 'Berkas melebihi 20 MB');
       if (buf.length < 28) throw new HttpError(400, 'Berkas terenkripsi tidak valid');
@@ -375,7 +394,7 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
         throw new HttpError(429, 'Terlalu banyak percobaan.');
       const x = await body<{ email?: string; password?: string; demoRole?: string }>(req);
       let m =
-        x.demoRole && process.env.GEMA_DEMO !== 'off'
+        x.demoRole && demoEnabled()
           ? Object.values(db.members).find(
               (mm) => mm.institution_id === DEMO_INSTITUTION_ID && mm.role === x.demoRole,
             )
@@ -422,6 +441,15 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
         now: nowFor(db, inst.id),
       });
 
+    if (b === 'team' && method === 'GET') {
+      satgasSession(req, ['Ketua']);
+      return json({
+        members: Object.values(db.members)
+          .filter((m) => m.institution_id === inst.id && ['Ketua', 'Anggota'].includes(m.role))
+          .map((m) => ({ id: m.id, nama: m.nama, role: m.role })),
+      });
+    }
+
     if (b === 'cases' && !c && method === 'GET') {
       if (!['Ketua', 'Anggota', 'Pimpinan'].includes(s.role))
         throw new HttpError(403, 'Peranmu tidak memiliki akses ke daftar kasus.');
@@ -442,8 +470,9 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
             status: e.status,
             escalatedAt: e.escalated_at,
             prioritas: !!e.prioritas,
+            penanggungJawab: e.assignee_id ? (db.members[e.assignee_id]?.nama ?? null) : null,
           };
-          if (s.role === 'Pimpinan') return base; // hanya status dan SLA
+          if (s.role === 'Pimpinan') return base; // hanya status, SLA, dan penanggung jawab
           return {
             ...base,
             sumber: e.sumber,
@@ -458,6 +487,48 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
     if (b === 'cases' && c) {
       const e = db.escalations[c];
       if (!e || e.institution_id !== inst.id) throw new HttpError(404, 'Kasus tidak ditemukan');
+      if (d === 'assign' && method === 'POST') {
+        satgasSession(req, ['Ketua']);
+        const x = await body<{ memberId?: string | null }>(req);
+        if (e.status === 'Selesai')
+          throw new HttpError(409, 'Kasus yang selesai tidak dapat ditugaskan.');
+        let target: (typeof db.members)[string] | undefined;
+        if (x.memberId) {
+          target = db.members[x.memberId];
+          if (
+            !target ||
+            target.institution_id !== inst.id ||
+            !['Ketua', 'Anggota'].includes(target.role)
+          )
+            throw new HttpError(
+              400,
+              'Penanggung jawab harus Ketua atau Anggota Satgas institusi ini.',
+            );
+        }
+        const now = nowFor(db, inst.id);
+        e.assignee_id = target?.id ?? null;
+        e.assigned_at = target ? now : null;
+        db.events.push({
+          id: uid(8),
+          escalation_id: e.id,
+          actor_role: s.role,
+          tipe: 'penugasan',
+          label: target
+            ? 'Kasus ditugaskan kepada seorang anggota Satgas.'
+            : 'Penugasan kasus dicabut.',
+          catatan_ciphertext: null,
+          at: now,
+        });
+        audit(
+          db,
+          `${s.role}:${me.nama}`,
+          target ? 'tugaskan-kasus' : 'cabut-penugasan',
+          `${e.alias}${target ? '>' + target.nama : ''}`,
+          now,
+        );
+        persist(db);
+        return json({ ok: true, penanggungJawab: target?.nama ?? null });
+      }
       if (d === 'status' && method === 'POST') {
         satgasSession(req, ['Ketua', 'Anggota', 'Pimpinan']);
         const x = await body<{ to: CaseStatus }>(req);
@@ -512,6 +583,8 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
             wrapped: e.dek_wrapped_satgas,
             institutionId: inst.id,
             prioritas: !!e.prioritas,
+            penanggungJawab: e.assignee_id ? (db.members[e.assignee_id]?.nama ?? null) : null,
+            penanggungJawabId: e.assignee_id ?? null,
           },
           sla: slaView(db, e),
           report: {
@@ -641,7 +714,7 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
 
   /* ---------- demo ---------- */
   if (a === 'demo') {
-    if (process.env.GEMA_DEMO === 'off') throw new HttpError(404, 'Mode Demo dinonaktifkan');
+    if (!demoEnabled()) throw new HttpError(404, 'Mode Demo dinonaktifkan');
     if (!limiters.misc.check('demo:' + ipHash(clientIp(req)), 60, 60_000))
       throw new HttpError(429, 'Terlalu cepat.');
     if (b === 'info' && method === 'GET')
@@ -669,6 +742,9 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
       return json({ sealed: !!a2, root: a2?.merkle_root ?? null, size: a2?.jumlah_hash ?? 0 });
     }
     if (b === 'reset' && method === 'POST') {
+      // pengaman: hanya boleh bila seluruh institusi di basis data ini fiktif
+      if (!Object.values(db.institutions).every((i) => i.demo))
+        throw new HttpError(403, 'Reset ditolak: basis data memuat institusi non-demo.');
       await resetDb();
       return json({ ok: true });
     }
@@ -701,7 +777,10 @@ export async function route({ method, seg, req, url }: Ctx): Promise<Response> {
 
 export async function handle(req: Request, method: string, seg: string[]): Promise<Response> {
   try {
-    return await route({ method, seg, req, url: new URL(req.url) });
+    const res = await route({ method, seg, req, url: new URL(req.url) });
+    // permintaan pengubah baru dijawab setelah datanya benar-benar ditulis (bukan hanya dijadwalkan)
+    if (method !== 'GET' && res.status < 400) await flush(loadedDb());
+    return res;
   } catch (e) {
     if (e instanceof HttpError) return json({ error: e.message }, e.status);
     console.error('[api]', e);

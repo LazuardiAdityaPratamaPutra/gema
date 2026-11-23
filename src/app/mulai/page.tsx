@@ -38,7 +38,8 @@ export default function Mulai() {
         <h1>Kode dan kata sandimu</h1>
         <p className="lede">
           Ini satu-satunya kunci brankasmu. Dibuat di perangkat ini, tidak dikirim ke mana pun dalam
-          bentuk asli. Bila hilang, tidak ada yang bisa memulihkannya, termasuk kami.
+          bentuk asli. Bila hilang, kami tidak bisa memulihkannya. Kamu bisa menyiapkan pemulihan
+          lewat dua orang tepercaya di Pengaturan setelah masuk.
         </p>
       </header>
 
@@ -120,7 +121,13 @@ export default function Mulai() {
           {error}
         </p>
       )}
-      <button className="btn teal" type="button" disabled={!saved || busy || !cred} onClick={go}>
+      <button
+        className="btn teal"
+        type="button"
+        disabled={!saved || busy || !cred}
+        aria-busy={busy}
+        onClick={go}
+      >
         {busy ? 'Membuat brankas…' : 'Buat brankas'}
       </button>
       {busy && (

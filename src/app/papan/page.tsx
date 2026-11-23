@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { NextStep } from '@/components/NextStep';
+import { LoadError } from '@/components/LoadError';
 
 type Row = {
   id: string;
@@ -36,11 +37,7 @@ export default function Papan() {
           dengan kasus terlalu sedikit tidak ditampilkan.
         </p>
       </header>
-      {error && (
-        <p className="err" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <LoadError what="papan kampus" message={error} />}
       {!rows && !error && <p role="status">Memuat…</p>}
       <div className="grid g2 mt-lg">
         {rows?.map((r) => (
@@ -54,7 +51,12 @@ export default function Papan() {
             <p className="muted small">
               {r.kota}, ε = {r.epsilon}
             </p>
-            <div className="tablewrap">
+            <div
+              className="tablewrap"
+              role="region"
+              aria-label={`Kepatuhan tenggat per kuartal, ${r.nama}`}
+              tabIndex={0}
+            >
               <table className="keep">
                 <caption className="sr">Kepatuhan tenggat per kuartal, {r.nama}</caption>
                 <thead>

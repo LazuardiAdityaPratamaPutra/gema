@@ -5,11 +5,14 @@
   margin: 0 0 0.6rem;
   padding: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem;
 }
 
 .rujukan li {
   display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
   gap: 0.15rem;
   padding: 0.75rem 0.9rem;
   border-radius: 14px;
@@ -319,7 +322,7 @@ fieldset.relasi {
   align-items: start;
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .ph-grid {
     grid-template-columns: 1fr;
   }
@@ -416,7 +419,7 @@ fieldset.relasi {
   margin-top: 2.5rem;
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .hasil {
     position: static;
   }
@@ -467,7 +470,7 @@ fieldset.relasi {
   gap: 1.4rem;
 }
 
-@media (width <= 760px) {
+@media (width <= 47.5em) {
   .assist-grid {
     grid-template-columns: 1fr;
   }

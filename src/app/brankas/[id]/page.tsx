@@ -27,6 +27,9 @@ import {
   triggerDownload,
 } from '@/lib/proof';
 import { fmtBytes, fmtDate, fmtDateTime, shortHash } from '@/lib/format';
+import { Term } from '@/components/Term';
+import { LoadError } from '@/components/LoadError';
+import { VeilBar } from '@/components/Veil';
 
 type Plain = { dek: Uint8Array; narasi: Narasi; meta: BuktiMeta };
 type Loaded = 'hilang' | { report: ReportView; plain: Plain; inst: InstitutionInfo | null };
@@ -78,19 +81,35 @@ function Detail() {
       .catch((e) => setMsg(e.message));
   }, [session, id, apply]);
 
+  if (session && !r && msg)
+    return (
+      <div className="narrow">
+        <LoadError
+          what="laporan ini"
+          message={msg}
+          onRetry={() => {
+            setMsg('');
+            fetchReport(session, id)
+              .then(apply)
+              .catch((e) => setMsg(e.message));
+          }}
+        />
+      </div>
+    );
   if (!session || !r || !plain)
     return (
       <div className="narrow">
-        <p role="status">{msg || 'Membuka laporan…'}</p>
+        <p role="status">Membuka laporan…</p>
       </div>
     );
-  const act = async (fn: () => Promise<unknown>, ok: string) => {
+  const act = async (fn: () => Promise<unknown>, ok: string, onDone?: () => void) => {
     setBusy(true);
     setMsg('');
     try {
       await fn();
       await load();
       setMsg(ok);
+      onDone?.();
     } catch (e) {
       setMsg(e instanceof Error ? e.message : 'Gagal.');
     }
@@ -146,7 +165,7 @@ function Detail() {
       )}
 
       {r.match.notify && (
-        <section className="card tint my-lg" aria-labelledby="pola">
+        <section className="card my-lg" aria-labelledby="pola">
           <h2 className="title-md" id="pola">
             Ada pola yang cocok
           </h2>
@@ -155,6 +174,11 @@ function Detail() {
             {r.match.size} laporan, keyakinan <strong>{r.match.confidence}</strong>
             {r.match.weak ? `, ${r.match.weak} kecocokan lemah` : ''}). Kamu tidak melihat siapa
             mereka, dan mereka tidak melihatmu.
+          </p>
+          <p className="small muted">
+            Keyakinan menunjukkan seberapa banyak penanda yang sama (nama terlapor, ditambah peran,
+            periode, atau tempat bila diisi). Ini petunjuk, bukan kepastian dan bukan tuduhan, dan
+            tidak menunjukkan seberapa benar atau berat kejadiannya.
           </p>
           {r.match.flagFast && (
             <p className="small">
@@ -165,7 +189,8 @@ function Detail() {
         </section>
       )}
 
-      <section aria-labelledby="isi" className="card my-lg">
+      <VeilBar defaultOn what="Isi laporan dan bukti" />
+      <section aria-labelledby="isi" className="card my-lg sensitive">
         <h2 className="title-md" id="isi">
           Isi laporan
         </h2>
@@ -190,7 +215,7 @@ function Detail() {
         </dl>
       </section>
 
-      <section className="my-xl" aria-labelledby="bukti">
+      <section className="my-xl sensitive" aria-labelledby="bukti">
         <h2 className="title-md" id="bukti">
           Bukti dan sertifikat
         </h2>
@@ -202,7 +227,15 @@ function Detail() {
               <div className="row row-between">
                 <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{m?.nama ?? 'Berkas'}</h3>
                 <span className={`pill ${ev.anchored ? 'teal' : 'amber'}`}>
-                  {ev.anchored ? 'Akar harian terbit' : 'Menunggu akar harian'}
+                  {ev.anchored ? (
+                    <>
+                      <Term k="akar">Akar harian</Term> terbit
+                    </>
+                  ) : (
+                    <>
+                      Menunggu <Term k="akar">akar harian</Term>
+                    </>
+                  )}
                 </span>
               </div>
               <p className="small muted" style={{ margin: '.3rem 0 .6rem' }}>
@@ -261,23 +294,30 @@ function Detail() {
                 </li>
               ))}
             </ul>
-            <button
-              className="btn danger sm"
-              disabled={busy}
-              onClick={() =>
-                act(
-                  () =>
-                    api(`reports/${r.id}/withdraw`, {
-                      token: session.token,
-                      method: 'POST',
-                      body: {},
-                    }),
-                  'Eskalasi ditarik. Satgas tidak lagi dapat membuka isi.',
-                )
-              }
-            >
-              Tarik eskalasi
-            </button>
+            {r.escalation.opened ? (
+              <p className="small muted" role="status">
+                Satgas sudah membuka kasus ini, jadi persetujuan tidak dapat ditarik.
+              </p>
+            ) : (
+              <button
+                className="btn danger sm"
+                disabled={busy}
+                aria-busy={busy}
+                onClick={() =>
+                  act(
+                    () =>
+                      api(`reports/${r.id}/withdraw`, {
+                        token: session.token,
+                        method: 'POST',
+                        body: {},
+                      }),
+                    'Eskalasi ditarik. Satgas tidak lagi dapat membuka isi.',
+                  )
+                }
+              >
+                Tarik eskalasi
+              </button>
+            )}
             <OwnerProofReporter
               session={session}
               report={r}
@@ -289,7 +329,8 @@ function Detail() {
           <>
             <p>
               Eskalasi mengirim kunci laporan ke Satgas, terenkripsi untuk mereka saja. Setelah itu
-              tenggat berjalan dan kamu dapat memantaunya di sini. Kamu bisa menariknya kapan saja.
+              tenggat berjalan dan kamu dapat memantaunya di sini. Penarikan hanya dapat dilakukan
+              sebelum Satgas membuka kasus.
             </p>
             {r.match.notify && r.match.size && r.match.size > 1 && (
               <fieldset style={{ border: 0, padding: 0 }}>
@@ -327,23 +368,37 @@ function Detail() {
               </span>
             </label>
             {!confirmEsc ? (
-              <button className="btn teal" onClick={() => setConfirmEsc(true)}>
+              <button className="btn teal" disabled={busy} onClick={() => setConfirmEsc(true)}>
                 Eskalasi laporan ini
               </button>
             ) : (
               <div className="card warn">
-                <p>
-                  <strong>Pastikan.</strong> Satgas akan dapat membaca isi laporan dan buktimu.
-                  Identitas tetap anonim.
-                </p>
+                <h3 className="title-sm">Sebelum kamu mengeskalasi</h3>
+                <ul className="konfirmasi">
+                  <li>
+                    <strong>Siapa yang bisa membaca.</strong> Satgas akan dapat membaca isi laporan
+                    dan buktimu.
+                  </li>
+                  <li>
+                    <strong>Yang perlu kamu periksa.</strong> Gema tidak pernah meminta nama, email,
+                    atau nomor teleponmu, tetapi ceritamu dan buktimu bisa memuat petunjuk tentang
+                    siapa kamu. Periksa dulu isinya.
+                  </li>
+                  <li>
+                    <strong>Penarikan.</strong> Kamu bisa menarik eskalasi selama Satgas belum
+                    membuka kasusnya; setelah dibuka, tidak bisa ditarik.
+                  </li>
+                </ul>
                 <div className="row">
                   <button
                     className="btn teal"
                     disabled={busy || !inst}
+                    aria-busy={busy}
                     onClick={() =>
                       act(
                         () => escalateReport(session, r, plain.dek, inst!, mode, prioritas),
                         'Laporan dieskalasi. Tenggat berjalan.',
+                        () => setConfirmEsc(false),
                       )
                     }
                   >
@@ -367,6 +422,7 @@ function Detail() {
                   <button
                     className="btn ghost sm"
                     disabled={busy}
+                    aria-busy={busy}
                     onClick={() =>
                       act(
                         () => clearConditionalEscalation(session, r),
@@ -403,6 +459,7 @@ function Detail() {
                   <button
                     className="btn ghost"
                     disabled={busy || !inst}
+                    aria-busy={busy}
                     onClick={() =>
                       act(async () => {
                         const res = await setConditionalEscalation(
@@ -476,7 +533,12 @@ function Detail() {
         </label>
         <hr />
         {!confirmDel ? (
-          <button className="btn danger sm" disabled={busy} onClick={() => setConfirmDel(true)}>
+          <button
+            className="btn danger sm"
+            disabled={busy}
+            aria-busy={busy}
+            onClick={() => setConfirmDel(true)}
+          >
             Hapus laporan selamanya
           </button>
         ) : (
@@ -489,6 +551,7 @@ function Detail() {
               <button
                 className="btn danger"
                 disabled={busy}
+                aria-busy={busy}
                 onClick={() =>
                   void act(async () => {
                     await api(`reports/${r.id}`, { method: 'DELETE', token: session.token });

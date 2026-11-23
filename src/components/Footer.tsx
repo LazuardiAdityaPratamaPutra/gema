@@ -10,6 +10,7 @@ export function Footer() {
         <nav aria-label="Tautan kaki">
           <Link href="/panduan#bantuan">Bantuan segera</Link>
           <Link href="/panduan#batas">Batas jujur</Link>
+          <Link href="/bukti-teknis">Bukti teknis</Link>
           <Link href="/satgas/masuk">Masuk Satgas</Link>
         </nav>
       </div>

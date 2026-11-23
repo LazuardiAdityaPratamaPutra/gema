@@ -1,6 +1,6 @@
 /* Brankasmu, panduan, bagian lipat */
 /* tabel papan tetap tabel di mobile */
-@media (width <= 640px) {
+@media (width <= 40em) {
   table.keep th,
   table.keep td {
     padding: 0.6rem 0.45rem;
@@ -207,7 +207,7 @@ details.fold li {
   color: var(--ink-2);
 }
 
-@media (width <= 860px) {
+@media (width <= 53.75em) {
   .file {
     gap: 0.8rem;
   }
@@ -236,7 +236,7 @@ details.fold li {
   }
 }
 
-@media (width <= 640px) {
+@media (width <= 40em) {
   .vault .ph-row > .row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -384,7 +384,7 @@ details.fold li {
   color: var(--ink-2);
 }
 
-@media (width <= 420px) {
+@media (width <= 26.25em) {
   .t-ring {
     width: 4.4rem;
     height: 4.4rem;
@@ -441,4 +441,111 @@ details.fold:last-of-type {
   margin-top: 0.3rem;
   overflow-wrap: anywhere;
   font-size: 0.8rem;
+}
+
+/* alur pelaporan: jeda, tinjauan, kartu draf */
+.pause {
+  margin-top: 2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.pause .more {
+  margin-top: 0.8rem;
+}
+
+.review-part {
+  margin-bottom: 0.8rem;
+  padding: 1rem 1.2rem;
+}
+
+.review-part .row-between {
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.review-text {
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.draft-card {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  margin-bottom: 1.2rem;
+}
+
+.savestate {
+  margin: 0.6rem 0 0;
+  font: 400 0.85rem var(--sans);
+  color: var(--muted);
+}
+
+.savestate[data-state='error'] {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+.ctx {
+  margin-bottom: 1.4rem;
+}
+
+.ctx-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.ctx-list dt {
+  font-weight: 700;
+}
+
+.ctx-list dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* privasi layar: samarkan isi sensitif dan kunci saat tidak aktif */
+.veilbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  margin: 1rem 0;
+  padding: 0.7rem 1rem;
+  border-radius: 14px;
+  background: var(--warn-bg);
+  color: var(--ink);
+}
+
+html[data-veil='on'] .sensitive {
+  filter: blur(9px);
+  user-select: none;
+}
+
+.sensitive {
+  transition: filter 0.15s;
+}
+
+.idle-warn {
+  position: fixed;
+  inset: auto 0.75rem 0.75rem;
+  z-index: 80;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: 0.9rem 1.1rem;
+  border-radius: 16px;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 12px 28px rgb(14 15 18 / 35%);
 }

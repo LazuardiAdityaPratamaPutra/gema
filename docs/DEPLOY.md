@@ -7,6 +7,10 @@ npm ci && npm run build
 GEMA_DEMO=on PORT=3000 npm start
 ```
 
+**Mode Demo di produksi harus dinyatakan `GEMA_DEMO=on`.** Tanpa variabel itu, `npm start` menjalankan mode non-demo: masuk Satgas tanpa kata sandi dan `POST /api/demo/reset` mati, dan akun Satgas seed memakai kata sandi acak. Untuk deploy juri/lomba, pasang `GEMA_DEMO=on`. Titik reset menolak bekerja bila basis data memuat institusi non-demo.
+
+Di balik proksi (Railway, Fly, Nginx), atur `GEMA_TRUSTED_PROXIES` sesuai jumlah proksi (bawaan 1) agar pembatas laju memakai alamat klien asli.
+
 ## PostgreSQL
 
 Tanpa disk persisten (Vercel, kontainer tanpa volume), pakai PostgreSQL:
