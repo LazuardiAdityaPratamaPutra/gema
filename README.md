@@ -1,6 +1,6 @@
 # Gema
 
-Platform web untuk perguruan tinggi yang membantu penyintas kekerasan seksual **menyimpan bukti tanpa harus langsung melapor**, dan membuat **penanganan Satgas PPKPT terlihat tepat waktu**. Subtema Gender Equality, SDG 5. Dibuat untuk SEVENT X Software Development, kategori Website.
+Platform web untuk perguruan tinggi yang membantu penyintas kekerasan seksual **menyimpan bukti tanpa harus langsung melapor**, dan membuat **penanganan Satgas PPKPT terlihat tepat waktu**. Subtema Gender Equality, SDG 5. 
 
 > Prototipe lomba. Belum diaudit pihak independen. Jangan dipakai untuk kasus nyata sebelum ditinjau.
 
