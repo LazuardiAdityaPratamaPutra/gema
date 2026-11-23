@@ -144,4 +144,4 @@ export async function submitReport(
   return { res, built };
 }
 
-export const randomId = () => b64u(randomBytes(6));
+const randomId = () => b64u(randomBytes(6));

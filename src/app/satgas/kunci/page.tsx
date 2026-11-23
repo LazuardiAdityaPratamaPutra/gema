@@ -1,4 +1,5 @@
 'use client';
+import { HeaderPhoto } from '@/components/HeaderPhoto';
 import { useEffect, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
@@ -61,7 +62,8 @@ export default function Kunci() {
 
   return (
     <div className="narrow">
-      <header className="ph">
+      <header className="ph ph-foto">
+        <HeaderPhoto />
         <SatgasBar s={session} />
         <h1>Kunci Satgas</h1>
         <p className="lede">

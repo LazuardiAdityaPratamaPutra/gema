@@ -13,8 +13,7 @@ import { hkdf } from '@noble/hashes/hkdf.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { aesGcmDecrypt, aesGcmEncrypt, b64u, concat, fromB64u, utf8 } from '@gema/crypto';
 
-export const KEM_SUITE_HYBRID = 'ecdh-p256+mlkem768-v1';
-export const KEM_SUITE_ECDH_ONLY = 'ecdh-p256-v1'; // cadangan berlabel bila ML-KEM gagal
+const KEM_SUITE_HYBRID = 'ecdh-p256+mlkem768-v1';
 
 export type HybridPublicKey = { suite: string; ecdh: string; mlkem: string };
 export type HybridSecretKey = { suite: string; ecdh: string; mlkem: string };

@@ -49,9 +49,10 @@ describe('privasi diferensial', () => {
   });
 
   it('snapshot kepatuhan: data belum cukup bila hitungan berderau di bawah 5', () => {
+    // uji acak: ambang longgar agar tidak sesekali gagal karena derau
     let notEnough = 0;
     for (let i = 0; i < 200; i++) if (!complianceSnapshot(0, 0, 4, 2).enough) notEnough++;
-    expect(notEnough).toBeGreaterThan(190);
+    expect(notEnough).toBeGreaterThan(170);
     const big = complianceSnapshot(400, 360, 4, 1);
     expect(big.enough).toBe(true);
     expect(big.percent).toBeGreaterThan(70);

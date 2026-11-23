@@ -1,5 +1,5 @@
 /** Cerita yang ditulis di /pahami dibawa ke formulir laporan lewat sessionStorage tab ini, lalu dihapus. Keluar cepat juga menghapusnya. */
-export const CARRY_KEY = 'gema:cerita-awal';
+const CARRY_KEY = 'gema:cerita-awal';
 export function takeCarried(): string {
   try {
     const v = sessionStorage.getItem(CARRY_KEY) ?? '';

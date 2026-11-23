@@ -1,70 +1,19 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { reporterStore, satgasStore } from '@/lib/store';
 import { useIslandState } from '@/lib/island-bus';
 import { QUICK_EXIT_LIMITS, quickExit } from '@/lib/quick-exit';
 import { api } from '@/lib/api';
-import { Echo } from './Echo';
+import { Echo, Wordmark } from './Echo';
 import { ICheck, IExit } from './Icons';
+import { QuickExitButton } from './navbar/QuickExitButton';
+import { GUEST, REPORTER, satgasLinks, type Cta } from './navbar/links';
+import { useOnline } from './navbar/useOnline';
+import { zoneOf } from './navbar/zone';
 
-type Link_ = { href: string; label: string; hint: string };
-type Cta = { href: string; label: string; short: string };
-
-const GUEST: Link_[] = [
-  { href: '/pahami', label: 'Pahami dulu', hint: 'Apakah yang kualami termasuk kekerasan?' },
-  { href: '/verifikasi', label: 'Periksa bukti', hint: 'Cek keutuhan berkas, tanpa akun' },
-  { href: '/papan', label: 'Papan', hint: 'Ketepatan waktu penanganan tiap kampus' },
-  { href: '/panduan', label: 'Bantuan', hint: 'SAPA 129, Komnas Perempuan, LPSK' },
-  { href: '/demo', label: 'Demo', hint: 'Seluruh alur dengan data fiktif' },
-  { href: '/satgas/masuk', label: 'Untuk Satgas', hint: 'Masuk dengan akun Satgas' },
-];
-const REPORTER: Link_[] = [
-  { href: '/brankas', label: 'Brankasmu', hint: 'Laporan dan bukti yang tersimpan' },
-  { href: '/pahami', label: 'Pahami dulu', hint: 'Bantuan menyusun cerita' },
-  { href: '/verifikasi', label: 'Periksa bukti', hint: 'Cek keutuhan berkas' },
-  {
-    href: '/brankas/pengaturan',
-    label: 'Kode Paksa',
-    hint: 'Brankas tiruan bila kamu dipaksa membuka',
-  },
-  { href: '/panduan', label: 'Bantuan', hint: 'Cara kerja dan kontak darurat' },
-];
-function satgasLinks(role: string): Link_[] {
-  const out: Link_[] = [];
-  if (['Ketua', 'Anggota', 'Pimpinan'].includes(role))
-    out.push({ href: '/satgas', label: 'Kasus', hint: 'Tenggat dan tangga eskalasi' });
-  if (role === 'Pengawas')
-    out.push({ href: '/satgas', label: 'Pengawasan', hint: 'Angka agregat tingkat 3' });
-  if (role === 'Pimpinan')
-    out.push({ href: '/satgas/radar', label: 'Radar', hint: 'Pola per unit dan periode' });
-  if (['Auditor', 'Ketua'].includes(role))
-    out.push({ href: '/satgas/audit', label: 'Jejak audit', hint: 'Apakah rantai hash utuh?' });
-  if (role === 'Ketua')
-    out.push({ href: '/satgas/kunci', label: 'Kunci', hint: 'Buat atau impor kunci Satgas' });
-  out.push({ href: '/papan', label: 'Papan', hint: 'Ketepatan waktu penanganan' });
-  out.push({ href: '/panduan', label: 'Panduan', hint: 'Cara kerja dan batas jujur' });
-  return out;
-}
-
-/** Status koneksi peramban. Server dianggap online sampai ada kejadian offline. */
-function useOnline() {
-  return useSyncExternalStore(
-    (cb) => {
-      window.addEventListener('online', cb);
-      window.addEventListener('offline', cb);
-      return () => {
-        window.removeEventListener('online', cb);
-        window.removeEventListener('offline', cb);
-      };
-    },
-    () => navigator.onLine,
-    () => true,
-  );
-}
-
-export function Navbar({ demo = false }: { demo?: boolean }) {
+export function Navbar() {
   const online = useOnline();
   const path = usePathname();
   const router = useRouter();
@@ -73,24 +22,12 @@ export function Navbar({ demo = false }: { demo?: boolean }) {
   const bus = useIslandState();
   // Menu terbuka hanya untuk halaman tempat ia dibuka, jadi pindah halaman otomatis menutupnya.
   const [openOn, setOpenOn] = useState<string | null>(null);
-  const [qxInfo, setQxInfo] = useState(false);
   const open = openOn === path;
   const setOpen = (next: boolean) => setOpenOn(next ? path : null);
   const boxRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const z =
-      path === '/'
-        ? 'home'
-        : /^\/(brankas|mulai|masuk|pulihkan)/.test(path)
-          ? 'lapor'
-          : path.startsWith('/satgas')
-            ? 'satgas'
-            : path.startsWith('/papan')
-              ? 'papan'
-              : path.startsWith('/demo')
-                ? 'demo'
-                : 'cek';
+    const z = zoneOf(path);
     document.documentElement.dataset.zone = z;
   }, [path]);
   useEffect(() => {
@@ -109,15 +46,23 @@ export function Navbar({ demo = false }: { demo?: boolean }) {
     };
   }, [open]);
 
-  const inStaff = path.startsWith('/satgas') && !!satgas && path !== '/satgas/masuk';
+  // Halaman umum yang juga ada di menu Satgas (Papan, Panduan): menu Satgas tetap dipakai selama
+  // sesinya aktif dan tidak ada brankas pelapor di perangkat ini.
+  const sharedWithStaff = ['/papan', '/panduan', '/bukti-teknis'].some(
+    (p) => path === p || path.startsWith(p + '/'),
+  );
+  const inStaff =
+    !!satgas &&
+    path !== '/satgas/masuk' &&
+    (path.startsWith('/satgas') || (sharedWithStaff && !reporter));
   let links = GUEST;
-  let cta: Cta | null = { href: '/mulai', label: 'Buat brankas tanpa nama', short: 'Mulai' };
+  let cta: Cta | null = { href: '/mulai', label: 'Buat brankas', short: 'Mulai' };
   let who = '';
   let signOut: (() => void) | null = null;
   if (inStaff && satgas) {
     links = satgasLinks(satgas.member.role);
     cta = null;
-    who = `${satgas.member.role}${satgas.institution.demo ? ', mode demo' : ''}`;
+    who = satgas.member.role;
     signOut = () => {
       void api('auth/logout', { method: 'POST', token: satgas.token }).catch(() => undefined);
       satgasStore.clear();
@@ -153,15 +98,12 @@ export function Navbar({ demo = false }: { demo?: boolean }) {
           memuat data baru menunggu koneksi kembali.
         </p>
       )}
-      {demo && (
-        <p className="nb-demo" role="note">
-          <strong>Mode demo:</strong> semua data di sini fiktif. Jangan isi data sungguhan.
-        </p>
-      )}
       <div className="nb-bar">
         <Link href={home} className="nb-brand" aria-label="Gema, ke halaman utama">
-          <Echo size={26} />
-          <span>Gema</span>
+          <Echo size={30} />
+          <span>
+            <Wordmark height={30} />
+          </span>
         </Link>
         <nav className="nb-links" aria-label="Menu utama">
           {links.map((l) => (
@@ -187,42 +129,7 @@ export function Navbar({ demo = false }: { demo?: boolean }) {
               Keluar sesi
             </button>
           )}
-          <span
-            className="nb-qx-wrap"
-            onBlur={(e) => {
-              if (!e.currentTarget.contains(e.relatedTarget)) setQxInfo(false);
-            }}
-          >
-            <button
-              type="button"
-              className="nb-qx"
-              aria-label="Keluar cepat: hapus draf dan sesi di perangkat ini, lalu buka situs netral"
-              aria-describedby="qx-desc"
-              onClick={() => void quickExit()}
-              title="Keluar cepat. Esc dua kali juga bisa, kapan saja"
-            >
-              <span className="nb-qx-long">Keluar cepat</span>
-              <span className="nb-qx-short" aria-hidden="true">
-                <IExit />
-              </span>
-            </button>
-            <span id="qx-desc" className="sr">
-              {QUICK_EXIT_LIMITS}
-            </span>
-            <button
-              type="button"
-              className="nb-qx-info"
-              aria-expanded={qxInfo}
-              aria-controls="qx-pop"
-              aria-label="Apa yang dihapus Keluar cepat?"
-              onClick={() => setQxInfo(!qxInfo)}
-            >
-              ?
-            </button>
-            <span id="qx-pop" className="nb-qx-pop" role="note" hidden={!qxInfo}>
-              {QUICK_EXIT_LIMITS}
-            </span>
-          </span>
+          <QuickExitButton />
           <button
             type="button"
             className="nb-burger"

@@ -115,13 +115,13 @@ export function normalizeCaseCode(input: string): string {
     .replace(/[IL]/g, '1');
 }
 
-export function normalizePassphrase(p: string): string {
+function normalizePassphrase(p: string): string {
   return p.normalize('NFKC').toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
 /* ---------- Hierarki kunci ---------- */
 
-export const PBKDF2_ITERATIONS = 600_000;
+const PBKDF2_ITERATIONS = 600_000;
 
 export type AccountKeys = { authKey: Uint8Array; kek: Uint8Array };
 

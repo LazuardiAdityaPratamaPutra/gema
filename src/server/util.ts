@@ -4,12 +4,11 @@ export const DAY = 86_400_000;
 const WIB = 7 * 3_600_000;
 
 export const uid = (n = 12): string => b64u(randomBytes(n));
-export const hex = toHex;
 export const sha256hex = (s: string): string => toHex(sha256(utf8(s)));
 
 const dayIndex = (t: number) => Math.floor((t + WIB) / DAY);
 const weekday = (t: number) => (dayIndex(t) + 4) % 7; // 0 = Minggu
-export const isBusinessDay = (t: number) => {
+const isBusinessDay = (t: number) => {
   const w = weekday(t);
   return w !== 0 && w !== 6;
 };

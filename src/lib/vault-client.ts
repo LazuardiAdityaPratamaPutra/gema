@@ -1,7 +1,6 @@
 /** Logika klien pelapor: akun anonim, enkripsi laporan, Jembatan Buta, eskalasi, Kode Paksa. Semua kunci hanya ada di perangkat. */
 import {
   aesGcmDecrypt,
-  authHash,
   b64u,
   decryptJson,
   deriveAccountKeys,
@@ -12,88 +11,17 @@ import {
   randomBytes,
   unpad,
   unwrapKey,
-  utf8,
 } from '@gema/crypto';
 import type { Attributes } from '@gema/matching';
-import { ownerKeyFromDek, proveOwnership } from '@gema/zk';
+import { ownerKeyFromDek } from '@gema/zk';
 import { api } from './api';
 import { AAD, VAULT_SIZE, type BuktiMeta, type Narasi, type Vault } from './report-format';
 import { buildReport, type FileInput, type FpFn } from './report-build';
 import { reporterStore, type ReporterSession } from './store';
+import type { InstitutionInfo, ReportView } from './vault-types';
 
-export type InstitutionInfo = {
-  id: string;
-  nama: string;
-  kota: string;
-  demo: boolean;
-  fpMode: 'oprf' | 'hmac';
-  slaHari: number;
-  publicKey: { suite: string; ecdh: string; mlkem: string };
-  units: { id: string; nama: string; tipe: string }[];
-  rujukan?: {
-    nama: string;
-    jenis: 'psikolog' | 'hukum' | 'medis' | 'pendamping' | 'lainnya';
-    kontak: string;
-    catatan?: string;
-  }[];
-};
-
-export type EvidenceView = {
-  id: string;
-  sha256: string;
-  messageRoot: string | null;
-  messageCount: number | null;
-  ukuran: number;
-  tipe: string;
-  uploadedAt: number;
-  blobReady: boolean;
-  anchored: boolean;
-};
-export type SlaView = {
-  status: string;
-  due: number;
-  escalated: number;
-  hariSisa: number | null;
-  hariTerlambat: number;
-  tingkat: number;
-  terlambat: boolean;
-  h2: boolean;
-};
-export type ReportView = {
-  id: string;
-  institutionId: string;
-  institutionNama: string;
-  demo: boolean;
-  unitId: string;
-  unitNama: string;
-  status: 'tersimpan' | 'tereskalasi';
-  k: number;
-  includeWeak: boolean;
-  optIn: boolean;
-  hasOwnerKey: boolean;
-  conditional: null | { minSize: number; prioritas: boolean };
-  createdAt: number;
-  secrets: { narasi_ciphertext: string; dek_wrapped_klien: string; bukti_meta_ciphertext: string };
-  evidence: EvidenceView[];
-  match: {
-    notify: boolean;
-    size: number | null;
-    confidence: 'rendah' | 'sedang' | 'tinggi' | null;
-    weak: number | null;
-    optedIn: number;
-    flagFast: boolean;
-  };
-  escalation: null | {
-    id: string;
-    alias: string;
-    sumber: string;
-    escalatedAt: number;
-    opened: boolean;
-    sla: SlaView;
-    events: { at: number; label: string; actor: string }[];
-    ladder: { tingkat: number; at: number }[];
-  };
-};
+export * from './vault-escalation';
+export type * from './vault-types';
 
 export async function newCredentials(): Promise<{ caseCode: string; passphrase: string }> {
   const { generatePassphrase } = await import('@gema/passphrase');
@@ -165,7 +93,7 @@ export async function downloadEvidence(
 }
 
 /** Jembatan Buta: nama disamarkan di perangkat; server hanya mengevaluasi titik tersamar. Mode HMAC = cadangan berlabel. */
-export function fingerprintFn(s: ReporterSession, inst: InstitutionInfo, draftId: string): FpFn {
+function fingerprintFn(s: ReporterSession, inst: InstitutionInfo, draftId: string): FpFn {
   if (inst.fpMode === 'hmac') {
     return async (inputs) =>
       (
@@ -243,64 +171,6 @@ export async function submitReport(
   return res.reportId;
 }
 
-export async function escalateReport(
-  s: ReporterSession,
-  r: ReportView,
-  dek: Uint8Array,
-  inst: InstitutionInfo,
-  mode: 'tunggal' | 'bersama',
-  prioritas = false,
-) {
-  const { wrapForSatgas } = await import('@gema/pq-kem');
-  const escalationId = b64u(randomBytes(9));
-  const wrapped = await wrapForSatgas(dek, inst.publicKey, {
-    institutionId: inst.id,
-    escalationId,
-  });
-  return api<{ ok: true; alias: string; due: number }>(`reports/${r.id}/escalate`, {
-    token: s.token,
-    body: { escalationId, mode, wrapped, prioritas },
-  });
-}
-
-/** Eskalasi Bersyarat: kunci dibungkus untuk Satgas sekarang, tetapi baru dikirim bila cukup pelapor cocok. */
-export async function setConditionalEscalation(
-  s: ReporterSession,
-  r: ReportView,
-  dek: Uint8Array,
-  inst: InstitutionInfo,
-  minSize: number,
-  prioritas = false,
-) {
-  const { wrapForSatgas } = await import('@gema/pq-kem');
-  const escalationId = b64u(randomBytes(9));
-  const wrapped = await wrapForSatgas(dek, inst.publicKey, {
-    institutionId: inst.id,
-    escalationId,
-  });
-  return api<{ fired: boolean }>(`reports/${r.id}/bersyarat`, {
-    token: s.token,
-    body: { escalationId, wrapped, minSize, prioritas },
-  });
-}
-
-export const clearConditionalEscalation = (s: ReporterSession, r: ReportView) =>
-  api(`reports/${r.id}/bersyarat`, { method: 'DELETE', token: s.token });
-
-/** Bukti Pemilik: membuktikan memegang kunci laporan tanpa membukanya. Laporan lama mendaftarkan kunci dulu. */
-export async function makeOwnerProof(
-  s: ReporterSession,
-  r: ReportView,
-  dek: Uint8Array,
-  alias: string,
-  challenge: string,
-): Promise<string> {
-  const key = ownerKeyFromDek(dek);
-  if (!r.hasOwnerKey)
-    await api(`reports/${r.id}/owner`, { token: s.token, body: { ownerPub: key.publicKey } });
-  return proveOwnership(key, `${alias}|${challenge.trim()}`);
-}
-
 export async function setKodePaksa(
   s: ReporterSession,
   decoyPassphrase: string,
@@ -323,6 +193,3 @@ export async function removeKodePaksa(s: ReporterSession) {
     body: { authKey: null, vaultBlob: b64u(randomBytes(VAULT_SIZE)) },
   });
 }
-
-export const demoNote = utf8('');
-void authHash;

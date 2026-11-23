@@ -34,7 +34,7 @@ const RULES: Record<SignalKind, Cue[]> = {
 };
 
 export type ChatMessage = { ts: string; sender: string; text: string };
-export type FlaggedMessage = {
+type FlaggedMessage = {
   i: number;
   ts: string;
   sender: string;
@@ -58,7 +58,7 @@ export function hourOf(ts: string): number | null {
   if (ap === 'am' && h === 12) h = 0;
   return h >= 0 && h < 24 ? h : null;
 }
-export const isLate = (h: number | null) => h !== null && (h >= 22 || h < 5);
+const isLate = (h: number | null) => h !== null && (h >= 22 || h < 5);
 
 export function readChat(messages: ChatMessage[]): ChatReading {
   const flagged: FlaggedMessage[] = [];

@@ -47,7 +47,7 @@ export function swapBackend(b: Backend) {
   g.__gemaDb = undefined;
 }
 
-export function emptyDb(): DB {
+function emptyDb(): DB {
   return {
     v: 1,
     institutions: {},

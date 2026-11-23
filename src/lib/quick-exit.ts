@@ -5,11 +5,11 @@
  */
 /** Teks batas perlindungan, ditampilkan dekat setiap tombol Keluar cepat. */
 export const QUICK_EXIT_LIMITS =
-  'Menghapus draf dan sesi di perangkat ini, lalu membuka situs cuaca. Laporan yang sudah tersimpan tetap aman: masuk lagi dengan Kode dan kata sandimu. Tidak menghapus riwayat peramban. Hapus riwayat sendiri, atau pakai jendela privat.';
+  'Menghapus draf dan sesi di perangkat ini, lalu membuka Google. Laporan yang sudah tersimpan tetap aman: masuk lagi dengan Kode dan kata sandimu. Tidak menghapus riwayat peramban. Hapus riwayat sendiri, atau pakai jendela privat.';
 
-export const NEUTRAL_URL = 'https://id.wikipedia.org/wiki/Cuaca';
+const NEUTRAL_URL = 'https://www.google.com/';
 
-export async function wipeLocal(): Promise<void> {
+async function wipeLocal(): Promise<void> {
   try {
     sessionStorage.clear();
     localStorage.clear();
@@ -43,7 +43,7 @@ export async function quickExit() {
   // Sembunyikan seketika dan netralkan judul tab, sebelum penghapusan yang bisa memakan waktu.
   try {
     document.documentElement.style.visibility = 'hidden';
-    document.title = 'Cuaca';
+    document.title = 'Google';
   } catch {
     /* abaikan */
   }

@@ -1,0 +1,539 @@
+/*
+  Aturan 60-30-10.
+  60% netral terang (kertas dan permukaan putih), 30% navy (hero, kepala halaman, satu bagian beranda, kaki),
+  10% kuning aksen khusus untuk aksi utama. Warna status (hijau, kuning tua, merah) tetap fungsional dan tidak dihitung.
+  Berkas ini dimuat terakhir; hapus impornya di layout.tsx untuk kembali ke tampilan sebelumnya.
+*/
+:root {
+  --paper: #eef1f8;
+  --paper-2: #e2e7f3;
+  --card: #fff;
+  --tint: #e3e8f6;
+  --tint-2: #d4dcf1;
+  --aksen: #ffc21a;
+  --aksen-hover: #ffd24f;
+  --soft: rgb(21 27 59 / 8%);
+  --soft-hover: rgb(21 27 59 / 14%);
+  --soft-on-dark: rgb(255 255 255 / 15%);
+  --soft-on-dark-hover: rgb(255 255 255 / 26%);
+
+  /* amplop bukti: biru-abu, bukan cokelat, supaya tidak menambah keluarga warna */
+  --kraft: #cdd6ee;
+  --kraft-2: #b9c5e6;
+  --kraft-3: #a3b1dc;
+}
+
+/* satu palet untuk semua zona: warna zona tidak lagi menentukan warna halaman */
+html[data-zone] {
+  --zone: var(--malam);
+  --on: #fff;
+  --on-2: #d9dcf3;
+  --paper: #eef1f8;
+}
+
+/* ---------- aksi: satu warna aksen untuk aksi utama, permukaan lembut untuk sekunder ---------- */
+.btn {
+  border: 0;
+}
+
+.btn.teal,
+.band-hero .btn.teal,
+.nb-cta {
+  background: var(--aksen);
+  color: var(--ink);
+  border: 0;
+}
+
+.btn.ghost,
+.nb-ghost {
+  background: var(--soft);
+  color: var(--ink);
+  border: 0;
+}
+
+.btn.light {
+  background: var(--card);
+  color: var(--ink);
+  border: 0;
+}
+
+.btn.danger,
+.nb-qx {
+  background: var(--bad-bg);
+  color: var(--bad);
+  border: 0;
+}
+
+.nb-qx-info {
+  background: var(--soft);
+  color: var(--ink);
+  border: 0;
+}
+
+.ph .btn.ghost,
+.band-hero .btn.ghost,
+.band-clock .btn.ghost,
+.footer .btn.ghost {
+  background: var(--soft-on-dark);
+  color: #fff;
+  border: 0;
+}
+
+@media (hover: hover) {
+  .btn.teal:hover:not([disabled]),
+  .band-hero .btn.teal:hover:not([disabled]),
+  .nb-cta:hover {
+    background: var(--aksen-hover);
+    color: var(--ink);
+  }
+
+  .btn.ghost:hover:not([disabled]),
+  .nb-ghost:hover {
+    background: var(--soft-hover);
+    color: var(--ink);
+  }
+
+  .ph .btn.ghost:hover:not([disabled]),
+  .band-hero .btn.ghost:hover:not([disabled]),
+  .band-clock .btn.ghost:hover:not([disabled]) {
+    background: var(--soft-on-dark-hover);
+    color: #fff;
+  }
+
+  .btn.danger:hover:not([disabled]),
+  .nb-qx:hover {
+    background: #f4c3c8;
+    color: var(--bad);
+  }
+}
+
+/* ---------- kepala halaman: panel navy di dalam halaman, bukan pita warna selebar layar ---------- */
+.ph,
+html[data-zone] .ph {
+  margin: 1.2rem 0 2.2rem;
+  padding: clamp(1.8rem, 4.5vw, 3.2rem) clamp(1.3rem, 4vw, 3rem);
+  border-radius: 28px;
+  border-bottom: 0;
+  background: var(--malam);
+  color: #fff;
+  clip-path: none;
+}
+
+.ph h1 {
+  font-size: clamp(2.1rem, 5vw, 3.5rem);
+}
+
+html[data-zone='papan'] .ph .sbar,
+html[data-zone='cek'] .ph .sbar {
+  border-bottom-color: rgb(255 255 255 / 28%);
+}
+
+/* ---------- permukaan, bukan garis ---------- */
+.card {
+  border: 0;
+  box-shadow: none;
+}
+
+a.card:hover {
+  border-color: transparent;
+  background: var(--tint);
+}
+
+.card.tint {
+  border-color: transparent;
+}
+
+.hasil-empty,
+.vault-empty {
+  border: 0;
+  background: var(--tint);
+  border-radius: var(--r-md);
+}
+
+.contoh button,
+.chatsig {
+  border: 0;
+  background: var(--tint);
+}
+
+.cond {
+  border-top: 0;
+}
+
+.rc-top {
+  border-bottom: 0;
+}
+
+/* ---------- navigasi ---------- */
+.nb {
+  border-bottom: 0;
+  background: var(--paper);
+  backdrop-filter: none;
+}
+
+.nb-cta {
+  box-shadow: none;
+}
+
+.nb-links a[aria-current='page'] {
+  background: var(--tint);
+}
+
+.nb-sheet li a[aria-current='page'] b {
+  background: var(--tint);
+}
+
+/* ---------- beranda: hero navy, satu aksen, bentuk terisi bukan garis ---------- */
+.orb-sun {
+  background: #2d2680;
+  opacity: 1;
+}
+
+.orb-ring {
+  border: 0;
+  background: #231d68;
+}
+
+.rc-folder,
+.rc-tab {
+  background: var(--tint);
+}
+
+.chooser .panel {
+  background: var(--tint);
+}
+
+.tab .dot {
+  background: var(--tint-2);
+}
+
+.tab[aria-selected='true'] .dot {
+  background: var(--ink);
+}
+
+.pts li {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.verify {
+  background: var(--card);
+}
+
+.band-clock {
+  background: var(--malam);
+  color: #fff;
+  clip-path: none;
+  padding-top: 0;
+}
+
+.band-clock .clock-copy,
+.band-clock .clock-copy p,
+.band-clock h2,
+.band-clock .label,
+.band-clock .lamps,
+.band-clock .lamps li,
+.band-clock .small {
+  color: #fff;
+}
+
+.next {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  transform: none;
+}
+
+.next .btn.ghost {
+  background: var(--soft);
+}
+
+.chooser .tab[aria-selected='true'] {
+  background: var(--tint);
+}
+
+/* poin panel: titik terisi menggantikan garis vertikal */
+.panel .pts li {
+  position: relative;
+  padding-left: 1.2rem;
+  border-left: 0;
+}
+
+.panel .pts li::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+/* pita jam: teks terang di navy; kartu kalender tetap gelap di atas putih */
+.band-clock .cal {
+  color: var(--ink);
+}
+
+.band-clock .lamps li > span:last-child,
+.band-clock .lamps small {
+  color: rgb(255 255 255 / 82%);
+}
+
+.band-clock .lamps .lp {
+  border-color: #fff;
+}
+
+.band-clock .lamps li[data-on='true'] .lp {
+  border-color: #fff;
+}
+
+.band-clock .slider {
+  accent-color: var(--aksen);
+}
+
+.panel .btn.teal {
+  background: var(--aksen);
+  border: 0;
+  color: var(--ink);
+}
+
+.panel .btn.ghost {
+  background: var(--soft);
+  border: 0;
+}
+
+@media (hover: hover) {
+  .panel .btn.teal:hover:not([disabled]) {
+    background: var(--aksen-hover);
+    color: var(--ink);
+  }
+
+  .panel .btn.ghost:hover:not([disabled]) {
+    background: var(--soft-hover);
+    color: var(--ink);
+  }
+}
+
+/* ---------- tabel: baris bergantian dan kepala berwarna, bukan garis ---------- */
+th,
+td {
+  border-bottom: 0;
+}
+
+thead th {
+  border-bottom: 0;
+  background: var(--tint);
+}
+
+thead th:first-child {
+  border-top-left-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-sm);
+}
+
+thead th:last-child {
+  border-top-right-radius: var(--r-sm);
+  border-bottom-right-radius: var(--r-sm);
+}
+
+tbody tr:nth-child(even) > * {
+  background: rgb(227 232 246 / 45%);
+}
+
+/* ---------- sisa garis: daftar rujukan, chip, lipatan, pilihan, area unggah ---------- */
+.rujukan li {
+  border: 0;
+  background: var(--paper);
+}
+
+.rj-links a {
+  border: 0;
+  background: var(--card);
+}
+
+.jump a {
+  border: 0;
+  background: var(--tint);
+}
+
+details.fold,
+details.more {
+  border: 0;
+}
+
+details.fold {
+  background: var(--card);
+}
+
+details.more {
+  background: var(--tint);
+  border-radius: var(--r-md);
+}
+
+label.choice {
+  border: 0;
+  background: var(--paper);
+}
+
+/* pilihan terpilih tetap terlihat jelas tanpa bergantung pada warna */
+label.choice:has(input:checked) {
+  background: var(--tint-2);
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.drop,
+.drop.light,
+label.drop {
+  border: 0;
+  background: var(--tint);
+}
+
+.tab,
+.tabs {
+  border-bottom: 0;
+}
+
+.sbar {
+  border-bottom: 0;
+}
+
+.draft-badge {
+  border: 0;
+  background: var(--tint);
+}
+
+blockquote {
+  border-left: 0;
+  background: var(--tint);
+  border-radius: var(--r-sm);
+  padding: 0.7rem 1rem;
+}
+
+/* folder brankas: satu keluarga warna dengan permukaan lain */
+.file,
+.file-tab {
+  background: var(--tint);
+}
+
+/* tidak ada elemen yang dimiringkan: tampilan rapi, bukan tempelan */
+.receipt,
+.file-next,
+.track li[aria-current='step'] span {
+  transform: none;
+}
+
+.track li[aria-current='step'] span {
+  border: 0;
+  background: var(--tint-2);
+}
+
+/* indikator langkah aktif: navy, bukan biru tambahan */
+.wsteps li[aria-current='step'] span {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.nudges li::before {
+  background: var(--ink);
+}
+
+.wsteps li[data-on='true'] {
+  border-top-color: var(--ink);
+}
+
+/* lembar ringkasan Satgas: permukaan polos, tanpa kertas bergaris dan garis margin */
+.assist {
+  background: var(--card);
+  padding-left: 1.25rem;
+}
+
+.assist::before {
+  content: none;
+}
+
+.assist blockquote {
+  border-left: 0;
+  background: var(--tint);
+  border-radius: var(--r-sm);
+}
+
+/* ---------- kepala halaman asimetris: judul besar di kiri, pengantar di kanan (layar lebar) ---------- */
+@media (width >= 62em) {
+  .ph:has(> h1):has(> .lede) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-rows: auto 1fr auto auto;
+    column-gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+  }
+
+  .ph:has(> h1):has(> .lede) > h1 {
+    grid-column: 1;
+    grid-row: 2 / span 3;
+    margin: 0;
+    max-width: 14ch;
+  }
+
+  .ph:has(> h1):has(> .lede) > .lede {
+    grid-column: 2;
+    grid-row: 3;
+    margin: 0;
+  }
+
+  .ph:has(> h1):has(> .lede) > .hero-cta {
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 1.4rem;
+  }
+
+  .ph:has(> h1):has(> .lede)::before {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .ph:has(> h1):has(> .lede) > :not(h1, .lede, .hero-cta) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+}
+
+/* ---------- tautan: navy bergaris bawah (bukan warna ke-4); putih di permukaan gelap ---------- */
+main a:not([class]),
+.rj-links a,
+.small a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ph a:not(.btn),
+.band-hero a:not(.btn),
+.band-clock a:not(.btn),
+.footer a {
+  color: #fff;
+}
+
+/* ---------- tanpa kemiringan dan potongan diagonal: semua tepi lurus ---------- */
+.rc-stamp {
+  transform: scale(1.4);
+}
+
+.rc-stamp[data-on='true'] {
+  transform: scale(1);
+}
+
+.t-stack i:nth-child(1) {
+  transform: translate(-6px, 4px);
+}
+
+.t-stack i:nth-child(2) {
+  transform: translate(4px, 2px);
+}
+
+.band-hero {
+  clip-path: none;
+  overflow: clip;
+  padding-block-end: clamp(3rem, 7vw, 5rem);
+}

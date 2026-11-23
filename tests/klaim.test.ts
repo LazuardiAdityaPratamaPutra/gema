@@ -17,15 +17,21 @@ function* walk(dir: string, ext: RegExp): Generator<string> {
   }
 }
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+/** Seluruh berkas .tsx/.ts dalam satu folder halaman, karena halaman dipecah jadi komponen. */
+const readDir = (rel: string) =>
+  [...walk(path.join(ROOT, rel), /\.(tsx|ts)$/)]
+    .sort()
+    .map((f) => fs.readFileSync(f, 'utf8'))
+    .join('\n');
 const flat = (s: string) => s.replace(/\s+/g, ' ');
 
 // Teks yang dibaca pengguna atau juri. Dokumen audit/changelog sengaja dikecualikan: mereka mengutip klaim lama.
 const UI = [...walk(path.join(ROOT, 'src'), /\.(tsx|ts)$/)];
 const DOKUMEN = [
   'README.md',
-  'docs/NASKAH-DEMO.md',
-  'docs/KESIAPAN-LOMBA.md',
-  'docs/DEPLOY.md',
+  'docs/panduan/NASKAH-DEMO.md',
+  'docs/arsip/KESIAPAN-LOMBA.md',
+  'docs/panduan/DEPLOY.md',
 ].map((f) => path.join(ROOT, f));
 const SEMUA = [...UI, ...DOKUMEN];
 const rel = (f: string) => path.relative(ROOT, f);
@@ -74,7 +80,7 @@ describe('klaim penarikan eskalasi', () => {
   });
 
   it('halaman brankas menjelaskan batas penarikan dan tidak menawarkan tarik setelah dibuka', () => {
-    const s = flat(read('src/app/brankas/[id]/page.tsx'));
+    const s = flat(readDir('src/app/brankas/[id]'));
     expect(s).toContain('Penarikan hanya dapat dilakukan sebelum Satgas membuka kasus.');
     expect(s).toContain('selama Satgas belum membuka kasusnya');
     expect(s).toContain('r.escalation.opened ?');
@@ -82,12 +88,12 @@ describe('klaim penarikan eskalasi', () => {
   });
 
   it('API tetap menolak penarikan setelah kasus dibuka (dasar dari teks di atas)', () => {
-    const s = flat(read('src/server/logic.ts'));
+    const s = flat(read('src/server/logic/eskalasi.ts'));
     expect(s).toMatch(/if \(esc\.opened_at\)\s*throw new HttpError\(409/);
   });
 
   it('konfirmasi eskalasi menutup setelah berhasil, bukan hanya disembunyikan', () => {
-    const s = flat(read('src/app/brankas/[id]/page.tsx'));
+    const s = flat(readDir('src/app/brankas/[id]'));
     // reset dijalankan lewat callback sukses `act`, setelah fn() dan load() tanpa galat
     expect(s).toMatch(/await fn\(\); await load\(\); setMsg\(ok\); onDone\?\.\(\);/);
     expect(s).toContain('() => setConfirmEsc(false)');
@@ -102,7 +108,7 @@ describe('klaim ukuran dan kinerja model suara', () => {
   });
   it('panduan dan naskah memakai kata-kata faktual', () => {
     expect(flat(read('src/app/panduan/page.tsx'))).toContain('perlu diunduh terlebih dahulu');
-    expect(flat(read('docs/NASKAH-DEMO.md'))).toContain('perlu diunduh terlebih dahulu');
+    expect(flat(read('docs/panduan/NASKAH-DEMO.md'))).toContain('perlu diunduh terlebih dahulu');
   });
 });
 
@@ -117,16 +123,22 @@ describe('peringatan privasi', () => {
     expect((blok.match(/<li>/g) ?? []).length).toBe(8);
   });
   it('langkah Tinjau memperingatkan sebelum laporan dikunci, tanpa menuduh Gema meminta identitas', () => {
-    const s = flat(read('src/app/brankas/baru/page.tsx'));
-    const i = s.indexOf('Tinjau, lalu kunci.');
-    const j = s.indexOf('Kunci dan simpan');
-    const catatan = s.slice(i, j);
+    // Peringatan ada di komponen langkah Tinjau; tombol kunci ada di halamannya. Urutan berkas di
+    // disk berbeda antar sistem operasi, jadi keduanya dibaca terpisah, bukan digabung.
+    const tinjau = flat(read('src/app/brankas/baru/StepReview.tsx'));
+    const i = tinjau.indexOf('Tinjau, lalu kunci.');
+    const j = tinjau.indexOf('<ReviewPart');
+    const catatan = tinjau.slice(i, j);
+    expect(i).toBeGreaterThan(-1);
     expect(catatan).toContain('role="note"');
     expect(catatan).toContain('siapa pelapor atau orang lain');
     expect(catatan).toContain('Gema tidak meminta identitasmu');
+    const halaman = flat(read('src/app/brankas/baru/page.tsx'));
+    expect(halaman.indexOf('<StepReview')).toBeGreaterThan(-1);
+    expect(halaman.indexOf('<StepReview')).toBeLessThan(halaman.indexOf('Kunci dan simpan'));
   });
   it('konfirmasi eskalasi menyebut risiko isi cerita dan batas penarikan', () => {
-    const s = flat(read('src/app/brankas/[id]/page.tsx'));
+    const s = flat(readDir('src/app/brankas/[id]'));
     expect(s).toContain('bisa memuat petunjuk tentang siapa kamu');
     expect(s).toContain('selama Satgas belum membuka kasusnya');
   });

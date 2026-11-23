@@ -1,4 +1,5 @@
 'use client';
+import { PasswordEye } from '@/components/PasswordEye';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useSyncExternalStore } from 'react';
@@ -90,14 +91,7 @@ export default function Masuk() {
               spellCheck={false}
               required
             />
-            <button
-              type="button"
-              className="pw-toggle"
-              aria-pressed={show}
-              onClick={() => setShow((v) => !v)}
-            >
-              {show ? 'Sembunyikan' : 'Tampilkan'}
-            </button>
+            <PasswordEye show={show} onToggle={() => setShow((v) => !v)} />
           </div>
           <p className="hint">Pisahkan dengan spasi.</p>
         </div>

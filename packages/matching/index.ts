@@ -141,7 +141,7 @@ export function normalizeName(raw: string): string {
 }
 
 /** Kode fonetik sederhana per token: tahan variasi ejaan umum nama Indonesia. */
-export function phoneticToken(t: string): string {
+function phoneticToken(t: string): string {
   let s = t
     .replace(/kh/g, 'h')
     .replace(/ch/g, 'h')
@@ -184,7 +184,7 @@ export type FingerprintInput = {
   input: string;
 };
 
-export const MAX_INPUTS = 8;
+const MAX_INPUTS = 8;
 
 /**
  * Menyusun seluruh masukan fingerprint untuk satu terlapor:
@@ -261,9 +261,3 @@ export function confidenceFor(own: string[], others: string[][]): Confidence {
   }
   return best >= 2 ? 'tinggi' : best === 1 ? 'sedang' : 'rendah';
 }
-
-export const CONFIDENCE_COPY: Record<Confidence, string> = {
-  rendah: 'Keyakinan: rendah. Ini petunjuk, bukan kepastian dan bukan tuduhan.',
-  sedang: 'Keyakinan: sedang. Ini petunjuk, bukan kepastian dan bukan tuduhan.',
-  tinggi: 'Keyakinan: tinggi. Ini petunjuk, bukan kepastian dan bukan tuduhan.',
-};

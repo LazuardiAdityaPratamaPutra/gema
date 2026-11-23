@@ -122,11 +122,6 @@ th.rowhead {
   color: var(--muted);
 }
 
-.brandmark {
-  background: var(--lime);
-  box-shadow: inset 0 -2px 0 rgb(21 27 59 / 18%);
-}
-
 /* permukaan biasa: tenang, tanpa bayangan berat */
 .card {
   border: 1px solid var(--line);

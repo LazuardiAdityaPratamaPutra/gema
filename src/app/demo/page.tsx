@@ -44,7 +44,7 @@ export default function Demo() {
 
   return (
     <div className="wrap">
-      <header className="ph" data-tab="Mode demo, data fiktif">
+      <header className="ph">
         <h1>Lihat seluruh alur dalam lima menit</h1>
         <p className="lede">
           Semua nama, kampus, dan kasus di sini rekaan. Kunci Satgas demo sengaja dibuat publik. Jam
@@ -72,7 +72,10 @@ export default function Demo() {
         </div>
       </header>
 
-      <ol className="stack" style={{ paddingLeft: '1.2rem' }}>
+      <h2 className="title-md" id="skenario">
+        Empat hal yang sudah disiapkan untuk dilihat
+      </h2>
+      <ol className="stack" aria-labelledby="skenario" style={{ paddingLeft: '1.2rem' }}>
         <li>
           <strong>Maya dan Rafi</strong> melaporkan terlapor yang sama secara terpisah. Masuklah
           sebagai Maya: akan muncul pemberitahuan pola tanpa membuka identitas Rafi.

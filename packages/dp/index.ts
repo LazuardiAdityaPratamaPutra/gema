@@ -32,8 +32,8 @@ export function discreteLaplace(epsilon: number, sensitivity: number): number {
   return geometric(alpha) - geometric(alpha);
 }
 
-export const SENSITIVITY = 3; // batas laporan aktif per pelapor
-export const DEFAULT_EPSILON = 1;
+const SENSITIVITY = 3; // batas laporan aktif per pelapor
+const DEFAULT_EPSILON = 1;
 
 export function noisyCount(
   trueCount: number,
@@ -52,8 +52,6 @@ export function bucketize(noisy: number, minimum: number): Bucket {
   if (noisy <= 10) return '6-10';
   return '>10';
 }
-
-export type Release = { value: number; shown: boolean };
 
 /** Anggaran epsilon kumulatif per unit; bila habis, rilis berikutnya ditunda. */
 export class PrivacyBudget {

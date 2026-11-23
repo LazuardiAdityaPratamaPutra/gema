@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 
 /**
  * Kegagalan memuat. Menegaskan bahwa tidak ada yang hilang, agar pengguna tidak mengira buktinya terhapus.
@@ -13,6 +14,21 @@ export function LoadError({
   message?: string;
   onRetry?: () => void;
 }) {
+  // 403 dari server: bukan gangguan jaringan, jadi jangan menyuruh mencoba lagi.
+  if (message && /tidak memiliki akses/i.test(message)) {
+    return (
+      <section className="card alert" role="alert">
+        <h2 className="title-sm m-0">Peranmu tidak punya akses ke {what}</h2>
+        <p className="m-0">
+          Bagian ini dibatasi untuk peran tertentu. Tidak ada yang salah dengan akunmu, dan tidak
+          ada data yang berubah.
+        </p>
+        <Link href="/satgas" className="btn ghost sm">
+          Kembali ke daftar kasus
+        </Link>
+      </section>
+    );
+  }
   return (
     <section className="card alert" role="alert">
       <h2 className="title-sm m-0">Belum bisa memuat {what}</h2>

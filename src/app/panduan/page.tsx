@@ -1,29 +1,16 @@
 import type { Metadata } from 'next';
 import { NextStep } from '@/components/NextStep';
+import { OpenOnHash } from '@/components/OpenOnHash';
 import { Rujukan } from '@/components/Rujukan';
 export const metadata: Metadata = { title: 'Panduan dan batas jujur' };
 
 export default function Panduan() {
   return (
     <div className="narrow">
+      <OpenOnHash />
       <header className="ph" data-tab="Panduan">
         <h1>Cara kerja, dan apa yang tidak bisa kami janjikan</h1>
       </header>
-      <ul className="jump" aria-label="Loncat ke bagian">
-        <li>
-          <a href="#bantuan">Bantuan sekarang</a>
-        </li>
-        <li>
-          <a href="#data">Datamu</a>
-        </li>
-        <li>
-          <a href="#pendamping">Pendamping</a>
-        </li>
-        <li>
-          <a href="#batas">Batas jujur</a>
-        </li>
-      </ul>
-
       <section id="bantuan" className="card alert my-lg">
         <h2 className="title-md">Bila kamu butuh bantuan sekarang</h2>
         <p>
@@ -33,7 +20,7 @@ export default function Panduan() {
         <Rujukan />
       </section>
 
-      <details className="fold" id="data" open>
+      <details className="fold" id="data">
         <summary>
           <h2>Yang terjadi pada datamu</h2>
           <span>5 hal</span>
@@ -149,7 +136,7 @@ export default function Panduan() {
             lebih lemah daripada OPRF dan diberi label jelas.
           </li>
           <li>
-            <strong>Prototipe lomba.</strong> Belum diaudit pihak independen. Jangan dipakai untuk
+            <strong>Masih prototipe.</strong> Belum diaudit pihak independen. Jangan dipakai untuk
             kasus nyata sebelum ditinjau.
           </li>
         </ul>
