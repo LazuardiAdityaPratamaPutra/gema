@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { markLocked } from '@/lib/lock-note';
+import { markLocked } from '@/lib/vault/lock-note';
 import { reporterStore, satgasStore } from '@/lib/store';
 
 const IDLE_MS = 5 * 60_000;

@@ -14,36 +14,41 @@ function newAlias(): string {
   return s;
 }
 
-export function escalate(
-  db: DB,
-  s: Extract<Session, { kind: 'reporter' }>,
-  reportId: string,
-  body: {
-    escalationId: string;
-    mode: 'bersama' | 'tunggal';
-    wrapped: Escalation['dek_wrapped_satgas'];
-    prioritas?: boolean;
-  },
-) {
-  const r = db.reports[reportId];
-  if (!r || r.reporter_id !== s.reporter_id || r.scope_id !== s.scope_id)
-    throw new HttpError(404, 'Laporan tidak ditemukan');
+type EscalationInput = { escalationId: string; wrapped: Escalation['dek_wrapped_satgas'] };
+
+/** Pemeriksaan bersama eskalasi langsung dan bersyarat: belum dieskalasi, ID baru, kunci lengkap. */
+function assertEscalatable(db: DB, r: Report, body: EscalationInput) {
   if (r.status === 'tereskalasi') throw new HttpError(409, 'Laporan ini sudah dieskalasi.');
   if (!body.escalationId || db.escalations[body.escalationId])
     throw new HttpError(409, 'ID eskalasi tidak valid');
   if (!body.wrapped?.blob || !body.wrapped?.ctMlkem)
     throw new HttpError(400, 'Pembungkus kunci tidak lengkap');
-  if (body.mode === 'bersama') {
-    const mi = matchInfo(db, reportId);
-    if (!mi.notify || !r.opt_in || mi.optedIn < 2)
-      throw new HttpError(409, 'Eskalasi bersama butuh persetujuan minimal dua pelapor.');
-  }
+}
+
+/** Eskalasi bersama hanya boleh bila cukup pelapor di klaster sudah setuju. */
+function assertJointConsent(db: DB, r: Report) {
+  const mi = matchInfo(db, r.id);
+  if (!mi.notify || !r.opt_in || mi.optedIn < 2)
+    throw new HttpError(409, 'Eskalasi bersama butuh persetujuan minimal dua pelapor.');
+}
+
+export function escalate(
+  db: DB,
+  s: Extract<Session, { kind: 'reporter' }>,
+  reportId: string,
+  body: EscalationInput & { mode: 'bersama' | 'tunggal'; prioritas?: boolean },
+) {
+  const r = ownedReport(db, s, reportId);
+  assertEscalatable(db, r, body);
+  const joint = body.mode === 'bersama';
+  if (joint) assertJointConsent(db, r);
+  const sumber = joint ? 'bersama' : 'tunggal';
   return createEscalation(db, r, {
     escalationId: body.escalationId,
-    sumber: body.mode === 'bersama' ? 'bersama' : 'tunggal',
+    sumber,
     wrapped: body.wrapped,
     prioritas: body.prioritas === true,
-    label: `Laporan dieskalasi atas persetujuan pelapor (${body.mode === 'bersama' ? 'bersama' : 'tunggal'}).`,
+    label: `Laporan dieskalasi atas persetujuan pelapor (${sumber}).`,
     aktor: 'pelapor-anonim',
   });
 }
@@ -122,11 +127,7 @@ export function setConditional(
   },
 ) {
   const r = ownedReport(db, s, reportId);
-  if (r.status === 'tereskalasi') throw new HttpError(409, 'Laporan ini sudah dieskalasi.');
-  if (!body.escalationId || db.escalations[body.escalationId])
-    throw new HttpError(409, 'ID eskalasi tidak valid');
-  if (!body.wrapped?.blob || !body.wrapped?.ctMlkem)
-    throw new HttpError(400, 'Pembungkus kunci tidak lengkap');
+  assertEscalatable(db, r, body);
   const min = Math.round(Number(body.minSize));
   if (!Number.isFinite(min) || min < MIN_COND || min > MAX_COND)
     throw new HttpError(400, `Syarat harus antara ${MIN_COND} dan ${MAX_COND} pelapor.`);

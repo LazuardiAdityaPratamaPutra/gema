@@ -15,41 +15,49 @@ const RASA =
 
 export type Nudge = { id: 'waktu' | 'tempat' | 'saksi' | 'urutan' | 'dampak'; teks: string };
 
+type Filled = Partial<Record<'kapan' | 'dimana' | 'saksi' | 'dampak', string>>;
+type Rule = Nudge & { missing: (t: string, filled: Filled) => boolean };
+
+const empty = (v?: string) => !v?.trim();
+const words = (t: string) => t.split(' ').length;
+
+/** Urutan aturan = urutan pertanyaan; hanya dua pertama yang berlaku yang ditampilkan. */
+const RULES: Rule[] = [
+  {
+    id: 'waktu',
+    teks: 'Kamu ingat kira-kira kapan? Bulan atau semester saja sudah membantu.',
+    missing: (t, f) => empty(f.kapan) && !WAKTU.test(t),
+  },
+  {
+    id: 'tempat',
+    teks: 'Di mana kejadiannya? Ruangan, tempat, atau lewat aplikasi apa.',
+    missing: (t, f) => empty(f.dimana) && !TEMPAT.test(t),
+  },
+  {
+    id: 'urutan',
+    teks: 'Bila sanggup, ceritakan urutannya: apa yang terjadi lebih dulu, lalu sesudahnya.',
+    missing: (t) => words(t) > 25 && !URUTAN.test(t),
+  },
+  {
+    id: 'saksi',
+    teks: 'Apakah ada orang yang melihat, atau yang kamu ceritakan sesudahnya? Boleh dilewati.',
+    missing: (t, f) => empty(f.saksi) && !SAKSI.test(t),
+  },
+  {
+    id: 'dampak',
+    teks: 'Bila mau, tulis dampaknya padamu, misalnya kuliah atau tidurmu terganggu. Boleh dilewati.',
+    missing: (t, f) => empty(f.dampak) && !RASA.test(t),
+  },
+];
+
 /**
  * Mengembalikan paling banyak dua pertanyaan untuk bagian yang belum muncul.
  * `filled` berisi kolom yang sudah diisi terpisah (kapan/di mana/saksi/dampak) agar tidak ditanyakan ulang.
  */
-export function nudges(
-  text: string,
-  filled: Partial<Record<'kapan' | 'dimana' | 'saksi' | 'dampak', string>> = {},
-): Nudge[] {
+export function nudges(text: string, filled: Filled = {}): Nudge[] {
   const t = normalize(text);
-  if (t.split(' ').length < 8) return [];
-  const out: Nudge[] = [];
-  if (!filled.kapan?.trim() && !WAKTU.test(t))
-    out.push({
-      id: 'waktu',
-      teks: 'Kamu ingat kira-kira kapan? Bulan atau semester saja sudah membantu.',
-    });
-  if (!filled.dimana?.trim() && !TEMPAT.test(t))
-    out.push({
-      id: 'tempat',
-      teks: 'Di mana kejadiannya? Ruangan, tempat, atau lewat aplikasi apa.',
-    });
-  if (t.split(' ').length > 25 && !URUTAN.test(t))
-    out.push({
-      id: 'urutan',
-      teks: 'Bila sanggup, ceritakan urutannya: apa yang terjadi lebih dulu, lalu sesudahnya.',
-    });
-  if (!filled.saksi?.trim() && !SAKSI.test(t))
-    out.push({
-      id: 'saksi',
-      teks: 'Apakah ada orang yang melihat, atau yang kamu ceritakan sesudahnya? Boleh dilewati.',
-    });
-  if (!filled.dampak?.trim() && !RASA.test(t))
-    out.push({
-      id: 'dampak',
-      teks: 'Bila mau, tulis dampaknya padamu, misalnya kuliah atau tidurmu terganggu. Boleh dilewati.',
-    });
-  return out.slice(0, 2);
+  if (words(t) < 8) return [];
+  return RULES.filter((r) => r.missing(t, filled))
+    .slice(0, 2)
+    .map(({ id, teks }) => ({ id, teks }));
 }

@@ -62,18 +62,21 @@ function matchStart(line: string): Start | null {
   };
 }
 
+/** Jam 12 jam (am/pm) menjadi jam 24; tanpa penanda am/pm jam dipakai apa adanya. */
+function to24h(hour: number, ampm: string | null): number {
+  if (!ampm) return hour;
+  if (ampm.startsWith('p') && hour < 12) return hour + 12;
+  if (ampm.startsWith('a') && hour === 12) return 0;
+  return hour;
+}
+
 function toIso(s: Start, order: 'dmy' | 'mdy'): string | null {
   const day = order === 'dmy' ? s.a : s.b;
   const month = order === 'dmy' ? s.b : s.a;
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
   const year = s.y < 100 ? 2000 + s.y : s.y;
-  let h = s.hh;
-  if (s.ampm) {
-    if (s.ampm.startsWith('p') && h < 12) h += 12;
-    if (s.ampm.startsWith('a') && h === 12) h = 0;
-  }
   const p = (n: number) => String(n).padStart(2, '0');
-  return `${year}-${p(month)}-${p(day)}T${p(h)}:${p(s.mm)}:${p(s.ss ?? 0)}`;
+  return `${year}-${p(month)}-${p(day)}T${p(to24h(s.hh, s.ampm))}:${p(s.mm)}:${p(s.ss ?? 0)}`;
 }
 
 function splitSender(rest: string): { sender: string; text: string } {

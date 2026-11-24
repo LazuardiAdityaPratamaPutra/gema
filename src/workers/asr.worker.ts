@@ -1,7 +1,13 @@
 /// <reference lib="webworker" />
 // Pengenal suara Whisper yang berjalan di peramban. Audio tidak pernah meninggalkan perangkat.
 import { env, pipeline, type AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
-import { ASR_MODEL, ASR_OPTIONS, MODEL_HOST, ORT_PATHS, cleanTranscript } from '../lib/asr-config';
+import {
+  ASR_MODEL,
+  ASR_OPTIONS,
+  MODEL_HOST,
+  ORT_PATHS,
+  cleanTranscript,
+} from '@/lib/asr/asr-config';
 
 env.allowLocalModels = false;
 // Muat runtime langsung dari /ort (bukan URL blob) agar CSP tidak perlu melonggarkan script-src.

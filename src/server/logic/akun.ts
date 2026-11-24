@@ -49,28 +49,37 @@ export function registerReporter(
 
 const DUMMY = authHash(new Uint8Array(32));
 
+/** Kunci otentikasi dari klien; yang rusak diperlakukan sebagai kunci nol agar waktu jawab tetap sama. */
+function decodeAuthKey(authKey: string | undefined): Uint8Array {
+  try {
+    const key = fromB64u(authKey ?? '');
+    return key.length === 32 ? key : new Uint8Array(32);
+  } catch {
+    return new Uint8Array(32);
+  }
+}
+
+/** Indeks slot yang cocok, atau -1. Kedua slot (dan umpan) selalu dibandingkan, tanpa short-circuit. */
+function matchSlot(slots: { auth_hash: string }[], key: Uint8Array): number {
+  const hb = utf8(authHash(key));
+  let matched = -1;
+  for (let i = 0; i < 2; i++) {
+    const eq = constantTimeEqual(hb, utf8(slots[i]?.auth_hash ?? DUMMY));
+    if (eq && slots[i]) matched = i;
+  }
+  return matched;
+}
+
 /** Respons dan waktu seragam untuk kode yang tidak ada, slot nyata, maupun slot umpan. */
 export function loginReporter(db: DB, body: { caseCode: string; authKey: string }) {
   const code = normalizeCaseCode(body.caseCode ?? '');
   const rlKey = sha256hex('login:' + code);
   if (RL.login.count(rlKey, 15 * 60_000) >= 5)
     throw new HttpError(429, 'Terlalu banyak percobaan. Coba lagi dalam 15 menit.');
-  let key: Uint8Array;
-  try {
-    key = fromB64u(body.authKey ?? '');
-  } catch {
-    key = new Uint8Array(32);
-  }
+  const key = decodeAuthKey(body.authKey);
   const reporter = Object.values(db.reporters).find((r) => r.case_code === code);
   const slots = reporter ? db.slots.filter((s) => s.reporter_id === reporter.id) : [];
-  const h = authHash(key.length === 32 ? key : new Uint8Array(32));
-  const hb = utf8(h);
-  let matched = -1;
-  for (let i = 0; i < 2; i++) {
-    const cand = slots[i]?.auth_hash ?? DUMMY;
-    const eq = constantTimeEqual(hb, utf8(cand));
-    if (eq && slots[i]) matched = i; // tanpa short-circuit: kedua slot selalu diperiksa
-  }
+  const matched = matchSlot(slots, key);
   if (matched < 0 || !reporter) {
     RL.login.check(rlKey, 1_000_000, 15 * 60_000); // catat kegagalan
     throw new HttpError(401, 'Kode atau passphrase tidak cocok.');

@@ -1,4 +1,5 @@
-import { flush, getDb, loadedDb } from './db';
+import { flush, getDb, loadedDb, registerSeeder } from './db';
+import { seedDemo } from './seed';
 import { HttpError } from './util';
 import { akun } from './routes/akun';
 import { json, type Handler } from './routes/context';
@@ -7,6 +8,9 @@ import { demo } from './routes/demo';
 import { pelapor } from './routes/pelapor';
 import { publik } from './routes/publik';
 import { satgas } from './routes/satgas';
+
+// Titik perakitan: penyimpanan (db) tidak mengimpor seed, jadi pengisinya didaftarkan di sini.
+registerSeeder(seedDemo);
 
 /** Urutan penting: penangan pertama yang mengembalikan respons menang. */
 const HANDLERS: Handler[] = [publik, akun, pelapor, satgas, demo, cron];

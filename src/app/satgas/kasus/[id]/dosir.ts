@@ -1,8 +1,8 @@
 import { decryptJson, fromB64u } from '@gema/crypto';
 import { unwrapFromSatgas } from '@gema/pq-kem';
 import { api, ApiError } from '@/lib/api';
-import { AAD, AAD_CATATAN, type BuktiMeta, type Narasi } from '@/lib/report-format';
-import { loadSatgasSecret } from '@/lib/satgas-key';
+import { AAD, AAD_CATATAN, type BuktiMeta, type Narasi } from '@/lib/laporan/report-format';
+import { loadSatgasSecret } from '@/lib/vault/satgas-key';
 import type { SatgasSession } from '@/lib/store';
 
 export type Detail = {
@@ -110,3 +110,23 @@ export const STATUSES = [
   'Tindak lanjut pimpinan',
   'Selesai',
 ];
+
+/** Bahan ringkasan dan draf pendamping, diambil dari isi laporan dan metadata bukti yang sudah terbuka. */
+export function assistInputOf(narasi: Narasi | null, meta: BuktiMeta | null) {
+  if (!narasi || !meta) return null;
+  const { terlapor } = narasi;
+  return {
+    apa: narasi.apa,
+    kapan: narasi.kapan,
+    dimana: narasi.dimana,
+    saksi: narasi.saksi,
+    dampak: narasi.dampak,
+    terlapor: {
+      nama: terlapor.nama,
+      unitNama: terlapor.unitNama,
+      peran: terlapor.peran,
+      relasi: terlapor.relasi,
+    },
+    bukti: meta.items.map((m) => ({ nama: m.nama, messages: m.messages })),
+  };
+}

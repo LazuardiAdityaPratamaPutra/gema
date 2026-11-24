@@ -1,7 +1,7 @@
 /** Akun pelapor: pemulihan lewat orang tepercaya dan masuk dengan passkey (WebAuthn PRF). */
 import crypto from 'node:crypto';
 import { authHash, b64u, constantTimeEqual, fromB64u, normalizeCaseCode, utf8 } from '@gema/crypto';
-import { VAULT_SIZE } from '@/lib/report-format';
+import { VAULT_SIZE } from '@/lib/laporan/report-format';
 import { secretSeed, persist } from './db';
 import { audit, issueSession, limiters as RL, type Session } from './logic';
 import type { DB } from './types';

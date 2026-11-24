@@ -1,41 +1,13 @@
 'use client';
-import { PasswordEye } from '@/components/PasswordEye';
 import { HeaderPhoto } from '@/components/HeaderPhoto';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { api } from '@/lib/api';
-import { satgasStore, type SatgasSession } from '@/lib/store';
-import { clearLockNote, useLockNote } from '@/lib/lock-note';
+import { useLockNote } from '@/lib/vault/lock-note';
+import { LoginForm } from './LoginForm';
+import { useSatgasLogin } from './useSatgasLogin';
 
 export default function SatgasMasuk() {
-  const router = useRouter();
   const locked = useLockNote();
-  const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
-  const [err, setErr] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [show, setShow] = useState(false);
-  async function go(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setErr('');
-    try {
-      const r = await api<SatgasSession>('satgas/login', { body: { email, password: pw } });
-      satgasStore.set(r);
-      clearLockNote();
-      router.push(
-        r.member.role === 'Auditor'
-          ? '/satgas/audit'
-          : r.member.role === 'Pengawas'
-            ? '/satgas'
-            : '/satgas',
-      );
-    } catch (x) {
-      setErr(x instanceof Error ? x.message : 'Gagal masuk.');
-      setBusy(false);
-    }
-  }
+  const login = useSatgasLogin();
   return (
     <div className="narrow">
       <header className="ph ph-foto" data-tab="Untuk Satgas PPKPT">
@@ -48,39 +20,7 @@ export default function SatgasMasuk() {
           Layar dikunci karena lama tidak aktif. Masuk lagi untuk melanjutkan.
         </p>
       )}
-      <form onSubmit={go}>
-        <div className="field">
-          <label htmlFor="e">Email</label>
-          <input
-            id="e"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="username"
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="p">Kata sandi</label>
-          <div className="pw-row">
-            <input
-              id="p"
-              type={show ? 'text' : 'password'}
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              autoComplete="current-password"
-            />
-            <PasswordEye show={show} onToggle={() => setShow((v) => !v)} />
-          </div>
-        </div>
-        {err && (
-          <p className="err" role="alert">
-            {err}
-          </p>
-        )}
-        <button className="btn teal" disabled={busy || !email || !pw} aria-busy={busy}>
-          {busy ? 'Masuk…' : 'Masuk'}
-        </button>
-      </form>
+      <LoginForm l={login} />
       <div className="alt-line">
         <span className="muted">Ingin mencoba tanpa akun?</span>
         <Link href="/demo" className="btn ghost sm">

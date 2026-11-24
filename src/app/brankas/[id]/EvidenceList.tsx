@@ -1,8 +1,8 @@
 import { ChatSignals } from '@/components/ChatSignals';
 import { Term } from '@/components/Term';
-import { fmtBytes, fmtDateTime, shortHash } from '@/lib/format';
-import type { BuktiMeta } from '@/lib/report-format';
-import type { ReportView } from '@/lib/vault-client';
+import { fmtBytes, fmtDateTime, shortHash } from '@/lib/ui/format';
+import type { BuktiMeta } from '@/lib/laporan/report-format';
+import type { ReportView } from '@/lib/vault/vault-client';
 
 type Evidence = ReportView['evidence'][number];
 

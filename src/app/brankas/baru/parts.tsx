@@ -1,4 +1,4 @@
-import { fmtBytes } from '@/lib/format';
+import { fmtBytes } from '@/lib/ui/format';
 
 /** Lampiran dari draf yang belum dipasang lagi. Isinya tidak ikut tersimpan, jadi harus dipilih ulang atau dilewati dengan sadar. */
 export function MissingFiles({

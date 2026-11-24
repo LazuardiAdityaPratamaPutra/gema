@@ -229,7 +229,12 @@ gema/
 ├─ src/
 │  ├─ app/             halaman dan rute API (Next.js App Router)
 │  ├─ components/      komponen UI
-│  ├─ lib/             logika klien: brankas, bukti, passkey, format
+│  ├─ lib/             logika sisi klien
+│  │  ├─ vault/        brankas, kunci, passkey, pemulihan, bukti pemilik
+│  │  ├─ laporan/      penyusunan laporan, format, draf terenkripsi
+│  │  ├─ asr/          dikte suara di perangkat
+│  │  ├─ ui/           format tampilan, keluar cepat, rujukan
+│  │  └─ demo/         akun dan kunci Mode Demo
 │  ├─ server/
 │  │  ├─ routes/       rute API per domain: publik, akun, pelapor, satgas, demo, cron
 │  │  ├─ logic/        aturan inti: sesi, akun, laporan, klaster, eskalasi, SLA, anchor
@@ -240,7 +245,9 @@ gema/
 ├─ packages/           pustaka tanpa dependensi UI
 │  ├─ crypto  oprf  pq-kem  merkle  zk  shamir
 │  └─ matching  chat-parser  pendamping  dp  passphrase
-├─ tests/              uji unit, API end-to-end, dan klaim teks
+├─ tests/
+│  ├─ e2e/             uji alur API dari laporan sampai pertanggungjawaban
+│  └─ unit/            uji klaim teks, galat dikte, vektor ML-KEM
 ├─ scripts/            pembangun Verifier Mandiri, penyalin runtime WASM
 ├─ docs/               panduan, catatan desain, arsip
 └─ public/             logo, gambar, runtime WASM

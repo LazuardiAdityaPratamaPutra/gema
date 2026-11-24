@@ -1,5 +1,5 @@
 import { fromB64u } from '@gema/crypto';
-import { DEMO_INSTITUTION_ID } from '@/lib/demo';
+import { DEMO_INSTITUTION_ID } from '@/lib/demo/demo';
 import { persist } from '../db';
 import { advanceStatus, audit, issueSession, ipHash, limiters, nowFor, tick } from '../logic';
 import {
@@ -12,11 +12,17 @@ import {
   verifyOwner,
 } from '../logic-satgas';
 import { checkPassword } from '../seed';
-import { CASE_STATUSES, type CaseStatus, type Escalation } from '../types';
+import {
+  CASE_STATUSES,
+  type CaseStatus,
+  type DB,
+  type Escalation,
+  type Institution,
+} from '../types';
 import { demoEnabled } from '../demo-flag';
 import { HttpError, uid } from '../util';
 import {
-  body,
+  bodyOf,
   clientIp,
   json,
   memberOf,
@@ -26,27 +32,26 @@ import {
   type SatgasSession,
 } from './context';
 import { memberName } from './helpers';
+import {
+  assignBody,
+  noteBody,
+  panelBody,
+  replaceKeyBody,
+  satgasLoginBody,
+  statusBody,
+  verifyOwnerBody,
+} from './schemas';
 import { caseListItem, dossierView } from './views';
 
 const STAFF = ['Ketua', 'Anggota'];
 
-/** Rute `/api/satgas/*`: masuk, daftar kasus, dosir, persetujuan, kunci, audit, radar, tangga. */
-export const satgas: Handler = async (ctx) => {
-  const {
-    method,
-    seg: [a, b, c],
-    req,
-    db,
-  } = ctx;
-  if (a !== 'satgas') return;
+type Route = (ctx: Ctx, s: SatgasSession) => Promise<Response | undefined> | Response | undefined;
 
-  if (b === 'login' && method === 'POST') return login(ctx);
-
-  const s = satgasSession(req);
-  const me = memberOf(db, s);
-  const inst = db.institutions[s.institution_id];
-
-  if (b === 'me')
+/** Rute bernama `"METODE segmen"`; `*` berarti metode apa pun. Sesi sudah diperiksa sebelum masuk. */
+const ROUTES: Record<string, Route> = {
+  '* me': ({ db }, s) => {
+    const me = memberOf(db, s);
+    const inst = db.institutions[s.institution_id];
     return json({
       member: { nama: me.nama, role: me.role, email: me.email },
       institution: {
@@ -59,50 +64,64 @@ export const satgas: Handler = async (ctx) => {
       },
       now: nowFor(db, inst.id),
     });
-
-  if (b === 'team' && method === 'GET') {
+  },
+  'GET team': ({ req, db }, s) => {
     satgasSession(req, ['Ketua']);
     return json({
       members: Object.values(db.members)
-        .filter((m) => m.institution_id === inst.id && STAFF.includes(m.role))
+        .filter((m) => m.institution_id === s.institution_id && STAFF.includes(m.role))
         .map((m) => ({ id: m.id, nama: m.nama, role: m.role })),
     });
-  }
-
-  if (b === 'cases' && !c && method === 'GET') return caseList(ctx, s);
-  if (b === 'cases' && c) {
-    const res = await caseActions(ctx, s, c);
-    if (res) return res;
-  }
-
-  if (b === 'panel' && method === 'POST') {
-    const x = await body<{ mode?: string }>(req);
-    setPanelMode(db, s, x.mode as never);
-    return json({ ok: true, panelMode: inst.panel_mode });
-  }
-  if (b === 'approvals' && !c && method === 'GET') {
+  },
+  '* cases': (ctx, s) => {
+    const id = ctx.seg[2];
+    if (id) return caseActions(ctx, s, id);
+    return ctx.method === 'GET' ? caseList(ctx, s) : undefined;
+  },
+  'POST panel': async ({ req, db }, s) => {
+    const x = await bodyOf(panelBody, req);
+    setPanelMode(db, s, x.mode as Institution['panel_mode']);
+    return json({ ok: true, panelMode: db.institutions[s.institution_id].panel_mode });
+  },
+  'GET approvals': ({ req, db, seg }, s) => {
+    if (seg[2]) return;
     satgasSession(req, ['Ketua', 'Anggota', 'Pimpinan']);
     return json(approvalsFor(db, s));
-  }
-  if (b === 'approvals' && c && seg3(ctx) === 'approve' && method === 'POST') {
-    approve(db, s, c);
+  },
+  'POST approvals': ({ db, seg }, s) => {
+    if (!seg[2] || seg[3] !== 'approve') return;
+    approve(db, s, seg[2]);
     return json({ ok: true });
-  }
-  if (b === 'key' && method === 'POST') return replaceKey(ctx);
-  if (b === 'audit' && method === 'GET') {
+  },
+  'POST key': (ctx) => replaceKey(ctx),
+  'GET audit': ({ req, db }) => {
     satgasSession(req, ['Auditor', 'Ketua']);
     return json({ entries: db.audit.slice(-200).reverse(), total: db.audit.length });
-  }
-  if (b === 'radar' && method === 'GET') return radar(ctx);
-  if (b === 'ladder' && method === 'GET') return ladder(ctx, s);
+  },
+  'GET radar': (ctx) => radar(ctx),
+  'GET ladder': (ctx, s) => ladder(ctx, s),
 };
 
-const seg3 = ({ seg }: Ctx) => seg[3];
+/** Rute `/api/satgas/*`: masuk, daftar kasus, dosir, persetujuan, kunci, audit, radar, tangga. */
+export const satgas: Handler = async (ctx) => {
+  const {
+    method,
+    seg: [a, b],
+    req,
+    db,
+  } = ctx;
+  if (a !== 'satgas') return;
+  if (b === 'login' && method === 'POST') return login(ctx);
+
+  const s = satgasSession(req);
+  memberOf(db, s); // anggota yang sudah dihapus tidak boleh meneruskan sesi lamanya
+  return (ROUTES[`${method} ${b}`] ?? ROUTES[`* ${b}`])?.(ctx, s);
+};
 
 async function login({ req, db }: Ctx) {
   if (!limiters.misc.check('sl:' + ipHash(clientIp(req)), 20, 15 * 60_000))
     throw new HttpError(429, 'Terlalu banyak percobaan.');
-  const x = await body<{ email?: string; password?: string; demoRole?: string }>(req);
+  const x = await bodyOf(satgasLoginBody, req);
   const members = Object.values(db.members);
   let m =
     x.demoRole && demoEnabled()
@@ -142,43 +161,54 @@ async function caseList({ db }: Ctx, s: SatgasSession) {
   return json({ cases, now: nowFor(db, s.institution_id) });
 }
 
+type CaseRoute = (ctx: Ctx, s: SatgasSession, e: Escalation) => Promise<Response> | Response;
+
+/** Aksi yang memeriksa peran sendiri, jadi berjalan sebelum syarat Ketua/Anggota. */
+const OWN_CHECK: Record<string, CaseRoute> = {
+  'POST assign': (ctx, s, e) => assign(ctx, s, e),
+  'POST status': (ctx, s, e) => changeStatus(ctx, s, e),
+};
+
+/** Aksi khusus Ketua dan Anggota; kunci `"METODE aksi"` (aksi kosong = membuka dosir). */
+const STAFF_ONLY: Record<string, CaseRoute> = {
+  'POST challenge': ({ db }, s, e) => json(newChallenge(db, s, e.id), 201),
+  'POST verify-owner': async ({ req, db }, s, e) =>
+    json(verifyOwner(db, s, e.id, await bodyOf(verifyOwnerBody, req))),
+  'POST approval': ({ db }, s, e) =>
+    json({ ok: true, approval: requestApproval(db, s, e.id) }, 201),
+  'POST notes': (ctx, s, e) => addNote(ctx, s, e),
+  'GET ': (ctx, s, e) => openDossier(ctx, s, e),
+};
+
 /** Aksi atas satu kasus: `/api/satgas/cases/:id[/aksi]`. */
-async function caseActions(ctx: Ctx, s: SatgasSession, caseId: string) {
-  const {
-    method,
-    seg: [, , , d],
-    req,
-    db,
-  } = ctx;
-  const e = db.escalations[caseId];
+function caseActions(ctx: Ctx, s: SatgasSession, caseId: string) {
+  const e = ctx.db.escalations[caseId];
   if (!e || e.institution_id !== s.institution_id)
     throw new HttpError(404, 'Kasus tidak ditemukan');
 
-  if (d === 'assign' && method === 'POST') return assign(ctx, s, e);
-  if (d === 'status' && method === 'POST') return changeStatus(ctx, s, e);
+  const key = `${ctx.method} ${ctx.seg[3] ?? ''}`;
+  const own = OWN_CHECK[key];
+  if (own) return own(ctx, s, e);
+  satgasSession(ctx.req, ['Ketua', 'Anggota']);
+  return STAFF_ONLY[key]?.(ctx, s, e);
+}
 
-  satgasSession(req, ['Ketua', 'Anggota']);
-  if (d === 'challenge' && method === 'POST') return json(newChallenge(db, s, e.id), 201);
-  if (d === 'verify-owner' && method === 'POST')
-    return json(verifyOwner(db, s, e.id, (await body(req)) as never));
-  if (d === 'approval' && method === 'POST')
-    return json({ ok: true, approval: requestApproval(db, s, e.id) }, 201);
-  if (d === 'notes' && method === 'POST') return addNote(ctx, s, e);
-  if (!d && method === 'GET') return openDossier(ctx, s, e);
+/** Penanggung jawab harus Ketua atau Anggota di institusi yang sama; tanpa id berarti mencabut. */
+function assigneeOf(db: DB, s: SatgasSession, memberId: string | null | undefined) {
+  if (!memberId) return undefined;
+  const target = db.members[memberId];
+  if (!target || target.institution_id !== s.institution_id || !STAFF.includes(target.role))
+    throw new HttpError(400, 'Penanggung jawab harus Ketua atau Anggota Satgas institusi ini.');
+  return target;
 }
 
 async function assign({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
   satgasSession(req, ['Ketua']);
   const me = memberOf(db, s);
-  const x = await body<{ memberId?: string | null }>(req);
+  const x = await bodyOf(assignBody, req);
   if (e.status === 'Selesai')
     throw new HttpError(409, 'Kasus yang selesai tidak dapat ditugaskan.');
-  const target = x.memberId ? db.members[x.memberId] : undefined;
-  if (
-    x.memberId &&
-    (!target || target.institution_id !== s.institution_id || !STAFF.includes(target.role))
-  )
-    throw new HttpError(400, 'Penanggung jawab harus Ketua atau Anggota Satgas institusi ini.');
+  const target = assigneeOf(db, s, x.memberId);
   const now = nowFor(db, s.institution_id);
   e.assignee_id = target?.id ?? null;
   e.assigned_at = target ? now : null;
@@ -202,11 +232,13 @@ async function assign({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
   return json({ ok: true, penanggungJawab: memberName(db, target?.id) });
 }
 
+const isStatus = (v: string): v is CaseStatus => (CASE_STATUSES as readonly string[]).includes(v);
+
 async function changeStatus({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
   satgasSession(req, ['Ketua', 'Anggota', 'Pimpinan']);
   const me = memberOf(db, s);
-  const x = await body<{ to: CaseStatus }>(req);
-  if (!CASE_STATUSES.includes(x.to)) throw new HttpError(400, 'Status tidak dikenal');
+  const x = await bodyOf(statusBody, req);
+  if (!isStatus(x.to)) throw new HttpError(400, 'Status tidak dikenal');
   if (x.to === 'Selesai' && !['Ketua', 'Pimpinan'].includes(s.role))
     throw new HttpError(403, 'Hanya Ketua atau Pimpinan yang dapat menyelesaikan kasus.');
   if (s.role === 'Pimpinan' && x.to !== 'Selesai')
@@ -216,7 +248,7 @@ async function changeStatus({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
 }
 
 async function addNote({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
-  const x = await body<{ catatan_ciphertext: string }>(req);
+  const x = await bodyOf(noteBody, req);
   fromB64u(x.catatan_ciphertext);
   db.events.push({
     id: uid(8),
@@ -249,7 +281,7 @@ function openDossier({ db }: Ctx, s: SatgasSession, e: Escalation) {
 async function replaceKey({ req, db }: Ctx) {
   const s = satgasSession(req, ['Ketua']);
   const inst = db.institutions[s.institution_id];
-  const x = await body<{ publicKey?: { suite?: string; ecdh?: string; mlkem?: string } }>(req);
+  const x = await bodyOf(replaceKeyBody, req);
   const k = x.publicKey;
   if (
     !k ||

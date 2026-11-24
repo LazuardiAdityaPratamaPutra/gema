@@ -1,6 +1,6 @@
 'use client';
 import { useSyncExternalStore } from 'react';
-import type { Vault } from './report-format';
+import type { Vault } from '@/lib/laporan/report-format';
 
 const EVT = 'gema:session';
 

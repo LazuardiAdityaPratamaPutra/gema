@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { generateHybridKeypair } from '@gema/pq-kem';
-import { combineSatgasSecret, splitSatgasSecret } from '@/lib/key-shares';
+import { combineSatgasSecret, splitSatgasSecret } from '@/lib/vault/key-shares';
 
 describe('pembagian kunci Satgas 2-dari-3', () => {
   const { secretKey } = generateHybridKeypair();

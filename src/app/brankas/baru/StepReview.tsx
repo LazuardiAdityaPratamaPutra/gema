@@ -2,10 +2,10 @@ import type { RefObject } from 'react';
 import { RELASI_LABEL, type Relasi } from '@gema/pendamping';
 import { Term } from '@/components/Term';
 import { VeilBar } from '@/components/Veil';
-import type { Draft } from '@/lib/drafts';
-import { fmtBytes } from '@/lib/format';
-import type { FileInput } from '@/lib/report-build';
-import type { InstitutionInfo } from '@/lib/vault-client';
+import type { Draft } from '@/lib/laporan/drafts';
+import { fmtBytes } from '@/lib/ui/format';
+import type { FileInput } from '@/lib/laporan/report-build';
+import type { InstitutionInfo } from '@/lib/vault/vault-client';
 import { PERAN_LABEL, hasExtras, type SetField } from './draft-form';
 import { MissingFiles, ReviewPart } from './parts';
 
@@ -24,22 +24,62 @@ type Props = {
 };
 
 /** Langkah 3: tinjauan akhir sebelum dikunci. */
-export function StepReview(p: Props) {
-  const { d, set, inst, unit, files, lostFiles, error, headRef, editFrom } = p;
+/** Berkas yang akan dikunci, dengan tombol hapus; atau penjelasan bila belum ada. */
+function FileList({ files, onRemove }: { files: FileInput[]; onRemove: (i: number) => void }) {
+  if (files.length === 0)
+    return (
+      <p className="muted small m-0">
+        Belum ada berkas. Kamu tetap bisa menyimpan dan menambah bukti nanti.
+      </p>
+    );
   return (
-    <section>
-      <h1 ref={headRef} tabIndex={-1}>
-        Tinjau, lalu kunci.
-      </h1>
-      <VeilBar defaultOn={false} what="Tinjauan laporan" />
-      <p className="muted">
-        Periksa tiap bagian. Tekan Ubah untuk memperbaikinya, lalu kamu kembali ke sini.
-      </p>
-      <p className="card tint small" role="note">
-        Cerita, dokumen, tangkapan layar, tanggal, tempat, dan detail lain bisa menunjukkan siapa
-        pelapor atau orang lain. Gema tidak meminta identitasmu, tetapi kamu yang menentukan apa
-        yang ditulis dan diunggah. Periksa sekali lagi, dan ubah bagian yang tidak perlu.
-      </p>
+    <ul className="plain-list">
+      {files.map((f, i) => (
+        <li key={i} className="row row-between">
+          <span>
+            {f.nama}{' '}
+            <span className="muted small">
+              {fmtBytes(f.bytes.length)}
+              {f.messages ? `, ${f.messages.length} pesan dibaca` : ''}
+            </span>
+          </span>
+          <button
+            className="btn ghost sm"
+            type="button"
+            aria-label={`Hapus ${f.nama}`}
+            onClick={() => onRemove(i)}
+          >
+            Hapus
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Isian opsional yang terisi; atau keterangan bahwa tidak ada. */
+function ExtrasList({ d }: { d: Draft }) {
+  if (!hasExtras(d)) return <p className="muted small m-0">Tidak ada. Ini opsional.</p>;
+  return (
+    <ul className="plain-list small">
+      {d.saksi && <li>Saksi: {d.saksi}</li>}
+      {d.dampak && <li>Dampak: {d.dampak}</li>}
+      {d.alias && <li>Nama panggilan terlapor: {d.alias}</li>}
+      {d.periode && <li>Periode: {d.periode}</li>}
+    </ul>
+  );
+}
+
+function ReviewSummary({
+  d,
+  inst,
+  unit,
+  files,
+  editFrom,
+  onRemoveFile,
+}: Pick<Props, 'd' | 'inst' | 'unit' | 'files' | 'editFrom' | 'onRemoveFile'>) {
+  return (
+    <>
       <ReviewPart
         title="Kampus dan unit"
         onEdit={() => editFrom(0, 'inst')}
@@ -78,33 +118,7 @@ export function StepReview(p: Props) {
         onEdit={() => editFrom(1, 'berkas')}
         editLabel="Ubah bukti"
       >
-        {files.length === 0 ? (
-          <p className="muted small m-0">
-            Belum ada berkas. Kamu tetap bisa menyimpan dan menambah bukti nanti.
-          </p>
-        ) : (
-          <ul className="plain-list">
-            {files.map((f, i) => (
-              <li key={i} className="row row-between">
-                <span>
-                  {f.nama}{' '}
-                  <span className="muted small">
-                    {fmtBytes(f.bytes.length)}
-                    {f.messages ? `, ${f.messages.length} pesan dibaca` : ''}
-                  </span>
-                </span>
-                <button
-                  className="btn ghost sm"
-                  type="button"
-                  aria-label={`Hapus ${f.nama}`}
-                  onClick={() => p.onRemoveFile(i)}
-                >
-                  Hapus
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <FileList files={files} onRemove={onRemoveFile} />
         {d.bukti && <p className="muted small m-0">Catatan: {d.bukti}</p>}
       </ReviewPart>
       <ReviewPart
@@ -112,31 +126,56 @@ export function StepReview(p: Props) {
         onEdit={() => editFrom(1, 'saksi', true)}
         editLabel="Ubah detail tambahan"
       >
-        {hasExtras(d) ? (
-          <ul className="plain-list small">
-            {d.saksi && <li>Saksi: {d.saksi}</li>}
-            {d.dampak && <li>Dampak: {d.dampak}</li>}
-            {d.alias && <li>Nama panggilan terlapor: {d.alias}</li>}
-            {d.periode && <li>Periode: {d.periode}</li>}
-          </ul>
-        ) : (
-          <p className="muted small m-0">Tidak ada. Ini opsional.</p>
-        )}
+        <ExtrasList d={d} />
       </ReviewPart>
+    </>
+  );
+}
+
+function PatternChoice({ d, set }: Pick<Props, 'd' | 'set'>) {
+  return (
+    <div className="field mt-md">
+      <label htmlFor="k">Kapan kamu mau diberi tahu ada pola?</label>
+      <select id="k" value={d.k} onChange={(e) => set('k', Number(e.target.value))}>
+        <option value={2}>Bila 2 laporan cocok (paling cepat)</option>
+        <option value={3}>Bila 3 laporan cocok</option>
+        <option value={4}>Bila 4 laporan cocok (paling berhati-hati)</option>
+      </select>
+    </div>
+  );
+}
+
+export function StepReview(p: Props) {
+  const { d, set, inst, unit, files, lostFiles, error, headRef, editFrom } = p;
+  return (
+    <section>
+      <h1 ref={headRef} tabIndex={-1}>
+        Tinjau, lalu kunci.
+      </h1>
+      <VeilBar defaultOn={false} what="Tinjauan laporan" />
+      <p className="muted">
+        Periksa tiap bagian. Tekan Ubah untuk memperbaikinya, lalu kamu kembali ke sini.
+      </p>
+      <p className="card tint small" role="note">
+        Cerita, dokumen, tangkapan layar, tanggal, tempat, dan detail lain bisa menunjukkan siapa
+        pelapor atau orang lain. Gema tidak meminta identitasmu, tetapi kamu yang menentukan apa
+        yang ditulis dan diunggah. Periksa sekali lagi, dan ubah bagian yang tidak perlu.
+      </p>
+      <ReviewSummary
+        d={d}
+        inst={inst}
+        unit={unit}
+        files={files}
+        editFrom={editFrom}
+        onRemoveFile={p.onRemoveFile}
+      />
       <MissingFiles
         items={lostFiles}
         tone="alert"
         onPick={() => editFrom(1, 'berkas')}
         onSkip={p.onSkipLost}
       />
-      <div className="field mt-md">
-        <label htmlFor="k">Kapan kamu mau diberi tahu ada pola?</label>
-        <select id="k" value={d.k} onChange={(e) => set('k', Number(e.target.value))}>
-          <option value={2}>Bila 2 laporan cocok (paling cepat)</option>
-          <option value={3}>Bila 3 laporan cocok</option>
-          <option value={4}>Bila 4 laporan cocok (paling berhati-hati)</option>
-        </select>
-      </div>
+      <PatternChoice d={d} set={set} />
       <p className="small muted">
         Menyimpan tidak berarti melapor. Tidak ada yang dikirim ke Satgas sampai kamu memilih{' '}
         <Term k="eskalasi">eskalasi</Term>.

@@ -1,9 +1,9 @@
 import { ChatSignals } from '@/components/ChatSignals';
 import { aesGcmDecrypt } from '@gema/crypto';
 import { api } from '@/lib/api';
-import { fmtBytes, fmtDateTime } from '@/lib/format';
-import { triggerDownload } from '@/lib/proof';
-import { AAD, type BuktiMeta } from '@/lib/report-format';
+import { fmtBytes, fmtDateTime } from '@/lib/ui/format';
+import { triggerDownload } from '@/lib/vault/proof';
+import { AAD, type BuktiMeta } from '@/lib/laporan/report-format';
 import type { SatgasSession } from '@/lib/store';
 import type { Detail } from './dosir';
 

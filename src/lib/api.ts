@@ -10,17 +10,32 @@ export class ApiError extends Error {
 
 type Opts = { method?: string; token?: string; body?: unknown; raw?: Uint8Array };
 
-export async function api<T = unknown>(path: string, opts: Opts = {}): Promise<T> {
+/** Header dan badan permintaan: biner mentah, JSON, atau tanpa badan. */
+function requestOf(opts: Opts): { headers: Record<string, string>; body?: BodyInit } {
   const headers: Record<string, string> = {};
   if (opts.token) headers.authorization = 'Bearer ' + opts.token;
-  let body: BodyInit | undefined;
   if (opts.raw) {
     headers['content-type'] = 'application/octet-stream';
-    body = opts.raw as unknown as BodyInit;
-  } else if (opts.body !== undefined) {
-    headers['content-type'] = 'application/json';
-    body = JSON.stringify(opts.body);
+    return { headers, body: opts.raw as unknown as BodyInit };
   }
+  if (opts.body === undefined) return { headers };
+  headers['content-type'] = 'application/json';
+  return { headers, body: JSON.stringify(opts.body) };
+}
+
+/** Galat dari server: pesan dari isi JSON bila ada, kalau tidak pesan umum. */
+async function failureOf(res: Response, isJson: boolean): Promise<ApiError> {
+  if (!isJson) return new ApiError(res.status, 'Terjadi kesalahan.');
+  const data: Record<string, unknown> | undefined = await res.json().catch(() => undefined);
+  return new ApiError(
+    res.status,
+    (data?.error as string | undefined) ?? 'Terjadi kesalahan.',
+    data,
+  );
+}
+
+export async function api<T = unknown>(path: string, opts: Opts = {}): Promise<T> {
+  const { headers, body } = requestOf(opts);
   let res: Response;
   try {
     res = await fetch('/api/' + path, {
@@ -33,15 +48,7 @@ export async function api<T = unknown>(path: string, opts: Opts = {}): Promise<T
   } catch {
     throw new ApiError(0, 'Tidak dapat terhubung. Periksa koneksimu, lalu coba lagi.');
   }
-  const type = res.headers.get('content-type') ?? '';
-  if (!res.ok) {
-    let msg = 'Terjadi kesalahan.';
-    let data: Record<string, unknown> | undefined;
-    if (type.includes('json')) {
-      data = await res.json().catch(() => undefined);
-      msg = (data?.error as string | undefined) ?? msg;
-    }
-    throw new ApiError(res.status, msg, data);
-  }
-  return (type.includes('json') ? await res.json() : new Uint8Array(await res.arrayBuffer())) as T;
+  const isJson = (res.headers.get('content-type') ?? '').includes('json');
+  if (!res.ok) throw await failureOf(res, isJson);
+  return (isJson ? await res.json() : new Uint8Array(await res.arrayBuffer())) as T;
 }

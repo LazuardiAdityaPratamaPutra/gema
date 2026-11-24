@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { reporterStore, satgasStore } from '@/lib/store';
-import { quickExit } from '@/lib/quick-exit';
+import { quickExit } from '@/lib/ui/quick-exit';
 
 const PROTECTED = /^\/(brankas|satgas)(\/|$)/;
 

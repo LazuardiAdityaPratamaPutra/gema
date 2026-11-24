@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
-import { DEMO_INSTITUTION_ID, DEMO_MEMBERS, DEMO_PASSWORD, DEMO_UNITS } from '@/lib/demo';
-import { DEMO_SATGAS_PUBLIC } from '@/lib/demo-keys';
+import { DEMO_INSTITUTION_ID, DEMO_MEMBERS, DEMO_PASSWORD, DEMO_UNITS } from '@/lib/demo/demo';
+import { DEMO_SATGAS_PUBLIC } from '@/lib/demo/demo-keys';
 import { demoEnabled } from '../demo-flag';
 import type { DB } from '../types';
 import { uid } from '../util';
