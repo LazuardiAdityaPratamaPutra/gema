@@ -1,4 +1,4 @@
-import { JENIS_LABEL, NASIONAL, type RujukanKampus } from '@/lib/rujukan';
+import { JENIS_LABEL, NASIONAL, type RujukanKampus } from '@/lib/ui/rujukan';
 
 /** Direktori rujukan: layanan kampus (bila ada) lalu layanan nasional. */
 export function Rujukan({

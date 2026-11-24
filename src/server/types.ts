@@ -115,7 +115,7 @@ type Evidence = {
   anchor_id: string | null;
 };
 
-type Fingerprint = {
+export type Fingerprint = {
   report_id: string;
   varian: 'V1' | 'V2' | 'V3' | 'V4' | 'W1' | 'W2' | 'S1' | 'S2' | 'S3';
   tingkat: 'kuat' | 'lemah' | 'penguat';

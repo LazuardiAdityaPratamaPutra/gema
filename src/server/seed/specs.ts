@@ -1,7 +1,7 @@
 /** Isi laporan fiktif untuk Mode Demo. Semua nama dan peristiwa rekaan. */
 import type { Relasi } from '@gema/pendamping';
 import type { Escalation } from '../types';
-import { DEMO_CHAT, DEMO_NOTE_SAKSI } from '@/lib/demo';
+import { DEMO_CHAT, DEMO_NOTE_SAKSI } from '@/lib/demo/demo';
 
 export type Spec = {
   nama: string;

@@ -4,7 +4,7 @@
  * Semua isi fiktif. Laporan dibangun dengan kode yang sama dengan wizard klien.
  */
 import { deriveInstitutionKey, runLocal } from '@gema/oprf';
-import { DEMO_INSTITUTION_ID } from '@/lib/demo';
+import { DEMO_INSTITUTION_ID } from '@/lib/demo/demo';
 import { secretSeed } from '../db';
 import { sealAnchors, tick } from '../logic';
 import type { DB } from '../types';

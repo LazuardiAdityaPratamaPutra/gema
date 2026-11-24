@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/archivo/wght.css';
 import '@fontsource-variable/atkinson-hyperlegible-next';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';

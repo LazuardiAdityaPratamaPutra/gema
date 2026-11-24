@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import { fmtDateTime } from '@/lib/format';
+import { fmtDateTime } from '@/lib/ui/format';
 import type { SatgasSession } from '@/lib/store';
 import { STATUSES, type Detail } from './dosir';
 

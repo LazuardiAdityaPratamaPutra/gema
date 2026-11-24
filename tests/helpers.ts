@@ -15,8 +15,8 @@ import {
 } from '@gema/crypto';
 import { blindInputs, finalizeInputs } from '@gema/oprf';
 import { ownerKeyFromDek } from '@gema/zk';
-import { AAD, VAULT_SIZE } from '@/lib/report-format';
-import { buildReport } from '@/lib/report-build';
+import { AAD, VAULT_SIZE } from '@/lib/laporan/report-format';
+import { buildReport } from '@/lib/laporan/report-build';
 
 export const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gema-e2e-'));
 process.env.GEMA_DATA_DIR = dir;

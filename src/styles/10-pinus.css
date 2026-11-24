@@ -23,7 +23,6 @@
   --aksen: #0e5a45;
   --aksen-hover: #0a4636;
   --madu: #f2a33a;
-  --madu-lembut: #fbe6c2;
   --map-biru: #d3e5ea;
   --map-hijau: #cfe6d8;
   --map-oranye: #f6d9a8;
@@ -44,14 +43,12 @@ html[data-zone] {
 }
 
 body {
-  background: var(--paper);
   color: var(--ink);
 }
 
 /* ---------- tombol ---------- */
 .btn,
 .btn.teal,
-.band-hero .btn.teal,
 .panel .btn.teal,
 .nb-cta,
 html[data-zone] .ph .btn:not(.ghost):not(.teal):not(.danger):not(.light) {
@@ -63,7 +60,6 @@ html[data-zone] .ph .btn:not(.ghost):not(.teal):not(.danger):not(.light) {
 .btn.ghost,
 .nb-ghost,
 .ph .btn.ghost,
-.band-hero .btn.ghost,
 .band-clock .btn.ghost,
 html[data-zone] .ph .btn.ghost {
   background: var(--soft);
@@ -92,7 +88,6 @@ html[data-zone] .ph .btn.ghost {
   .btn.ghost:hover:not([disabled]),
   .nb-ghost:hover,
   .ph .btn.ghost:hover:not([disabled]),
-  .band-hero .btn.ghost:hover:not([disabled]),
   .band-clock .btn.ghost:hover:not([disabled]) {
     background: var(--soft-hover);
     color: var(--ink);
@@ -101,31 +96,10 @@ html[data-zone] .ph .btn.ghost {
 
 /* ---------- navigasi, banner, merek, kaki ---------- */
 .nb {
-  background: rgb(243 247 244 / 94%);
   color: var(--ink);
-}
-
-.nb-links a {
-  color: var(--ink);
-}
-
-.nb-links a[aria-current='page'] {
-  background: var(--tint);
-}
-
-.nb-demo {
-  background: var(--tint-2);
-  color: var(--ink);
-}
-
-.footer {
-  background: var(--tint);
-  color: var(--ink-2);
-  margin-top: clamp(3rem, 7vw, 6rem);
 }
 
 .footer a {
-  color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -143,7 +117,6 @@ main a:not([class]),
 }
 
 .ph a:not(.btn),
-.band-hero a:not(.btn),
 .band-clock a:not(.btn) {
   color: #0e5a45;
 }
@@ -178,30 +151,15 @@ details.fold,
   background: #fff;
 }
 
-tbody tr:nth-child(even) > * {
-  background: rgb(221 235 227 / 55%);
-}
-
-thead th {
-  background: var(--tint);
-}
-
 /* ---------- kepala halaman dalam: tanpa panel, tipografi yang bekerja ---------- */
 .ph,
 html[data-zone] .ph {
-  background: transparent;
   color: var(--ink);
-  border-radius: 0;
-  margin: 0;
-  padding: clamp(2rem, 5vw, 4rem) 0 clamp(1.4rem, 3vw, 2.4rem);
-  border-bottom: 0;
 }
 
 .ph h1 {
   color: var(--ink);
-  font-size: clamp(2.3rem, 6.2vw, 4.4rem);
   line-height: 1;
-  letter-spacing: -0.035em;
 }
 
 .ph .lede,
@@ -210,51 +168,7 @@ html[data-zone] .ph {
   color: var(--ink-2);
 }
 
-.ph::before,
-html[data-zone] .ph:not([data-tab])::before {
-  background: var(--tint);
-  color: #0e5a45;
-}
-
 /* ---------- beranda: hero ---------- */
-.band-hero {
-  background: var(--paper);
-  color: var(--ink);
-  padding-block: clamp(2.5rem, 6vw, 5rem) clamp(3rem, 7vw, 6rem);
-}
-
-.band-hero .hero-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: end;
-}
-
-@media (width >= 62em) {
-  .band-hero .hero-top {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
-  }
-}
-
-.band-hero h1 {
-  color: var(--ink);
-  font-size: clamp(3rem, 9vw, 6.8rem);
-  line-height: 0.93;
-  letter-spacing: -0.045em;
-  max-width: 10ch;
-}
-
-.band-hero .sub {
-  color: var(--ink-2);
-}
-
-.orb-sun {
-  background: var(--tint);
-}
-
-.orb-ring {
-  display: none;
-}
 
 .receipt {
   background: #fff;
@@ -266,19 +180,12 @@ html[data-zone] .ph:not([data-tab])::before {
 
 /* ---------- beranda: pemilih peran sebagai blok hijau muda berbulatan besar ---------- */
 .chooser .panel {
-  background: var(--tint);
   color: var(--ink);
-}
-
-.chooser .tabs {
-  background: transparent;
 }
 
 /* ---------- beranda: jam tenggat sebagai momen utama ---------- */
 .band-clock {
-  background: var(--tint);
   color: var(--ink);
-  padding-block: clamp(3.5rem, 8vw, 7rem);
 }
 
 .band-clock h2,
@@ -289,12 +196,6 @@ html[data-zone] .ph:not([data-tab])::before {
 .band-clock .lamps li,
 .band-clock .small {
   color: var(--ink);
-}
-
-.band-clock h2 {
-  font-size: clamp(2.4rem, 6vw, 4.6rem);
-  line-height: 1;
-  letter-spacing: -0.035em;
 }
 
 .band-clock .lamps li > span:last-child,
@@ -318,9 +219,6 @@ html[data-zone] .ph:not([data-tab])::before {
 }
 
 /* ---------- veil dan status tetap fungsional ---------- */
-.verify {
-  background: transparent;
-}
 
 html[data-zone='demo'] .ph,
 html[data-zone='demo'] .ph .lede {
@@ -351,7 +249,6 @@ html[data-zone='demo'] .ph h1 {
   .band-clock .clock {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
-    padding-block: 0;
   }
 
   .band-clock .lamps {

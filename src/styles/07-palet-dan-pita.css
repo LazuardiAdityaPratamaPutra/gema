@@ -41,17 +41,8 @@ html[data-zone='cek'] {
   --paper: #fffae3;
 }
 
-.nb {
-  background: color-mix(in srgb, var(--paper) 90%, transparent);
-}
-
 /* kepala halaman: pita selebar layar, tepi bawah khas tiap zona */
 .ph {
-  margin: -1.6rem calc(50% - 50vw) 2.8rem;
-  padding: clamp(2.2rem, 6vw, 4rem) calc(50vw - 50%) clamp(3.2rem, 8vw, 5.4rem);
-  border-radius: 0;
-  background: var(--zone);
-  color: var(--on);
   overflow: visible;
 }
 
@@ -74,17 +65,12 @@ html[data-zone] .ph:not([data-tab])::before {
 }
 
 .ph h1 {
-  font-size: clamp(2.3rem, 6vw, 4.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
   max-width: 16ch;
-  color: var(--on);
 }
 
 .ph .lede,
 .ph .muted,
 .ph > p {
-  color: var(--on-2);
   max-width: 58ch;
 }
 
@@ -104,11 +90,6 @@ html[data-zone] .ph:not([data-tab])::before {
 .ph .av {
   background: #fff;
   color: var(--ink);
-}
-
-html[data-zone='papan'] .ph .sbar,
-html[data-zone='cek'] .ph .sbar {
-  border-bottom-color: rgb(21 27 59 / 20%);
 }
 
 html[data-zone='lapor'] .ph {
@@ -150,85 +131,8 @@ html[data-zone='satgas'] .ph {
   position: relative;
 }
 
-.band-hero {
-  background: var(--malam);
-  color: #fff;
-  margin-top: -1.6rem;
-  padding-block: clamp(2.4rem, 7vw, 4.6rem) clamp(4.2rem, 10vw, 7.5rem);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 52px), 0 100%);
-  position: relative;
-  isolation: isolate;
-}
-
-.band-hero .home-hero {
-  padding-bottom: 0;
-}
-
-.band-hero h1 {
-  color: #fff;
-  font-size: clamp(2.8rem, 8.4vw, 6.4rem);
-  line-height: 0.95;
-  max-width: 11ch;
-}
-
-.band-hero .sub {
-  color: var(--on-2);
-}
-
-.band-hero .btn.teal {
-  background: var(--mentari);
-  border-color: var(--mentari);
-  color: var(--ink);
-}
-
-.band-hero .btn.ghost {
-  color: #fff;
-  border-color: rgb(255 255 255 / 70%);
-  background: transparent;
-}
-
-@media (hover: hover) {
-  .band-hero .btn.teal:hover:not([disabled]) {
-    background: #fff;
-    border-color: #fff;
-    color: var(--ink);
-  }
-
-  .band-hero .btn.ghost:hover:not([disabled]) {
-    background: #fff;
-    color: var(--ink);
-  }
-}
-
-.rc-folder,
-.rc-tab {
-  background: var(--mawar-lembut);
-}
-
 .pick {
   margin-top: 1.4rem;
-}
-
-.band-clock {
-  background: var(--teal-lembut);
-  clip-path: polygon(0 34px, 100% 0, 100% 100%, 0 100%);
-  margin-block: 2.5rem 0;
-  padding-top: 34px;
-}
-
-.band-clock .clock {
-  padding-block: clamp(2.2rem, 6vw, 4rem) clamp(3rem, 7vw, 5rem);
-}
-
-@media (width <= 40em) {
-  .band-hero {
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 28px), 0 100%);
-  }
-
-  .band-clock {
-    clip-path: polygon(0 20px, 100% 0, 100% 100%, 0 100%);
-    padding-top: 20px;
-  }
 }
 
 .rc-folder {
@@ -298,35 +202,12 @@ main table:not(.keep) tbody th::before {
 }
 
 /* parallax hero: hanya transform, digerakkan scroll di compositor (tanpa JS) */
-.hero-orbs {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-}
 
 .orb {
   position: absolute;
   display: block;
   border-radius: 50%;
   will-change: transform;
-}
-
-.orb-sun {
-  width: clamp(9rem, 26vw, 20rem);
-  aspect-ratio: 1;
-  right: 6%;
-  top: 8%;
-  background: var(--mentari);
-  opacity: 0.9;
-}
-
-.orb-ring {
-  width: clamp(14rem, 44vw, 34rem);
-  aspect-ratio: 1;
-  left: -8%;
-  bottom: -30%;
-  border: 2px solid rgb(255 255 255 / 28%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -347,24 +228,6 @@ main table:not(.keep) tbody th::before {
       to {
         transform: translate3d(0, 36px, 0);
       }
-    }
-
-    .orb-sun {
-      animation: drift-slow linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 90vh;
-    }
-
-    .orb-ring {
-      animation: drift-fast linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 90vh;
-    }
-
-    .band-hero .receipt {
-      animation: drift-card linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 90vh;
     }
   }
 }

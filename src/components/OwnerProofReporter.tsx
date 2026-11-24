@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { ReporterSession } from '@/lib/store';
-import { makeOwnerProof, type ReportView } from '@/lib/vault-client';
+import { makeOwnerProof, type ReportView } from '@/lib/vault/vault-client';
 
 /** Pelapor membuktikan ia pemilik laporan kepada Satgas tanpa membuka identitas atau isi. */
 export function OwnerProofReporter({

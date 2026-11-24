@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
-import { fmtDateTime, shortHash } from '@/lib/format';
+import { fmtDateTime, shortHash } from '@/lib/ui/format';
 import { LoadError } from '@/components/LoadError';
 
 type Entry = {

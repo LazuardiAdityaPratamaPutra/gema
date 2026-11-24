@@ -1,5 +1,5 @@
 import { bucketize, complianceSnapshot, noisyCount } from '@gema/dp';
-import { DEMO_INSTITUTION_ID } from '@/lib/demo';
+import { DEMO_INSTITUTION_ID } from '@/lib/demo/demo';
 import type { DB } from '../types';
 import { DAY } from '../util';
 

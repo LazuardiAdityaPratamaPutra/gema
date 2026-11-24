@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { QUICK_EXIT_LIMITS, quickExit } from '@/lib/quick-exit';
+import { QUICK_EXIT_LIMITS, quickExit } from '@/lib/ui/quick-exit';
 import { IExit } from '../Icons';
 
 /** Tombol Keluar cepat di navbar, beserta penjelasan apa yang dihapusnya. */

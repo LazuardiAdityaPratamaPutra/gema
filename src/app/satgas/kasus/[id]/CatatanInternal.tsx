@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { b64u, encryptJson } from '@gema/crypto';
-import { AAD_CATATAN } from '@/lib/report-format';
+import { AAD_CATATAN } from '@/lib/laporan/report-format';
 import type { SatgasSession } from '@/lib/store';
 
 type Props = {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { ReporterSession } from '@/lib/store';
-import type { ReportView } from '@/lib/vault-client';
+import type { ReportView } from '@/lib/vault/vault-client';
 
 type Props = {
   session: ReporterSession;

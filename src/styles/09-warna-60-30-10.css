@@ -5,15 +5,6 @@
   Berkas ini dimuat terakhir; hapus impornya di layout.tsx untuk kembali ke tampilan sebelumnya.
 */
 :root {
-  --paper: #eef1f8;
-  --paper-2: #e2e7f3;
-  --card: #fff;
-  --tint: #e3e8f6;
-  --tint-2: #d4dcf1;
-  --aksen: #ffc21a;
-  --aksen-hover: #ffd24f;
-  --soft: rgb(21 27 59 / 8%);
-  --soft-hover: rgb(21 27 59 / 14%);
   --soft-on-dark: rgb(255 255 255 / 15%);
   --soft-on-dark-hover: rgb(255 255 255 / 26%);
 
@@ -24,43 +15,15 @@
 }
 
 /* satu palet untuk semua zona: warna zona tidak lagi menentukan warna halaman */
-html[data-zone] {
-  --zone: var(--malam);
-  --on: #fff;
-  --on-2: #d9dcf3;
-  --paper: #eef1f8;
-}
 
 /* ---------- aksi: satu warna aksen untuk aksi utama, permukaan lembut untuk sekunder ---------- */
-.btn {
-  border: 0;
-}
-
-.btn.teal,
-.band-hero .btn.teal,
-.nb-cta {
-  background: var(--aksen);
-  color: var(--ink);
-  border: 0;
-}
-
-.btn.ghost,
-.nb-ghost {
-  background: var(--soft);
-  color: var(--ink);
-  border: 0;
-}
 
 .btn.light {
-  background: var(--card);
-  color: var(--ink);
   border: 0;
 }
 
 .btn.danger,
 .nb-qx {
-  background: var(--bad-bg);
-  color: var(--bad);
   border: 0;
 }
 
@@ -71,7 +34,6 @@ html[data-zone] {
 }
 
 .ph .btn.ghost,
-.band-hero .btn.ghost,
 .band-clock .btn.ghost,
 .footer .btn.ghost {
   background: var(--soft-on-dark);
@@ -81,23 +43,9 @@ html[data-zone] {
 
 @media (hover: hover) {
   .btn.teal:hover:not([disabled]),
-  .band-hero .btn.teal:hover:not([disabled]),
   .nb-cta:hover {
     background: var(--aksen-hover);
     color: var(--ink);
-  }
-
-  .btn.ghost:hover:not([disabled]),
-  .nb-ghost:hover {
-    background: var(--soft-hover);
-    color: var(--ink);
-  }
-
-  .ph .btn.ghost:hover:not([disabled]),
-  .band-hero .btn.ghost:hover:not([disabled]),
-  .band-clock .btn.ghost:hover:not([disabled]) {
-    background: var(--soft-on-dark-hover);
-    color: #fff;
   }
 
   .btn.danger:hover:not([disabled]),
@@ -110,17 +58,7 @@ html[data-zone] {
 /* ---------- kepala halaman: panel navy di dalam halaman, bukan pita warna selebar layar ---------- */
 .ph,
 html[data-zone] .ph {
-  margin: 1.2rem 0 2.2rem;
-  padding: clamp(1.8rem, 4.5vw, 3.2rem) clamp(1.3rem, 4vw, 3rem);
-  border-radius: 28px;
-  border-bottom: 0;
-  background: var(--malam);
-  color: #fff;
   clip-path: none;
-}
-
-.ph h1 {
-  font-size: clamp(2.1rem, 5vw, 3.5rem);
 }
 
 html[data-zone='papan'] .ph .sbar,
@@ -165,41 +103,15 @@ a.card:hover {
 }
 
 /* ---------- navigasi ---------- */
-.nb {
-  border-bottom: 0;
-  background: var(--paper);
-  backdrop-filter: none;
-}
-
-.nb-cta {
-  box-shadow: none;
-}
-
-.nb-links a[aria-current='page'] {
-  background: var(--tint);
-}
 
 .nb-sheet li a[aria-current='page'] b {
   background: var(--tint);
 }
 
 /* ---------- beranda: hero navy, satu aksen, bentuk terisi bukan garis ---------- */
-.orb-sun {
-  background: #2d2680;
-  opacity: 1;
-}
-
-.orb-ring {
-  border: 0;
-  background: #231d68;
-}
 
 .rc-folder,
 .rc-tab {
-  background: var(--tint);
-}
-
-.chooser .panel {
   background: var(--tint);
 }
 
@@ -216,39 +128,18 @@ a.card:hover {
   padding-left: 0;
 }
 
-.verify {
-  background: var(--card);
-}
-
 .band-clock {
-  background: var(--malam);
-  color: #fff;
   clip-path: none;
   padding-top: 0;
 }
 
-.band-clock .clock-copy,
-.band-clock .clock-copy p,
-.band-clock h2,
-.band-clock .label,
-.band-clock .lamps,
-.band-clock .lamps li,
-.band-clock .small {
-  color: #fff;
-}
-
 .next {
-  background: var(--card);
   border-radius: var(--r-lg);
   transform: none;
 }
 
 .next .btn.ghost {
   background: var(--soft);
-}
-
-.chooser .tab[aria-selected='true'] {
-  background: var(--tint);
 }
 
 /* poin panel: titik terisi menggantikan garis vertikal */
@@ -271,14 +162,6 @@ a.card:hover {
 }
 
 /* pita jam: teks terang di navy; kartu kalender tetap gelap di atas putih */
-.band-clock .cal {
-  color: var(--ink);
-}
-
-.band-clock .lamps li > span:last-child,
-.band-clock .lamps small {
-  color: rgb(255 255 255 / 82%);
-}
 
 .band-clock .lamps .lp {
   border-color: #fff;
@@ -286,16 +169,6 @@ a.card:hover {
 
 .band-clock .lamps li[data-on='true'] .lp {
   border-color: #fff;
-}
-
-.band-clock .slider {
-  accent-color: var(--aksen);
-}
-
-.panel .btn.teal {
-  background: var(--aksen);
-  border: 0;
-  color: var(--ink);
 }
 
 .panel .btn.ghost {
@@ -323,7 +196,6 @@ td {
 
 thead th {
   border-bottom: 0;
-  background: var(--tint);
 }
 
 thead th:first-child {
@@ -334,10 +206,6 @@ thead th:first-child {
 thead th:last-child {
   border-top-right-radius: var(--r-sm);
   border-bottom-right-radius: var(--r-sm);
-}
-
-tbody tr:nth-child(even) > * {
-  background: rgb(227 232 246 / 45%);
 }
 
 /* ---------- sisa garis: daftar rujukan, chip, lipatan, pilihan, area unggah ---------- */
@@ -359,10 +227,6 @@ tbody tr:nth-child(even) > * {
 details.fold,
 details.more {
   border: 0;
-}
-
-details.fold {
-  background: var(--card);
 }
 
 details.more {
@@ -444,7 +308,6 @@ blockquote {
 
 /* lembar ringkasan Satgas: permukaan polos, tanpa kertas bergaris dan garis margin */
 .assist {
-  background: var(--card);
   padding-left: 1.25rem;
 }
 
@@ -503,16 +366,8 @@ blockquote {
 main a:not([class]),
 .rj-links a,
 .small a {
-  color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 0.2em;
-}
-
-.ph a:not(.btn),
-.band-hero a:not(.btn),
-.band-clock a:not(.btn),
-.footer a {
-  color: #fff;
 }
 
 /* ---------- tanpa kemiringan dan potongan diagonal: semua tepi lurus ---------- */
@@ -522,18 +377,4 @@ main a:not([class]),
 
 .rc-stamp[data-on='true'] {
   transform: scale(1);
-}
-
-.t-stack i:nth-child(1) {
-  transform: translate(-6px, 4px);
-}
-
-.t-stack i:nth-child(2) {
-  transform: translate(4px, 2px);
-}
-
-.band-hero {
-  clip-path: none;
-  overflow: clip;
-  padding-block-end: clamp(3rem, 7vw, 5rem);
 }

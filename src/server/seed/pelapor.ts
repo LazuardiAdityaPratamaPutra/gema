@@ -7,8 +7,8 @@ import {
   padTo,
   randomBytes,
 } from '@gema/crypto';
-import { DEMO_ACCOUNTS } from '@/lib/demo';
-import { AAD, VAULT_SIZE } from '@/lib/report-format';
+import { DEMO_ACCOUNTS } from '@/lib/demo/demo';
+import { AAD, VAULT_SIZE } from '@/lib/laporan/report-format';
 import type { DB } from '../types';
 import { DAY, uid } from '../util';
 

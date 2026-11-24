@@ -94,8 +94,6 @@ body {
   background: var(--pine-grad);
   color: #fff;
   border: 0;
-  height: 2.6rem;
-  padding-inline: 1.15rem;
   box-shadow:
     0 1px 2px rgb(10 70 54 / 30%),
     0 6px 14px rgb(14 90 69 / 28%);
@@ -103,7 +101,6 @@ body {
 
 .nb-qx {
   border-radius: 999px;
-  height: 2.6rem;
 }
 
 .nb-ghost {
@@ -163,26 +160,6 @@ html {
 }
 
 /* ---------- foto: kedalaman, tetap utuh ---------- */
-.t-photo {
-  position: relative;
-  isolation: isolate;
-}
-
-.t-photo::before {
-  content: '';
-  position: absolute;
-  inset: 8% -4% -6% 6%;
-  z-index: -1;
-  border-radius: 28px;
-  background: var(--pine-grad);
-  opacity: 0.22;
-  filter: blur(26px);
-}
-
-.t-photo img {
-  border-radius: 22px;
-  box-shadow: var(--sh-2);
-}
 
 /* ---------- kartu dan panel: lapisan berbayang ---------- */
 .card:not(.alert, .warn, .tint, .ok, .bad),
@@ -460,7 +437,6 @@ details.fold {
 .hero-cta,
 .next-acts,
 .acts,
-.row-acts,
 .chooser .panel .row {
   display: flex;
   flex-wrap: wrap;
@@ -590,6 +566,11 @@ html[data-zone] .ph.ph-foto {
 .ph-foto::before,
 html[data-zone] .ph-foto:not([data-tab])::before {
   color: #fff;
+}
+
+/* `.ph .muted` (lapisan 02) lebih spesifik dari aturan di atas dan membuat keterangan hijau gelap di atas foto gelap. */
+html .ph-foto .muted {
+  color: rgb(255 255 255 / 88%);
 }
 
 .t-closer .next {
@@ -969,4 +950,20 @@ html .rj-links a:hover {
 
 #bantuan .rujukan li {
   padding: 0.65rem 0.8rem;
+}
+
+/* ---------- Sasaran sentuh 44 px di layar kecil dan layar sentuh ---------- */
+@media (width < 48em), (pointer: coarse) {
+  html .nb-brand {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  html .rj-links a {
+    min-height: 44px;
+  }
+
+  html .term-btn::before {
+    inset: -0.9rem -0.4rem;
+  }
 }

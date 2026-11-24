@@ -92,6 +92,14 @@ export function loadedDb(): DB {
   return g.__gemaLoaded;
 }
 
+type Seeder = (db: DB) => Promise<void>;
+let seeder: Seeder | null = null;
+
+/** Mendaftarkan pengisi data awal. Dipasang dari luar agar lapisan penyimpanan tidak bergantung pada logika domain. */
+export function registerSeeder(fn: Seeder): void {
+  seeder = fn;
+}
+
 export function getDb(): Promise<DB> {
   if (!g.__gemaDb) {
     g.__gemaDb = (async () => {
@@ -100,8 +108,8 @@ export function getDb(): Promise<DB> {
       db.approvals ??= []; // data lama dari sebelum mode Empat Mata
       db.runtime ??= { sessions: {}, hits: {}, challenges: {} };
       if (!db.meta.seededAt) {
-        const { seedDemo } = await import('./seed');
-        await seedDemo(db);
+        if (!seeder) throw new Error('Pengisi data awal belum didaftarkan (registerSeeder)');
+        await seeder(db);
         await be.save(db);
       }
       rebuildIndex(db);

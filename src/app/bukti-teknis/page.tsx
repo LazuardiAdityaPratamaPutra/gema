@@ -80,6 +80,18 @@ function Integritas() {
   );
 }
 
+type Hasil = 'belum' | 'gagal' | 'berhasil';
+
+/** Apakah bagian yang dipilih memulihkan rahasia. Satu bagian, atau bagian yang tak cocok, gagal. */
+function hasilPemulihan(rahasia: Uint8Array | null, bagian: Share[], pilih: number[]): Hasil {
+  if (!rahasia || pilih.length === 0) return 'belum';
+  try {
+    return sameBytes(combine(pilih.map((i) => bagian[i])), rahasia) ? 'berhasil' : 'gagal';
+  } catch {
+    return 'gagal';
+  }
+}
+
 function Ambang() {
   const [rahasia, setRahasia] = useState<Uint8Array | null>(null);
   const [bagian, setBagian] = useState<Share[]>([]);
@@ -90,14 +102,7 @@ function Ambang() {
     setBagian(split(r, 2, 3));
     setPilih([]);
   };
-  let hasil: 'belum' | 'gagal' | 'berhasil' = 'belum';
-  if (rahasia && pilih.length > 0) {
-    try {
-      hasil = sameBytes(combine(pilih.map((i) => bagian[i])), rahasia) ? 'berhasil' : 'gagal';
-    } catch {
-      hasil = 'gagal';
-    }
-  }
+  const hasil = hasilPemulihan(rahasia, bagian, pilih);
   return (
     <section className="card" aria-labelledby="b2">
       <h2 id="b2" className="title-md">

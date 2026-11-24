@@ -1,6 +1,6 @@
-import { fmtBytes } from '@/lib/format';
-import { MAX_FILE, MAX_FILES } from '@/lib/report-format';
-import type { FileInput } from '@/lib/report-build';
+import { fmtBytes } from '@/lib/ui/format';
+import { MAX_FILE, MAX_FILES } from '@/lib/laporan/report-format';
+import type { FileInput } from '@/lib/laporan/report-build';
 
 /** Membaca berkas pilihan pengguna; ekspor chat WhatsApp (.txt) ikut diurai per pesan. */
 export async function readEvidenceFiles(

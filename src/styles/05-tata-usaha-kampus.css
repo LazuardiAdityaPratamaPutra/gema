@@ -2,18 +2,10 @@
 /*  — bahasa visual kampus: map snelhecter, pulpen biru, stabilo,
    amplop cokelat, stempel. Menggantikan palet hitam + hijau menyala,
    label kapital monospace, gradien, dan kartu seragam.  */
-html[data-zone='home'] {
-  --zone: var(--map-biru);
-}
 
 ::selection {
   background: var(--lime);
   color: var(--ink);
-}
-
-:focus-visible {
-  outline: 3px solid var(--pen);
-  outline-offset: 2px;
 }
 
 /* tautan: tinta pulpen, disorot stabilo saat diarahkan */
@@ -21,11 +13,6 @@ a {
   color: var(--pen);
   text-decoration-color: currentcolor;
   text-decoration-thickness: 1.5px;
-}
-
-a:hover {
-  background: var(--lime);
-  color: var(--ink);
 }
 
 /* label: huruf biasa, bukan kapital monospace */
@@ -51,7 +38,6 @@ thead th {
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--ink-2);
-  border-bottom: 2px solid var(--ink);
 }
 
 th.rowhead {
@@ -66,27 +52,6 @@ th.rowhead {
 }
 
 /* tombol: pulpen biru untuk aksi utama, tanpa panah tempelan */
-.btn {
-  background: var(--ink);
-  border-color: var(--ink);
-}
-
-.btn.teal,
-.panel .btn.teal {
-  background: var(--pen);
-  border-color: var(--pen);
-  color: #fff;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--ink);
-  border-color: var(--ink);
-}
-
-.btn.light {
-  background: var(--card);
-}
 
 @media (hover: hover) {
   .btn:hover:not([disabled]) {
@@ -97,21 +62,12 @@ th.rowhead {
 
   .btn.teal:hover:not([disabled]),
   .panel .btn.teal:hover:not([disabled]) {
-    background: var(--pen-dark);
     border-color: var(--pen-dark);
-    color: #fff;
   }
 
   .btn.ghost:hover:not([disabled]),
   .panel .btn.ghost:hover:not([disabled]) {
-    background: var(--lime);
-    color: var(--ink);
     border-color: var(--ink);
-  }
-
-  .btn.danger:hover:not([disabled]) {
-    background: var(--bad);
-    color: #fff;
   }
 }
 
@@ -123,16 +79,10 @@ th.rowhead {
 }
 
 /* permukaan biasa: tenang, tanpa bayangan berat */
-.card {
-  border: 1px solid var(--line);
-  box-shadow: none;
-}
 
 a.card:hover {
   transform: none;
   box-shadow: none;
-  border-color: var(--ink);
-  background: var(--card);
 }
 
 .pill.teal {
@@ -157,19 +107,13 @@ a.card:hover {
 /* kepala halaman = map plastik bertab */
 .ph {
   box-shadow: none;
-  margin-top: 2.6rem;
 }
 
 .ph::before {
-  content: attr(data-tab);
   position: absolute;
   left: 0;
   bottom: calc(100% - 1px);
-  background: var(--zone);
-  padding: 0.55rem 1.2rem 0.35rem;
-  border-radius: 14px 14px 0 0;
   font: 700 0.88rem var(--sans);
-  color: var(--ink);
   white-space: nowrap;
   max-width: 85%;
   overflow: hidden;
@@ -200,10 +144,6 @@ html[data-zone='demo'] .ph {
   background: var(--ink);
 }
 
-.ph .btn.ghost {
-  background: rgb(255 255 255 / 55%);
-}
-
 .ph .seg {
   background: rgb(255 255 255 / 55%);
 }
@@ -223,7 +163,6 @@ html[data-zone='demo'] .ph {
   justify-self: end;
   width: min(100%, 380px);
   margin-top: 2.2rem;
-  background: var(--map-biru);
   border-radius: 0 24px 24px;
   padding: 1.4rem 1.3rem 1.6rem;
 }
@@ -232,19 +171,13 @@ html[data-zone='demo'] .ph {
   position: absolute;
   left: 0;
   bottom: calc(100% - 1px);
-  background: var(--map-biru);
   padding: 0.5rem 1.1rem 0.3rem;
   border-radius: 14px 14px 0 0;
   font: 700 0.88rem var(--sans);
 }
 
 .receipt {
-  transform: rotate(-1.2deg);
   border: 0;
-  border-radius: 6px;
-  box-shadow:
-    0 1px 0 rgb(21 27 59 / 8%),
-    0 14px 26px -18px rgb(21 27 59 / 45%);
   padding: 1.2rem 1.3rem 1.3rem;
 }
 
@@ -252,7 +185,6 @@ html[data-zone='demo'] .ph {
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--ink-2);
-  border-bottom: 1px dashed var(--line);
   padding-bottom: 0.7rem;
   margin-bottom: 0.8rem;
   display: block;
@@ -277,7 +209,6 @@ html[data-zone='demo'] .ph {
 
 .rc-stamp {
   border: 3px solid var(--stempel);
-  color: var(--stempel);
   background: transparent;
   border-radius: 999px;
   padding: 0.35rem 0.9rem;
@@ -291,7 +222,6 @@ html[data-zone='demo'] .ph {
   bottom: auto;
   top: 0.7rem;
   right: 0.8rem;
-  transform: rotate(-9deg) scale(1.4);
 }
 
 .rc-stamp b {
@@ -313,7 +243,6 @@ html[data-zone='demo'] .ph {
 /* peran: daftar biasa, tanpa nomor */
 .chooser {
   border: 0;
-  box-shadow: 0 1px 0 rgb(21 27 59 / 6%);
 }
 
 .tabs {
@@ -341,43 +270,25 @@ html[data-zone='demo'] .ph {
 }
 
 .panel .pts li {
-  padding-left: 1rem;
-  border-left: 3px solid rgb(21 27 59 / 25%);
   display: block;
 }
 
 @media (width <= 50em) {
-  .tabs {
-    border-bottom: 0;
-  }
-
   .tab {
     border-right-color: var(--line);
   }
 }
 
 /* amplop cokelat untuk pemeriksa bukti */
-.verify {
-  background: var(--kraft);
-  color: var(--ink);
-}
 
 .verify h2 {
-  color: var(--ink);
   max-width: 14ch;
-}
-
-.verify p {
-  color: var(--ink-2);
 }
 
 .drop.envelope {
   position: relative;
   overflow: hidden;
   border: 0;
-  border-radius: 12px;
-  background: var(--kraft-2);
-  color: var(--ink);
   min-height: 220px;
   align-items: end;
   padding: 1.6rem;
@@ -414,11 +325,6 @@ html[data-zone='demo'] .ph {
   color: var(--ink);
 }
 
-.verify .verdict.wait {
-  background: rgb(255 255 255 / 50%);
-  color: var(--ink);
-}
-
 /* kalender hari kerja */
 .clock {
   grid-template:
@@ -433,10 +339,7 @@ html[data-zone='demo'] .ph {
 
 .cal {
   grid-area: cal;
-  background: var(--card);
-  border-radius: 22px;
   padding: 1.2rem;
-  box-shadow: 0 1px 0 rgb(21 27 59 / 6%);
 }
 
 .clock h2 {
@@ -464,8 +367,6 @@ html[data-zone='demo'] .ph {
 .cal-day {
   position: relative;
   min-height: 4.4rem;
-  border-radius: 12px;
-  background: var(--paper);
   padding: 0.45rem 0.5rem;
   display: flex;
   flex-direction: column;
@@ -476,14 +377,6 @@ html[data-zone='demo'] .ph {
 .cal-day b {
   font: 700 1rem var(--display);
   font-variant-numeric: tabular-nums;
-}
-
-.cal-day[data-past='true'] {
-  background: #dce3fb;
-}
-
-.cal-day[data-past='true'][style] {
-  background: var(--lv);
 }
 
 .cal-day[data-due='true'] {
@@ -565,7 +458,6 @@ html[data-zone='demo'] .ph {
 .limits details {
   border: 0;
   background: var(--card);
-  box-shadow: 0 1px 0 rgb(21 27 59 / 6%);
 }
 
 /* Brankasmu: tiap laporan satu map */
@@ -601,12 +493,10 @@ html[data-zone='demo'] .ph {
   align-items: center;
   padding: 0 1.1rem;
   border-radius: 14px 14px 0 0;
-  background: var(--tone);
   font: 700 0.86rem var(--sans);
 }
 
 .file {
-  background: var(--tone);
   border: 0;
   border-radius: 0 24px 24px;
   box-shadow: none;
@@ -637,40 +527,26 @@ html[data-zone='demo'] .ph {
   border-radius: 6px;
   padding: 0.85rem 1rem;
   box-shadow: 0 10px 20px -16px rgb(21 27 59 / 50%);
-  transform: rotate(0.6deg);
 }
 
 .track li[aria-current='step'] span {
-  background: var(--card);
-  border-color: var(--ink);
   box-shadow: inset 0 0 0 3px var(--ink);
-}
-
-.track li span {
-  border-color: var(--ink-2);
 }
 
 @media (width <= 53.75em) {
   .file {
     grid-template-columns: 1fr;
   }
-
-  .file-next {
-    transform: none;
-  }
 }
 
 /* lembar catatan Satgas: kertas buku tulis bergaris */
 .assist {
-  background: #fff repeating-linear-gradient(to bottom, transparent 0 31px, #dce5f6 31px 32px);
   color: var(--ink);
   position: relative;
-  padding-left: clamp(2.6rem, 6vw, 3.6rem);
   box-shadow: 0 1px 0 rgb(21 27 59 / 6%);
 }
 
 .assist::before {
-  content: '';
   position: absolute;
   top: 0;
   bottom: 0;
@@ -690,7 +566,6 @@ html[data-zone='demo'] .ph {
 .draft-badge {
   font: 600 0.8rem var(--sans);
   color: var(--stempel);
-  border: 2px solid var(--stempel);
   border-radius: 8px;
   padding: 0.2rem 0.55rem;
   transform: rotate(-2deg);
@@ -717,7 +592,6 @@ html[data-zone='demo'] .ph {
 }
 
 .assist blockquote {
-  background: transparent;
   border-left-color: var(--pen);
   color: var(--ink);
 }
@@ -763,11 +637,6 @@ html[data-zone='demo'] .ph {
   transform: rotate(45deg);
 }
 
-details.fold {
-  box-shadow: 0 1px 0 rgb(21 27 59 / 6%);
-  border: 1px solid var(--line);
-}
-
 details.fold[open] {
   background: var(--card);
   box-shadow: inset 4px 0 0 var(--pen);
@@ -784,17 +653,11 @@ details.fold > summary span {
 }
 
 .drop.light {
-  border-color: var(--pen);
   color: var(--ink);
 }
 
 .rj-tag {
   background: var(--paper-2);
-  color: var(--ink);
-}
-
-.rj-links a:hover {
-  background: var(--lime);
   color: var(--ink);
 }
 
@@ -808,7 +671,6 @@ details.fold > summary span {
 }
 
 .nudges li::before {
-  background: var(--pen);
   color: #fff;
 }
 
@@ -821,35 +683,12 @@ details.fold > summary span {
   border-color: var(--ink);
 }
 
-.wsteps li[data-on='true'] {
-  border-top-color: var(--pen);
-}
-
-.wsteps li[aria-current='step'] span {
-  background: var(--pen);
-  color: #fff;
-  border-color: var(--pen);
-}
-
 .tab[aria-selected='true'] {
   background: var(--dc);
 }
 
-.footer a {
-  text-decoration-color: var(--lime);
-}
-
 .mic.rec {
   background: var(--bad);
-}
-
-.panel .pts li::before {
-  content: none;
-  display: none;
-}
-
-.rc-stamp[data-on='true'] {
-  transform: rotate(-9deg) scale(1);
 }
 
 .plain-list {

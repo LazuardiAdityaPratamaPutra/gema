@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import { HttpError, clientIpFrom } from '../util';
 import { readSession, type Session } from '../logic';
 import type { DB, SatgasRole } from '../types';
@@ -23,6 +24,18 @@ export async function body<T = Record<string, unknown>>(req: Request): Promise<T
   } catch {
     throw new HttpError(400, 'Isi permintaan bukan JSON yang valid');
   }
+}
+
+/** Membaca JSON lalu memeriksanya terhadap skema. Galat menyebut nama kolom, tidak pernah nilainya. */
+export async function bodyOf<S extends z.ZodType>(schema: S, req: Request): Promise<z.infer<S>> {
+  const parsed = schema.safeParse(await body<unknown>(req));
+  if (!parsed.success) {
+    const where = [...new Set(parsed.error.issues.map((i) => i.path.join('.') || '(isi)'))]
+      .slice(0, 5)
+      .join(', ');
+    throw new HttpError(400, `Data permintaan tidak valid: ${where}`);
+  }
+  return parsed.data;
 }
 
 export function reporterSession(req: Request): ReporterSession {

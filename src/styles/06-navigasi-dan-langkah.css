@@ -1,21 +1,14 @@
 /* Navbar, langkah berikutnya, umpan balik */
 /* navbar sungguhan */
-html {
-  scroll-padding-top: calc(var(--nb-h) + 16px + 2rem);
-}
 
 .nb {
   position: sticky;
   top: 0;
   z-index: 60;
-  backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1.5px solid var(--ink);
 }
 
 .nb-bar {
-  width: min(1280px, 100% - 1.5rem);
   margin-inline: auto;
-  height: var(--nb-h);
   display: flex;
   align-items: center;
   gap: 0.6rem 1.4rem;
@@ -24,47 +17,30 @@ html {
 .nb-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
   color: var(--ink);
   text-decoration: none;
   font: 800 1.35rem/1 var(--display);
   letter-spacing: -0.02em;
   flex: none;
-  border-radius: 10px;
 }
 
 .nb-links {
   display: none;
   align-items: center;
-  gap: 0.15rem;
   margin-inline: auto;
 }
 
 .nb-links a {
   position: relative;
-  padding: 0.5rem 0.8rem;
-  border-radius: 10px;
-  color: var(--ink);
   text-decoration: none;
   font: 700 0.94rem var(--sans);
   white-space: nowrap;
-}
-
-.nb-links a[aria-current='page'] {
-  background: #ffe14a;
-}
-
-@media (hover: hover) {
-  .nb-links a:not([aria-current='page']):hover {
-    background: var(--paper-2);
-  }
 }
 
 .nb-end {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
 .nb-links + .nb-end {
@@ -74,29 +50,13 @@ html {
 .nb-cta {
   display: inline-flex;
   align-items: center;
-  min-height: 42px;
-  padding: 0 1.15rem;
-  border-radius: 999px;
-  background: var(--pen);
-  color: #fff;
   text-decoration: none;
   font: 700 0.94rem var(--sans);
   white-space: nowrap;
-  box-shadow: 0 2px 0 var(--pen-dark);
-  transition:
-    transform 140ms var(--ease-out),
-    background-color 120ms;
 }
 
 .nb-cta:active {
-  transform: translateY(1px);
   box-shadow: none;
-}
-
-@media (hover: hover) {
-  .nb-cta:hover {
-    background: var(--pen-dark);
-  }
 }
 
 .nb-cta-short {
@@ -104,45 +64,16 @@ html {
 }
 
 .nb-ghost {
-  min-height: 42px;
-  padding: 0 1rem;
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
   font: 700 0.9rem var(--sans);
   cursor: pointer;
   white-space: nowrap;
-}
-
-@media (hover: hover) {
-  .nb-ghost:hover {
-    background: var(--paper-2);
-  }
 }
 
 .nb-qx {
-  min-height: 44px;
   min-width: 44px;
-  padding: 0 1rem;
-  border-radius: 999px;
-  border: 1.5px solid var(--bad);
-  background: transparent;
-  color: var(--bad);
   font: 700 0.9rem var(--sans);
   cursor: pointer;
   white-space: nowrap;
-}
-
-.nb-qx:active {
-  transform: scale(0.97);
-}
-
-@media (hover: hover) {
-  .nb-qx:hover {
-    background: var(--bad);
-    color: #fff;
-  }
 }
 
 .nb-qx-short {
@@ -156,9 +87,6 @@ html {
 .nb-burger {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  border: 1.5px solid var(--ink);
-  background: var(--card);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -207,14 +135,7 @@ html {
 
 .nb-sheet {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  background: var(--paper);
-  border-bottom: 1.5px solid var(--ink);
-  max-height: calc(100dvh - var(--nb-h) - 2.2rem);
   overflow-y: auto;
-  padding: 0.5rem max(0.75rem, calc((100% - 1280px) / 2)) 1.2rem;
   visibility: hidden;
   opacity: 0;
   transform: translateY(-8px);
@@ -258,7 +179,6 @@ html {
 }
 
 .nb-sheet li a[aria-current='page'] b {
-  background: #ffe14a;
   justify-self: start;
   padding: 0 0.35rem;
   border-radius: 4px;
@@ -290,16 +210,13 @@ html {
   top: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  max-width: calc(100vw - 24px);
   display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.55rem 1.1rem;
-  border-radius: 999px;
   background: var(--ink);
   color: #fff;
   font-size: 0.9rem;
-  box-shadow: 0 10px 24px rgb(14 15 18 / 28%);
   animation: nbin 260ms var(--ease-out);
 }
 
@@ -352,17 +269,8 @@ html {
     display: inline;
   }
 
-  .nb-cta,
-  .nb-qx {
-    padding: 0 0.85rem;
-  }
-
   .nb-bar {
     gap: 0.4rem;
-  }
-
-  .nb-end {
-    gap: 0.35rem;
   }
 }
 
@@ -395,19 +303,14 @@ html {
 .next {
   margin-top: 2.6rem;
   padding: clamp(1.2rem, 3vw, 1.8rem);
-  border-radius: 18px 18px 18px 4px;
-  background: #ffe14a;
-  color: var(--ink);
   display: flex;
   gap: 1rem 2rem;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  transform: rotate(-0.4deg);
 }
 
 .next h2 {
-  font-size: clamp(1.25rem, 2.6vw, 1.7rem);
   margin: 0 0 0.25rem;
 }
 
@@ -417,21 +320,7 @@ html {
   color: var(--ink-2);
 }
 
-.next-acts {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.next .btn.ghost {
-  background: rgb(255 255 255 / 60%);
-}
-
 @media (width <= 35em) {
-  .next {
-    transform: none;
-  }
-
   .next-acts,
   .next-acts .btn {
     width: 100%;
@@ -439,9 +328,6 @@ html {
 }
 
 .hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
   margin-top: 1.4rem;
 }
 
@@ -449,21 +335,11 @@ html {
   position: relative;
 }
 
-.pw-row input {
-  padding-right: 5.2rem;
-}
-
 .pw-toggle {
   position: absolute;
-  right: 0.4rem;
   top: 50%;
   transform: translateY(-50%);
-  min-height: 40px;
-  padding: 0 0.8rem;
-  border-radius: 999px;
   border: 0;
-  background: var(--paper-2);
-  color: var(--ink);
   font: 700 0.85rem var(--sans);
   cursor: pointer;
 }
@@ -483,8 +359,6 @@ html {
   align-items: center;
   padding: 0 1rem;
   border-radius: 999px;
-  background: var(--card);
-  border: 1.5px solid var(--ink);
   color: var(--ink);
   text-decoration: none;
   font: 700 0.9rem var(--sans);
@@ -506,9 +380,7 @@ html {
 
 .next.urgent {
   margin: 0 0 1.2rem;
-  background: var(--lime);
   transform: none;
-  border-radius: 18px;
 }
 
 .nb-qx-short svg {
@@ -517,28 +389,16 @@ html {
   display: block;
 }
 
-@media (width <= 23.6875em) {
-  .nb-qx {
-    padding: 0 0.7rem;
-  }
-}
-
 /* keterangan batas Keluar cepat: tombol ? di desktop, teks di menu mobile */
 .nb-qx-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
 }
 
 .nb-qx-info {
   display: none;
-  width: 32px;
-  height: 32px;
   border-radius: 50%;
-  border: 1.5px solid var(--ink-2);
-  background: transparent;
-  color: var(--ink);
   font: 700 0.9rem var(--sans);
   cursor: pointer;
 }
@@ -576,17 +436,8 @@ html {
 }
 
 /* penanda permanen: data di instalasi ini fiktif */
-.nb-demo {
-  margin: 0;
-  padding: 0.3rem 0.75rem;
-  background: var(--mentari);
-  color: var(--ink);
-  font: 400 0.84rem/1.3 var(--sans);
-  text-align: center;
-}
 
 .nb-offline {
-  margin: 0;
   padding: 0.4rem 0.75rem;
   background: var(--warn-bg);
   color: var(--warn);

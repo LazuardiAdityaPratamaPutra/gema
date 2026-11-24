@@ -34,50 +34,63 @@ export type Ringkasan = {
   perhatian: string[];
 };
 
-export function summarize(d: DosirInput): Ringkasan {
-  const bentuk = understandStory(d.apa, 4);
+/** Dua kalimat yang paling memuat kata kunci bentuk kekerasan (kalimat pertama diberi bobot lebih). */
+function coreSentences(apa: string, bentuk: FormHit[]): string[] {
   const cueStems = new Set(bentuk.flatMap((h) => h.matched.flatMap((m) => stems(m))));
-  const ss = sentences(d.apa);
-  const scored = ss.map((s, i) => ({
-    s,
-    i,
-    score: stems(s).filter((x) => cueStems.has(x)).length + (i === 0 ? 0.5 : 0),
-  }));
-  const inti = scored
+  return sentences(apa)
+    .map((s, i) => ({
+      s,
+      i,
+      score: stems(s).filter((x) => cueStems.has(x)).length + (i === 0 ? 0.5 : 0),
+    }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 2)
     .sort((a, b) => a.i - b.i)
     .map((x) => x.s);
-  const msgs = d.bukti.flatMap((b) => b.messages ?? []);
-  const chat = msgs.length ? readChat(msgs) : null;
+}
+
+const orNone = (v?: string) => v?.trim() || 'Tidak disebutkan';
+
+function factsOf(d: DosirInput, pesan: number): [string, string][] {
+  const { terlapor: t } = d;
+  const bukti = d.bukti.length
+    ? `${d.bukti.length} berkas${pesan ? `, ${pesan} pesan chat` : ''}`
+    : 'Belum ada berkas';
   const fakta: [string, string][] = [
-    [
-      'Terlapor',
-      `${d.terlapor.nama}${d.terlapor.peran ? ` (${d.terlapor.peran})` : ''}, ${d.terlapor.unitNama}`,
-    ],
-    ['Kapan', d.kapan?.trim() || 'Tidak disebutkan'],
-    ['Di mana', d.dimana?.trim() || 'Tidak disebutkan'],
-    ['Saksi', d.saksi?.trim() || 'Tidak disebutkan'],
-    [
-      'Bukti',
-      d.bukti.length
-        ? `${d.bukti.length} berkas${msgs.length ? `, ${msgs.length} pesan chat` : ''}`
-        : 'Belum ada berkas',
-    ],
+    ['Terlapor', `${t.nama}${t.peran ? ` (${t.peran})` : ''}, ${t.unitNama}`],
+    ['Kapan', orNone(d.kapan)],
+    ['Di mana', orNone(d.dimana)],
+    ['Saksi', orNone(d.saksi)],
+    ['Bukti', bukti],
   ];
-  if (d.terlapor.relasi) fakta.splice(1, 0, ['Relasi akademik', RELASI_LABEL[d.terlapor.relasi]]);
-  const perhatian: string[] = [];
+  if (t.relasi) fakta.splice(1, 0, ['Relasi akademik', RELASI_LABEL[t.relasi]]);
+  return fakta;
+}
+
+function attentionOf(d: DosirInput, chat: ChatReading | null): string[] {
+  const out: string[] = [];
   if (isDependent(d.terlapor.relasi))
-    perhatian.push(
+    out.push(
       'Pelapor bergantung secara akademik pada terlapor. Pertimbangkan pelindungan sementara sejak awal.',
     );
-  if (chat?.counts.ancaman)
-    perhatian.push(`${chat.counts.ancaman} pesan memuat ancaman atau tekanan.`);
-  if (chat?.counts.rahasia)
-    perhatian.push(`${chat.counts.rahasia} pesan meminta kejadian dirahasiakan.`);
+  if (chat?.counts.ancaman) out.push(`${chat.counts.ancaman} pesan memuat ancaman atau tekanan.`);
+  if (chat?.counts.rahasia) out.push(`${chat.counts.rahasia} pesan meminta kejadian dirahasiakan.`);
   if (d.dampak?.trim())
-    perhatian.push('Pelapor menyebut dampak pada dirinya. Tawarkan pendampingan psikologis.');
-  return { inti, bentuk, chat, fakta, perhatian };
+    out.push('Pelapor menyebut dampak pada dirinya. Tawarkan pendampingan psikologis.');
+  return out;
+}
+
+export function summarize(d: DosirInput): Ringkasan {
+  const bentuk = understandStory(d.apa, 4);
+  const msgs = d.bukti.flatMap((b) => b.messages ?? []);
+  const chat = msgs.length ? readChat(msgs) : null;
+  return {
+    inti: coreSentences(d.apa, bentuk),
+    bentuk,
+    chat,
+    fakta: factsOf(d, msgs.length),
+    perhatian: attentionOf(d, chat),
+  };
 }
 
 export type Draf = { judul: string; isi: string };

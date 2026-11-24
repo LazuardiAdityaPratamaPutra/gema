@@ -1,6 +1,6 @@
 'use client';
 import { useId, useState, type ReactNode } from 'react';
-import { GLOSARIUM, type IstilahKey } from '@/lib/glosarium';
+import { GLOSARIUM, type IstilahKey } from '@/lib/ui/glosarium';
 
 /**
  * Istilah teknis dengan penjelasan sederhana tepat di dekatnya.

@@ -16,8 +16,6 @@
   gap: 0.15rem;
   padding: 0.75rem 0.9rem;
   border-radius: 14px;
-  background: rgb(255 255 255 / 70%);
-  border: 1px solid rgb(14 15 18 / 10%);
 }
 
 .rujukan li b {
@@ -31,8 +29,6 @@
 
 .rj-head {
   font: 500 0.7rem var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ink-2);
   margin: 0.4rem 0 0.45rem;
 }
@@ -54,11 +50,8 @@
 
 .rj-links a {
   font: 700 0.82rem var(--sans);
-  text-decoration: none;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  background: var(--card);
   min-height: 36px;
   display: inline-flex;
   align-items: center;
@@ -68,8 +61,6 @@
 .chatsig {
   margin-top: 1rem;
   border-radius: 18px;
-  background: #fbfbf8;
-  border: 1.5px dashed rgb(14 15 18 / 25%);
   padding: 1rem 1.1rem;
 }
 
@@ -342,8 +333,6 @@ fieldset.relasi {
   text-align: left;
   padding: 0.5rem 0.8rem;
   border-radius: 14px;
-  border: 1.5px dashed rgb(14 15 18 / 35%);
-  background: transparent;
   cursor: pointer;
   color: var(--ink);
 }
@@ -363,8 +352,6 @@ fieldset.relasi {
 }
 
 .hasil-empty {
-  border: 2px dashed var(--line);
-  border-radius: 22px;
   padding: 2.2rem 1.4rem;
   text-align: center;
   color: var(--muted);
@@ -372,9 +359,7 @@ fieldset.relasi {
 }
 
 .hasil-card {
-  border-radius: 22px;
   padding: 1.3rem 1.4rem;
-  background: var(--card);
   border: 1.5px solid var(--ink);
 }
 
@@ -428,12 +413,10 @@ fieldset.relasi {
 /* asisten dosir */
 .assist {
   margin: 1.5rem 0;
-  border-radius: 24px;
   padding: clamp(1.2rem, 3vw, 1.8rem);
 }
 
 .assist h2 {
-  font-size: 1.4rem;
   margin: 0;
 }
 
@@ -484,8 +467,6 @@ fieldset.relasi {
 
 .fakta dt {
   font: 500 0.68rem var(--mono);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
 }
 
 .fakta dd {
@@ -496,8 +477,6 @@ fieldset.relasi {
 .assist blockquote {
   margin: 0 0 0.6rem;
   padding: 0.6rem 0.9rem;
-  border-left: 3px solid var(--lime);
-  border-radius: 0 12px 12px 0;
   font-size: 0.95rem;
 }
 
@@ -527,7 +506,6 @@ fieldset.relasi {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 50px;
   padding: 0 1rem;
   background: none;
   border: 0;
