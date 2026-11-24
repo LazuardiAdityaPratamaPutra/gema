@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { markLocked } from '@/lib/vault/lock-note';
@@ -29,16 +29,18 @@ export function IdleLock() {
   const satgas = satgasStore.use();
   const token = reporter?.token ?? satgas?.token ?? null;
   const [left, setLeft] = useState<number | null>(null);
+  // Waktu aktivitas terakhir. Di ref agar tombol "Tetap masuk" ikut memperbaruinya.
+  const lastRef = useRef(0);
 
   useEffect(() => {
     if (!token) return;
     const limit = idleLimit();
     const warnAt = Math.min(WARN_MS, limit / 2);
-    let last = Date.now();
     let locking = false;
     const bump = () => {
-      last = Date.now();
+      lastRef.current = Date.now();
     };
+    bump();
     EVENTS.forEach((e) => window.addEventListener(e, bump, { passive: true }));
     const lock = async () => {
       locking = true;
@@ -55,7 +57,7 @@ export function IdleLock() {
     };
     const timer = setInterval(() => {
       if (locking) return;
-      const idle = Date.now() - last;
+      const idle = Date.now() - lastRef.current;
       if (idle >= limit) void lock();
       else setLeft(idle >= limit - warnAt ? Math.ceil((limit - idle) / 1000) : null);
     }, 1000);
@@ -66,13 +68,27 @@ export function IdleLock() {
   }, [token, router]);
 
   if (!token || left === null) return null;
+  // Klik tanpa peristiwa penunjuk atau papan ketik (mis. aktivasi oleh teknologi bantu) tidak
+  // lewat pendengar window, jadi tombol memperbarui waktu aktivitas sendiri.
+  const stayActive = () => {
+    lastRef.current = Date.now();
+    setLeft(null);
+  };
   return (
     <div className="idle-warn" role="alert">
+      {/* Pembaca layar mendengar pengumuman statis sekali. Angka hitung mundur hanya visual,
+          supaya tidak dibacakan ulang tiap detik. */}
       <p className="m-0">
-        Tidak ada aktivitas. Layar dikunci dalam {left} detik. Isianmu yang belum selesai disimpan
-        sebagai draf dulu.
+        <span className="sr">
+          Tidak ada aktivitas. Layar akan dikunci sebentar lagi. Isianmu yang belum selesai disimpan
+          sebagai draf dulu.
+        </span>
+        <span aria-hidden="true">
+          Tidak ada aktivitas. Layar dikunci dalam {left} detik. Isianmu yang belum selesai disimpan
+          sebagai draf dulu.
+        </span>
       </p>
-      <button type="button" className="btn teal sm" onClick={() => setLeft(null)}>
+      <button type="button" className="btn teal sm" onClick={stayActive}>
         Tetap masuk
       </button>
     </div>
