@@ -127,7 +127,7 @@ export function CaseTable({ cases, role }: { cases: Case[]; role: Role }) {
           ))}
           {cases.length === 0 && (
             <tr>
-              <td colSpan={6} className="muted">
+              <td colSpan={role === 'Pimpinan' ? 5 : 6} className="muted">
                 Belum ada kasus. Penyintas yang memilih eskalasi akan muncul di sini.
               </td>
             </tr>
