@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useLockNote } from '@/lib/vault/lock-note';
 import { LoginForm } from './LoginForm';
 import { useLogin } from './useLogin';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 export default function Masuk() {
   const locked = useLockNote();
@@ -10,6 +11,7 @@ export default function Masuk() {
   return (
     <div className="narrow">
       <header className="ph" data-tab="Brankas">
+        <Ilustrasi motif="brankas" />
         <h1>Masuk ke brankas</h1>
         <p className="lede">Kode dan enam kata dari kartu catatanmu.</p>
       </header>

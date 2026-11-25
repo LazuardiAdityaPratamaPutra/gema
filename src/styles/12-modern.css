@@ -967,3 +967,148 @@ html .rj-links a:hover {
     inset: -0.9rem -0.4rem;
   }
 }
+
+/* Di bawah 75em daftar tautan disembunyikan; grup tombol harus tetap menempel ke kanan (aturan lama 06 menolnya ke 0) */
+@media (width < 75em) {
+  .nb-links + .nb-end {
+    margin-left: auto;
+  }
+}
+
+/* ---------- navbar ponsel: hanya logo, tombol utama, dan menu; jarak sama di keempat sisi ---------- */
+@media (width <= 40em) {
+  :root {
+    --nb-gap: 0.75rem;
+  }
+
+  .nb-bar {
+    width: calc(100% - 1.5rem);
+    padding: 0 0.55rem 0 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .nb-brand {
+    margin-left: 0;
+  }
+
+  .nb-brand > span:last-child,
+  .nb-qx-wrap {
+    display: none;
+  }
+
+  .nb-sheet {
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+}
+
+/* ---------- menu ponsel: satu baris satu tujuan; sedang dibuka = hijau pekat, disentuh/disorot = hijau muda ---------- */
+.nb-sheet ul {
+  gap: 0.15rem;
+}
+
+.nb-sheet li a {
+  padding: 0.8rem 0.9rem;
+  border-bottom: 0;
+  border-radius: 12px;
+  transition: background-color 140ms var(--ease-out);
+}
+
+/* `a:hover` global menempelkan blok setelah ketuk di layar sentuh; di sini hanya perangkat dengan kursor */
+.nb-sheet li a:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .nb-sheet li a:hover:not([aria-current='page']) {
+    background: var(--tn-2);
+  }
+}
+
+.nb-sheet li a:active:not([aria-current='page']) {
+  background: var(--tn-3);
+}
+
+.nb-sheet li a[aria-current='page'] {
+  background: var(--pine);
+  color: #fff;
+}
+
+.nb-sheet li a[aria-current='page'] b {
+  padding: 0;
+  background: transparent;
+  color: #fff;
+}
+
+.nb-sheet li a[aria-current='page'] small {
+  color: rgb(255 255 255 / 84%);
+}
+
+/* tautan menu desktop: sorotan hover terlihat jelas di atas pil abu-hijau */
+@media (hover: hover) {
+  .nb-links a:not([aria-current='page']):hover {
+    background: var(--tn-3);
+    color: var(--ink);
+  }
+}
+
+/* Papan: label "Data fiktif" selalu tepat di bawah nama kampus */
+.campus-tag {
+  display: inline-block;
+  margin-top: 0.45rem;
+}
+
+/* ---------- Bantuan di desktop: dua kolom (bantuan segera di kiri, penjelasan di kanan) ---------- */
+.panduan-grid > #bantuan {
+  margin-block: 1.5rem;
+}
+
+@media (width >= 64em) {
+  .narrow.panduan {
+    width: min(1180px, 100% - 2.5rem);
+  }
+
+  .panduan-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .panduan-grid > #bantuan {
+    margin: 0;
+  }
+}
+
+/* ---------- teks diperbesar lewat pengaturan ukuran huruf: isi harus membungkus, bukan terpotong ---------- */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+}
+
+/* tabel yang tidak ditumpuk di ponsel (class keep) tetap bisa digulir ke samping, bukan terpotong */
+.tablewrap:has(> table.keep) {
+  overflow-x: auto;
+}
+
+.cal-head,
+.cal-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.cal-day,
+.cal-tag {
+  overflow-wrap: anywhere;
+}
+
+@media (width <= 53.75em) {
+  .clock {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+details.fold > summary h2 {
+  min-width: 0;
+}

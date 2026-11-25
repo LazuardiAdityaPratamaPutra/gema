@@ -5,6 +5,7 @@ import { understandStory } from '@gema/pendamping';
 import { Dictate } from '@/components/Dictate';
 import { Rujukan } from '@/components/Rujukan';
 import { carry } from '@/lib/ui/carry';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 const CONTOH = [
   'Dosen saya terus chat malam-malam minta ketemu berdua',
@@ -75,6 +76,7 @@ export default function Pahami() {
   return (
     <div className="wrap pahami">
       <header className="ph" data-tab="Pahami dulu">
+        <Ilustrasi motif="pahami" />
         <h1>Apakah yang kamu alami termasuk kekerasan?</h1>
         <p className="lede">
           Ceritakan dengan kata-katamu sendiri. Kami cocokkan dengan bentuk kekerasan dalam

@@ -5,6 +5,7 @@ import type { EvidenceCertificate } from '@gema/merkle';
 import { fetchCertificate } from '@/lib/vault/proof';
 import { checkFile, type Result } from './cek';
 import { ResultCard } from './ResultCard';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 function Verifikasi() {
   const qid = useSearchParams().get('id');
@@ -36,6 +37,7 @@ function Verifikasi() {
   return (
     <div className="narrow">
       <header className="ph" data-tab="Verifikasi publik">
+        <Ilustrasi motif="verifikasi" />
         <h1>Apakah berkas ini utuh?</h1>
         <p className="lede">
           Pilih berkas. Sidik SHA-256 dihitung di perangkatmu; berkasnya tidak dikirim ke mana pun.

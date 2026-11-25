@@ -344,6 +344,25 @@ html {
   margin: 0;
 }
 
+/* Ilustrasi dekoratif di kepala halaman dan keadaan kosong. Mengambang di kanan; teks mengalir di sebelahnya. */
+.ill {
+  float: right;
+  width: clamp(4.5rem, 16vw, 9.5rem);
+  height: auto;
+  margin: 0 0 0.5rem 1rem;
+  color: var(--on, var(--ink));
+  pointer-events: none;
+}
+
+.ph:has(> .ill),
+.vault-empty:has(> .ill) {
+  display: flow-root;
+}
+
+.vault-empty .ill {
+  color: var(--zone, var(--ink));
+}
+
 .back {
   display: inline-flex;
   align-items: center;
