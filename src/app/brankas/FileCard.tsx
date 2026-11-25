@@ -34,6 +34,27 @@ export function FileCard({ r }: { r: ReportView }) {
           </p>
           <h2>{r.unitNama}</h2>
           <p className="file-inst">{r.institutionNama}</p>
+          <p className="file-trust">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+              <rect
+                x="3"
+                y="7"
+                width="10"
+                height="7"
+                rx="1.6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M5.5 7V5.2a2.5 2.5 0 0 1 5 0V7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+            </svg>
+            Terenkripsi di perangkatmu sebelum disimpan
+          </p>
         </div>
         <div className="file-next">
           <b>{next.t}</b>

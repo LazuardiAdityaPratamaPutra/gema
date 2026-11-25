@@ -6,6 +6,7 @@ export function StepNav({
   canNext,
   fromReview,
   hasLost,
+  blocked,
   hint,
   onBack,
   onNext,
@@ -17,6 +18,7 @@ export function StepNav({
   canNext: boolean;
   fromReview: boolean;
   hasLost: boolean;
+  blocked: boolean;
   hint: string;
   onBack: () => void;
   onNext: () => void;
@@ -47,9 +49,9 @@ export function StepNav({
           <button
             className="btn teal"
             type="button"
-            disabled={busy || hasLost}
+            disabled={busy || hasLost || blocked}
             aria-busy={busy}
-            aria-describedby={hasLost ? 'belum-terlampir' : undefined}
+            aria-describedby={blocked ? 'belum-lengkap' : hasLost ? 'belum-terlampir' : undefined}
             onClick={onSend}
           >
             {busy ? 'Mengunci…' : 'Kunci dan simpan'}

@@ -52,6 +52,7 @@ export async function sendReport(
     (label, done, total) => island.progress(label, done, total),
   );
   await clearDraft(session.caseCode, 'baru');
+  island.toast('Laporan terkunci dan tersimpan.');
   return id;
 }
 

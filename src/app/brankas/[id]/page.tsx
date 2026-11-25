@@ -2,6 +2,7 @@
 import { useParams, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonPage } from '@/components/Skeleton';
 import { Rujukan } from '@/components/Rujukan';
 import { useReporter } from '@/components/useReporter';
 import { fmtBytes } from '@/lib/ui/format';
@@ -22,7 +23,7 @@ function Detail() {
   const { id } = useParams<{ id: string }>();
   const isNew = useSearchParams().get('baru') === '1';
   const { session } = useReporter();
-  const { r, plain, inst, msg, setMsg, busy, act, retry } = useReportDetail(session, id);
+  const { r, plain, inst, msg, tone, setMsg, busy, act, retry } = useReportDetail(session, id);
 
   if (session && !r && msg)
     return (
@@ -33,7 +34,7 @@ function Detail() {
   if (!session || !r || !plain)
     return (
       <div className="narrow">
-        <p role="status">Membuka laporan…</p>
+        <SkeletonPage label="Membuka laporan" />
       </div>
     );
   const metaFor = (sha: string) => plain.meta.items.find((m) => m.sha256 === sha);
@@ -64,7 +65,10 @@ function Detail() {
       {isNew && <NewBanner />}
       <ReportHeader r={r} narasi={n} />
       {msg && (
-        <p className="card warn small" role="status">
+        <p
+          className={tone === 'ok' ? 'card tint small umpan-ok' : 'card warn small'}
+          role={tone === 'ok' ? 'status' : 'alert'}
+        >
           {msg}
         </p>
       )}
@@ -105,7 +109,7 @@ export default function Page() {
     <Suspense
       fallback={
         <div className="narrow">
-          <p role="status">Membuka…</p>
+          <SkeletonPage label="Membuka" />
         </div>
       }
     >

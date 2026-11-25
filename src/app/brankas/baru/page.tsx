@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useSyncExternalStore } from 'react';
 import { useReporter } from '@/components/useReporter';
+import { SkeletonPage } from '@/components/Skeleton';
 import { normalizeName } from '@gema/matching';
 import { missingHint, stepReady } from './draft-form';
 import { PausePanel } from './PausePanel';
@@ -47,7 +48,7 @@ export default function Baru() {
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
 
@@ -111,6 +112,7 @@ export default function Baru() {
         canNext={stepReady(d)[step]}
         fromReview={w.fromReview}
         hasLost={lostFiles.length > 0}
+        blocked={!stepReady(d).every(Boolean)}
         hint={missingHint(d, step)}
         onBack={() => set('step', step - 1)}
         onNext={w.next}

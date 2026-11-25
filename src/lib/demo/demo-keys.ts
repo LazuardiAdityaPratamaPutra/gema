@@ -1,6 +1,6 @@
 /**
  * KUNCI DEMO — SENGAJA PUBLIK (FR-L2).
- * Dipakai hanya oleh institusi fiktif "Universitas Contoh" agar juri dapat membuka dosir tanpa mengurus berkas kunci.
+ * Dipakai hanya oleh institusi demo UPN Veteran Jawa Timur agar juri dapat membuka dosir tanpa mengurus berkas kunci.
  * Jangan pernah dipakai untuk institusi nyata. Kunci institusi nyata dibuat di browser Ketua Satgas (FR-K1).
  * Dibuat oleh tests/gen-demo-keys.test.ts
  */

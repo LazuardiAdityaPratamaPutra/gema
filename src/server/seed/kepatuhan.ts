@@ -5,7 +5,7 @@ import { DAY } from '../util';
 
 const inst = DEMO_INSTITUTION_ID;
 
-/** Snapshot Papan Kepatuhan dan Radar (fiktif, berderau; derau ditambahkan sekali saat dibuat). */
+/** Snapshot Papan Kepatuhan dan Radar untuk fixture uji (rekaan, berderau). Tidak dipakai produk. */
 export function seedCompliance(db: DB, now: number) {
   // snapshot Papan Kepatuhan dan Radar (fiktif, berderau; derau ditambahkan sekali saat dibuat)
   const synthetic: Record<string, [number, number, number][]> = {
@@ -14,16 +14,6 @@ export function seedCompliance(db: DB, now: number) {
       [16, 9, 7],
       [18, 12, 6],
       [24, 19, 4],
-    ],
-    'inst-poli': [
-      [9, 8, 4],
-      [11, 7, 6],
-      [14, 12, 4],
-    ],
-    'inst-itc': [
-      [30, 17, 8],
-      [34, 21, 7],
-      [38, 25, 6],
     ],
   };
   for (const [iid, rows] of Object.entries(synthetic)) {
@@ -42,9 +32,9 @@ export function seedCompliance(db: DB, now: number) {
     });
   }
   const radarTrue: [string, string, number, boolean][] = [
-    ['u-ft', 'Fakultas Teknik', 7, true],
+    ['u-ft', 'Fakultas Teknik dan Sains', 7, true],
     ['u-feb', 'Fakultas Ekonomi dan Bisnis', 3, false],
-    ['u-fisip', 'Fakultas Ilmu Sosial dan Politik', 5, true],
+    ['u-fisip', 'Fakultas Ilmu Sosial, Budaya, dan Politik', 5, true],
     ['u-fk', 'Fakultas Kedokteran', 1, false],
     ['u-bem', 'Unit Kegiatan Mahasiswa', 9, true],
   ];

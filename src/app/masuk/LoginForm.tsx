@@ -40,20 +40,22 @@ export function LoginForm({ l }: { l: LoginState }) {
           {l.error}
         </p>
       )}
-      <button className="btn teal" disabled={l.busy || !l.code || !l.pass} aria-busy={l.busy}>
-        {l.busy ? 'Membuka…' : 'Masuk'}
-      </button>
-      {l.pkOk && (
-        <button
-          type="button"
-          className="btn ghost mt-sm"
-          disabled={l.busy || !l.code}
-          aria-busy={l.busy}
-          onClick={() => void l.withPasskey()}
-        >
-          Masuk dengan passkey
+      <div className="row">
+        <button className="btn teal" disabled={l.busy || !l.code || !l.pass} aria-busy={l.busy}>
+          {l.busy ? 'Membuka…' : 'Masuk'}
         </button>
-      )}
+        {l.pkOk && (
+          <button
+            type="button"
+            className="btn ghost"
+            disabled={l.busy || !l.code}
+            aria-busy={l.busy}
+            onClick={() => void l.withPasskey()}
+          >
+            Masuk dengan passkey
+          </button>
+        )}
+      </div>
       {l.pkOk && (
         <p className="hint mt-sm">
           <Term k="passkey" question>

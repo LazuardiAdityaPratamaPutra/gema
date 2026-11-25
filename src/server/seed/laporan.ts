@@ -137,7 +137,7 @@ async function pushEscalationEvents(
     dek,
     {
       teks: 'Pelapor dan terlapor belum dihubungi. Menunggu jadwal klarifikasi dengan unit.',
-      penulis: 'Dr. Sari Wulandari',
+      penulis: 'Akun demo: Ketua Satgas',
     },
     AAD_CATATAN,
   );

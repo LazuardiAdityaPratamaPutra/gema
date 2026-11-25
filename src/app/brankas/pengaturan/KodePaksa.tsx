@@ -8,12 +8,10 @@ import type { Run } from './useRun';
 export function KodePaksa({
   session,
   busy,
-  msg,
   run,
 }: {
   session: ReporterSession;
   busy: boolean;
-  msg: string;
   run: Run;
 }) {
   const [pass, setPass] = useState('');
@@ -22,8 +20,10 @@ export function KodePaksa({
   const decoy = session.vault.t === 'decoy';
   const enough = pass.split(/\s+/).filter(Boolean).length >= 4;
   return (
-    <>
-      <h2 className="title-md">Kode Paksa</h2>
+    <section className="card my-xl" aria-labelledby="kp">
+      <h2 className="title-md" id="kp">
+        Kode Paksa
+      </h2>
       {decoy && (
         <p className="card warn">
           Kamu sedang berada di brankas tiruan, jadi pengaturan ini dinonaktifkan.
@@ -53,11 +53,6 @@ export function KodePaksa({
         <label htmlFor="di">Isi tiruan</label>
         <textarea id="di" value={isi} onChange={(e) => setIsi(e.target.value)} />
       </div>
-      {msg && (
-        <p role="status" className="card tint small">
-          {msg}
-        </p>
-      )}
       <div className="row">
         <button
           className="btn teal"
@@ -81,6 +76,6 @@ export function KodePaksa({
           Lepas
         </button>
       </div>
-    </>
+    </section>
   );
 }

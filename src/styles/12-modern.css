@@ -238,6 +238,16 @@ details.fold {
     0 4px 12px rgb(16 36 29 / 6%);
 }
 
+/* Di kartu putih dan formulir, tombol sekunder diberi tinta dan garis agar tetap terlihat. */
+.card .btn.ghost,
+form .btn.ghost,
+.alt-line .btn.ghost {
+  background: #eaf3ee;
+  box-shadow:
+    inset 0 0 0 1.5px #6f9684,
+    0 1px 2px rgb(16 36 29 / 8%);
+}
+
 /* ---------- pita berwarna: gradasi, bukan blok polos ---------- */
 .verify {
   background:
@@ -250,11 +260,12 @@ details.fold {
 
 .verify .drop.envelope {
   box-shadow: 0 24px 60px rgb(0 0 0 / 28%);
-  background: linear-gradient(160deg, #e9f3ed 0%, #d3e5da 100%);
+  background-color: #f2f8f4;
   border-radius: 22px;
   transition:
-    transform 160ms var(--ease-out),
-    box-shadow 160ms var(--ease-out);
+    transform 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out),
+    background-color 240ms var(--ease-out);
 }
 
 .band-clock {
@@ -596,22 +607,22 @@ html .ph-foto .muted {
 }
 
 @media (width <= 48em) {
+  /* Foto menjadi pita di bawah teks, bukan latar penuh: tidak ada ruang hitam kosong dan tidak menimpa tombol. */
   .t-closer {
     align-items: flex-start;
-    min-height: 46rem;
+    min-height: 0;
+    padding-bottom: 13rem;
   }
 
   .t-closer::after {
-    background: linear-gradient(
-      180deg,
-      rgb(253 236 201 / 88%) 0%,
-      rgb(253 236 201 / 62%) 42%,
-      rgb(253 236 201 / 0%) 62%
-    );
+    display: none;
   }
 
   .t-closer .t-bg {
-    object-position: 50% 100%;
+    top: auto !important;
+    height: 14rem !important;
+    object-position: 50% 62%;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 38%);
   }
 
   .t-closer .next {
@@ -825,16 +836,38 @@ a:hover,
 /* ---------- amplop cek berkas: hover dan seret tetap terbaca ---------- */
 .verify .drop.envelope:hover,
 .verify .drop.envelope[data-over='true'] {
-  background: linear-gradient(160deg, #f6fbf8 0%, #e3f0e8 100%);
+  background-color: #fff;
   box-shadow:
-    0 0 0 4px rgb(255 255 255 / 55%),
+    0 0 0 4px rgb(255 225 74 / 85%),
     0 28px 64px rgb(0 0 0 / 32%);
   transform: translateY(-3px);
 }
 
 .verify .drop.envelope .env-text,
 .verify .drop.envelope .env-text small {
-  color: #10241d;
+  color: #0a1a14;
+}
+
+.verify .drop.envelope .env-text {
+  font-size: 1.5rem;
+}
+
+.verify .drop.envelope .env-text small {
+  margin-top: 0.35rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.verify .drop.envelope .env-flap {
+  background: #cfe3d7;
+  transition:
+    transform 240ms var(--ease-out),
+    background-color 240ms var(--ease-out);
+}
+
+.verify .drop.envelope:hover .env-flap,
+.verify .drop.envelope[data-over='true'] .env-flap {
+  background: #b9d6c6;
 }
 
 /* ---------- hasil cek: teks gelap di atas latar terang ---------- */
@@ -1151,4 +1184,66 @@ h3 {
 
 details.fold > summary h2 {
   min-width: 0;
+}
+
+/* Papan: sisihkan ruang satu kartu selagi data dimuat agar bagian bawah tidak melompat (CLS). */
+.papan-grid[data-loading='true'] {
+  min-height: 20rem;
+}
+
+/* Kartu kode dan kata sandi: sisihkan tinggi akhirnya selagi kunci dibuat agar isi di bawahnya tidak melompat. */
+.cred-wait {
+  min-height: 16rem;
+}
+
+@media (width <= 40em) {
+  .cred-wait {
+    min-height: 21rem;
+  }
+}
+
+/* Gulir halus ditangani Lenis; gulir halus bawaan peramban membuatnya berebut. */
+html.lenis,
+html.lenis body {
+  scroll-behavior: auto;
+}
+
+/* Kunci Satgas: dua kolom di layar lebar agar halaman tidak memanjang ke bawah. */
+.kunci-grid,
+.kunci-kiri,
+.kunci-kanan {
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.kunci-kiri > *,
+.kunci-kanan > * {
+  margin: 0;
+}
+
+@media (width >= 64em) {
+  .narrow.kunci {
+    width: min(1180px, 100% - 2.5rem);
+  }
+
+  .kunci-grid:has(> .kunci-kanan) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+/* ---------- jarak napas: label kecil, chip, dan keadaan simpan tidak menempel ---------- */
+.savestate {
+  margin: 0.6rem 0 1rem;
+}
+
+.rj-tag {
+  padding: 0.2rem 0.7rem;
+  margin-bottom: 0.35rem;
+}
+
+details.fold > summary span {
+  padding: 0.25rem 0.7rem;
 }

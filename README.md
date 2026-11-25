@@ -12,11 +12,11 @@ Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
 ![Next.js](https://img.shields.io/badge/Next.js_16-0A3F31?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-0E5A45?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript_strict-0E5A45?style=flat-square&logo=typescript&logoColor=white)
-![Tes](https://img.shields.io/badge/tes-208_lolos-0E5A45?style=flat-square)
+![Tes](https://img.shields.io/badge/tes-244_lolos-0E5A45?style=flat-square)
 ![Aksesibilitas](https://img.shields.io/badge/axe--core-0_pelanggaran-0E5A45?style=flat-square)
 ![Lisensi](https://img.shields.io/badge/lisensi-MIT-F2A33A?style=flat-square)
 
-[Alur kerja](#alur-kerja) · [Fitur](#fitur) · [Privasi](#cara-kerja-privasi) · [Mulai cepat](#mulai-cepat) · [Struktur](#struktur-proyek) · [Batas yang jujur](#batas-yang-jujur)
+[Pembeda](#yang-membedakan-gema) · [Alur kerja](#alur-kerja) · [Fitur](#fitur) · [Privasi](#cara-kerja-privasi) · [Mulai cepat](#mulai-cepat) · [Struktur](#struktur-proyek) · [Batas yang jujur](#batas-yang-jujur)
 
 </div>
 
@@ -36,6 +36,29 @@ Banyak penyintas tidak melapor karena takut identitasnya sampai ke pelaku yang b
 | Bergantung secara akademik pada terlapor | Penanda relasi kuasa menandai kasus sebagai _Prioritas_ dan menyiapkan draf usulan pelindungan sementara.                                                  |
 | Laporan didiamkan kampus                 | Tenggat hari kerja, tangga eskalasi T1 sampai T3, dan papan kepatuhan publik.                                                                              |
 | Sulit mengetik saat tertekan             | **Bicara saja**: suara menjadi teks di perangkat.                                                                                                          |
+
+## Yang membedakan Gema
+
+Kanal pelaporan yang umum di kampus (formulir web, surel, atau pesan WhatsApp ke petugas) bertumpu pada kepercayaan kepada penerima. Gema memindahkan sebagian kepercayaan itu ke teknik yang bisa diperiksa. Perbandingan ini dengan jenis kanal tersebut, bukan ulasan produk tertentu.
+
+| Kemampuan                   | Kanal umum                                | Gema                                                                                                           |
+| --------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Isi laporan                 | Terbaca oleh admin atau penerima          | Dienkripsi di perangkat pelapor. Server tidak memegang kunci pembukanya.                                       |
+| Mengetahui ada korban lain  | Tidak ada, setiap laporan berdiri sendiri | **Pencocokan pola terlapor** lewat OPRF (RFC 9497), tanpa memberi nama terlapor kepada server.                 |
+| Siapa yang memutuskan       | Penerima laporan                          | Pelapor memilih kapan eskalasi, termasuk **eskalasi bersyarat** (baru terkirim bila 2 sampai 5 pelapor cocok). |
+| Kampus menunda              | Tidak terlihat dari luar                  | **Tenggat 3 hari kerja**, tangga eskalasi T1 sampai T3, dan **Papan Kepatuhan** publik.                        |
+| Bukti dihapus atau dibantah | Tangkapan layar tanpa jejak waktu         | **Sertifikat waktu** pohon Merkle harian, dan **verifikasi mandiri** tanpa akun.                               |
+| Penyalahgunaan oleh Satgas  | Bergantung pada kepercayaan               | **Empat Mata** (kunci terpecah 2-dari-3, ditambah persetujuan anggota lain) dan **jejak audit** berantai hash. |
+| Paksaan di sekitar pelapor  | Tidak ada                                 | **Kode Paksa** membuka brankas tiruan. **Pemulihan** lewat tiga orang tepercaya bila lupa sandi.               |
+| Sulit menulis saat tertekan | Formulir panjang                          | **Bicara saja** (suara jadi teks di perangkat) dan pendamping yang tidak mengirim cerita ke layanan AI.        |
+
+Tiga hal yang paling sulit ditiru:
+
+1. **Pencocokan tanpa membuka nama.** Pola pelaku berulang terlihat tanpa ada pihak yang menyimpan daftar nama terlapor.
+2. **Satgas ikut dibatasi.** Membuka isi laporan perlu dua orang, dan setiap pembukaan tercatat.
+3. **Kampus bisa dipantau.** Tenggat dan kepatuhan terlihat publik, bukan janji di atas kertas.
+
+Batasnya: semua ini prototipe yang belum diaudit pihak independen (lihat [Batas yang jujur](#batas-yang-jujur)), dan brankas tanpa nama bukan jaminan anonimitas.
 
 ## Alur kerja
 
@@ -103,7 +126,7 @@ sequenceDiagram
 
 ### 3. Penanganan oleh Satgas
 
-Setiap kasus melewati lima status, dan hanya boleh maju satu langkah (Tindak_lanjut berarti tindak lanjut pimpinan). Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Kalau tenggat terlewat, naik ke T1 Ketua Satgas; lalu T2 Pimpinan (terlambat 3 hari kerja); lalu T3 LLDIKTI, hanya agregat (10 hari kerja). Ambang T2 dan T3 adalah nilai bawaan dan bisa diatur per kampus.
+Setiap kasus melewati lima status, dan hanya boleh maju satu langkah (Tindak_lanjut berarti tindak lanjut pimpinan). Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Kalau tenggat terlewat, naik ke T1 Ketua Satgas; lalu T2 Pimpinan (terlambat 3 hari kerja); lalu T3 kementerian, hanya agregat (10 hari kerja). Ambang T2 dan T3 adalah nilai bawaan dan bisa diatur.
 
 ```mermaid
 stateDiagram-v2
@@ -130,8 +153,8 @@ Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui per
 ### 4. Yang bisa dilihat siapa saja
 
 - **Periksa bukti** (`/verifikasi`): unggah berkas dan Paket Bukti, lalu cek apakah berkas masih utuh sejak waktu pengunggahan. Tanpa akun, bahkan bisa offline lewat berkas HTML mandiri.
-- **Papan Kepatuhan** (`/papan`): persentase ketepatan waktu tiap kampus per kuartal. Angkanya diberi derau privasi diferensial supaya satu kasus tidak bisa ditebak.
-- **Coba demo** (`/demo`): semua peran dengan data fiktif, dalam sekitar lima menit.
+- **Papan Kepatuhan** (`/papan`): persentase ketepatan waktu UPN Veteran Jawa Timur per kuartal. Angkanya diberi derau privasi diferensial supaya satu kasus tidak bisa ditebak.
+- **Coba demo** (`/demo`): semua peran Satgas dengan basis data kosong; kamu membuat laporan sendiri, dalam sekitar lima menit.
 
 ## Fitur
 
@@ -199,7 +222,7 @@ npm install     # bila unduhan biner onnxruntime-node gagal: npm install --ignor
 npm run dev     # http://localhost:3000
 ```
 
-Buka `/demo` untuk mencoba semua peran dengan data fiktif. Data tersimpan di `.data/`.
+Buka `/demo` untuk mencoba semua peran Satgas. Demo dimulai kosong, tanpa laporan atau kasus rekaan; data yang kamu buat tersimpan di `.data/`.
 
 <details>
 <summary><b>Perintah yang tersedia</b></summary>
@@ -238,7 +261,7 @@ gema/
 │  ├─ server/
 │  │  ├─ routes/       rute API per domain: publik, akun, pelapor, satgas, demo, cron
 │  │  ├─ logic/        aturan inti: sesi, akun, laporan, klaster, eskalasi, SLA, anchor
-│  │  ├─ seed/         data fiktif Mode Demo
+│  │  ├─ seed/         institusi, unit, dan akun peran Mode Demo (fixture uji hanya dengan GEMA_SEED_CONTOH=on)
 │  │  └─ backends/     penyimpanan berkas dan PostgreSQL
 │  ├─ styles/          CSS berlapis, urutan impor di layout.tsx menentukan cascade
 │  └─ proxy.ts         CSP nonce
@@ -259,10 +282,22 @@ gema/
 
 | Dokumen                                                                      | Isi                                          |
 | ---------------------------------------------------------------------------- | -------------------------------------------- |
-| [`docs/panduan/NASKAH-DEMO.md`](docs/panduan/NASKAH-DEMO.md)                 | Alur demo lima menit                         |
 | [`docs/desain/PENYEMPURNAAN-VISUAL.md`](docs/desain/PENYEMPURNAAN-VISUAL.md) | Keputusan visual, pengukuran, dan batasannya |
 | [`docs/desain/AUDIT-UI.md`](docs/desain/AUDIT-UI.md)                         | Audit antarmuka dan aksesibilitas            |
 | [`docs/desain/KREDIT-FOTO.md`](docs/desain/KREDIT-FOTO.md)                   | Kredit foto latar                            |
+
+## Keberlanjutan
+
+Gema dirancang agar tetap berguna setelah lomba: dipakai kampus, bukan sekadar didemokan.
+
+| Segi        | Wujudnya di Gema                                                                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sosial      | Menurunkan hambatan melapor kekerasan seksual di kampus. Sejalan dengan SDG 5 (kesetaraan gender), SDG 16 (institusi yang akuntabel), dan SDG 4. |
+| Kelembagaan | Tenggat tindak lanjut 3 hari kerja dan jejak yang dapat diperiksa mengikuti Permendikbudristek 55/2024, jadi selaras dengan kewajiban Satgas.    |
+| Teknis      | Dijalankan sendiri oleh kampus, memakai standar terbuka (RFC 9497, RFC 9162), tanpa API AI berbayar. Pendamping bekerja di perangkat pengguna.   |
+| Kepercayaan | Server tidak memegang kunci pembuka isi, sehingga kepercayaan tidak bergantung pada satu admin.                                                  |
+
+Yang belum diukur: jejak energi atau karbon, dan kinerja di bawah beban banyak pengguna. Penyimpanan saat ini hanya cocok untuk satu instans server (lihat batas di bawah).
 
 ## Batas yang jujur
 

@@ -5,6 +5,7 @@ import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonPage, SkeletonTable } from '@/components/Skeleton';
 
 type Snap = {
   unit: string;
@@ -27,7 +28,7 @@ export default function Radar() {
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
   const periods = [...new Set(s?.map((x) => x.periode))].sort().reverse();
@@ -45,6 +46,7 @@ export default function Radar() {
         </p>
       </header>
       {err && <LoadError what="radar pola" message={err} />}
+      {!s && !err && <SkeletonTable label="Memuat radar pola" />}
       <div
         className="tablewrap card"
         style={{ padding: 0 }}

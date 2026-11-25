@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { drafts, summarize, type DosirInput } from '@gema/pendamping';
+import { salin } from '@/lib/ui/salin';
 
 type Summary = ReturnType<typeof summarize>;
 type Draft = ReturnType<typeof drafts>[number];
@@ -72,8 +73,10 @@ function DraftList({ ds }: { ds: Draft[] }) {
                 <button
                   type="button"
                   className="btn ghost sm"
+                  data-done={copied === i}
                   onClick={() => {
-                    void navigator.clipboard.writeText(texts[i] ?? d.isi).then(() => {
+                    void salin(texts[i] ?? d.isi).then((ok) => {
+                      if (!ok) return;
                       setCopied(i);
                       setTimeout(() => setCopied(null), 1800);
                     });

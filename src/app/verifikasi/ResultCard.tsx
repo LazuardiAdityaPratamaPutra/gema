@@ -6,9 +6,15 @@ import type { Result } from './cek';
 
 export function ResultCard({ res, onReset }: { res: Result; onReset: () => void }) {
   return (
-    <section className={`card ${res.ok ? 'tint' : 'alert'}`} role="status" aria-live="polite">
-      <h2 className="title-md">{res.ok ? 'Utuh dan tercatat' : 'Tidak cocok'}</h2>
-      <p>{res.detail}</p>
+    <section
+      className={`card hasil-cek ${res.ok ? 'tint' : 'alert'}`}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="integrity" data-ok={res.ok}>
+        <h2 className="title-md">{res.ok ? 'Utuh dan tercatat' : 'Tidak cocok'}</h2>
+        <span>{res.detail}</span>
+      </div>
       {!res.ok && (
         <p className="small">
           Tidak cocok belum berarti buktimu hilang. Ada dua kemungkinan: berkas yang kamu pilih

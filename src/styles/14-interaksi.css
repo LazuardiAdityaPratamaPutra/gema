@@ -1,0 +1,473 @@
+/* Interaksi dan umpan balik: kerangka muat, status tombol, hover baris, tanda berhasil. */
+
+/* ---------- kerangka muat ---------- */
+.sk {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+.sk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
+  animation: sk-geser 1.4s ease-in-out infinite;
+}
+
+@keyframes sk-geser {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.sk-pill {
+  border-radius: 999px;
+}
+
+.sk-tab {
+  border-radius: 12px 12px 0 0;
+}
+
+.sk-card {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+
+.sk-page {
+  display: grid;
+  gap: 0.9rem;
+  padding-block: 2rem;
+  max-width: 44rem;
+}
+
+.sk-rows {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.sk-lines {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.sk-files {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.sk-file-body {
+  display: grid;
+  grid-template-columns: 5rem 1fr minmax(0, 14rem);
+  gap: 1.4rem;
+  align-items: center;
+  padding: 1.2rem 1.4rem;
+  border-radius: 0 20px 20px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.sk-file-main {
+  display: grid;
+  gap: 0.6rem;
+}
+
+@media (width <= 40em) {
+  .sk-file-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- tombol sibuk dan tombol berhasil ---------- */
+.btn[aria-busy='true'] {
+  pointer-events: none;
+  position: relative;
+}
+
+.btn[aria-busy='true']::before {
+  content: '';
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-right: 0.55em;
+  vertical-align: -0.12em;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: tombol-putar 700ms linear infinite;
+}
+
+@keyframes tombol-putar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn[data-done='true']::before {
+  content: '';
+  display: inline-block;
+  width: 0.38em;
+  height: 0.7em;
+  margin: 0 0.6em 0.12em 0.15em;
+  border: solid var(--ok);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+  animation: tanda-centang 320ms var(--ease-out) both;
+}
+
+@keyframes tanda-centang {
+  0% {
+    opacity: 0;
+    transform: rotate(45deg) scale(0.4);
+  }
+
+  60% {
+    transform: rotate(45deg) scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+/* ---------- status simpan: tanda berhasil yang tampil sekali tiap simpan ---------- */
+.savestate[data-state='saved']::before {
+  content: '';
+  display: inline-block;
+  width: 0.3em;
+  height: 0.6em;
+  margin: 0 0.6em 0.1em 0.1em;
+  border: solid var(--ok);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.savestate[data-state='saved'] {
+  animation: simpan-berhasil 900ms var(--ease-out) both;
+}
+
+@keyframes simpan-berhasil {
+  from {
+    color: var(--ok);
+    background-color: var(--ok-bg);
+  }
+
+  to {
+    background-color: transparent;
+  }
+}
+
+/* ---------- lencana status kasus ---------- */
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.stat i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--s, #6b7d74);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s, #6b7d74) 22%, transparent);
+}
+
+.stat[data-s='Diterima'] {
+  --s: #4a78a8;
+}
+
+.stat[data-s='Verifikasi'] {
+  --s: #b8801a;
+}
+
+.stat[data-s='Rekomendasi'] {
+  --s: var(--teal);
+}
+
+.stat[data-s='Tindak lanjut pimpinan'] {
+  --s: #c9531c;
+}
+
+.stat[data-s='Selesai'] {
+  --s: var(--ok);
+}
+
+/* ---------- hover yang hidup (hanya perangkat dengan penunjuk) ---------- */
+@media (hover: hover) {
+  main table:not(.keep) tbody tr > * {
+    transition: background-color 160ms var(--ease-out);
+  }
+
+  main table:not(.keep) tbody tr:hover > * {
+    background-color: color-mix(in srgb, var(--teal) 9%, #fff);
+  }
+
+  main table:not(.keep) tbody tr:hover .btn.ghost {
+    box-shadow:
+      inset 0 0 0 1.5px var(--teal),
+      0 2px 6px rgb(16 36 29 / 14%);
+  }
+
+  details.fold > summary,
+  details.more > summary {
+    transition: background-color 160ms var(--ease-out);
+  }
+
+  details.fold > summary:hover,
+  details.more > summary:hover {
+    background-color: color-mix(in srgb, var(--teal) 7%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk::after,
+  .btn[aria-busy='true']::before,
+  .btn[data-done='true']::before,
+  .savestate[data-state='saved'] {
+    animation: none;
+  }
+
+  .sk::after {
+    display: none;
+  }
+}
+
+/* ---------- keterangan kepercayaan pada berkas ---------- */
+.file-trust {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.55rem 0 0;
+  font-size: var(--t-xs);
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.sk-table {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.2rem 1.4rem;
+}
+
+.sk-trow {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 1.2rem;
+  align-items: center;
+  padding-block: 0.5rem;
+}
+
+@media (width <= 40em) {
+  .sk-trow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- hasil pemeriksaan rantai audit ---------- */
+.integrity {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 1rem;
+  align-items: center;
+}
+
+.integrity::before {
+  content: '✓';
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  font: 800 1.35rem/1 var(--sans);
+  color: var(--ok);
+  background: var(--ok-bg);
+  box-shadow: inset 0 0 0 2px var(--ok);
+}
+
+.integrity[data-ok='true']::before {
+  animation: tanda-lencana 420ms var(--ease-out) both;
+}
+
+.integrity[data-ok='false']::before {
+  content: '!';
+  color: var(--bad);
+  background: var(--bad-bg);
+  box-shadow: inset 0 0 0 2px var(--bad);
+}
+
+.integrity b {
+  font-size: var(--t-lg);
+}
+
+.integrity span {
+  color: var(--ink-soft, inherit);
+}
+
+@keyframes tanda-lencana {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .integrity[data-ok='true']::before {
+    animation: none;
+  }
+}
+
+/* ---------- umpan balik berhasil ---------- */
+.umpan-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  animation: umpan-masuk 320ms var(--ease-out) both;
+}
+
+.umpan-ok::before,
+.sukses-judul::before {
+  content: '✓';
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  font: 800 1rem/1 var(--sans);
+  color: #fff;
+  background: var(--ok);
+}
+
+.sukses-judul {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: var(--t-lg);
+}
+
+.sukses-judul::before {
+  width: 2.2rem;
+  height: 2.2rem;
+  font-size: 1.25rem;
+  animation: tanda-lencana 420ms var(--ease-out) both;
+}
+
+.sukses ul {
+  margin: 0.7rem 0 0;
+  padding-left: 3rem;
+}
+
+@keyframes umpan-masuk {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .umpan-ok,
+  .sukses-judul::before {
+    animation: none;
+  }
+}
+
+/* Pesan hasil aksi tetap terlihat saat tombolnya jauh dari atas halaman. */
+.umpan-lekat {
+  position: sticky;
+  top: 4.75rem;
+  z-index: 5;
+}
+
+.cek-wait {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cek-wait i {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentcolor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: tombol-putar 700ms linear infinite;
+}
+
+.hasil-cek .integrity h2 {
+  margin: 0;
+}
+
+.hasil-card {
+  animation: tanda-masuk 260ms var(--ease-out) backwards;
+}
+
+@keyframes tanda-masuk {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cek-wait i,
+  .hasil-card {
+    animation: none;
+  }
+}
+
+.hasil-cek .integrity {
+  align-items: start;
+  margin-bottom: 0.8rem;
+}
+
+.kunci-janji {
+  margin-top: 1.2rem;
+}
+
+.kunci-janji ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* Menahan tinggi saat halaman Verifikasi menunggu parameter URL, agar footer tidak melompat. */
+.cek-muat {
+  min-height: 28.5rem;
+}
+
+/* Pilihan yang tidak bisa dipilih lagi (misalnya batas dua periode) tampak redup. */
+.choice:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Judul kelompok pilihan sejajar dan setebal label isian lain. */
+fieldset.field > legend {
+  padding: 0;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}

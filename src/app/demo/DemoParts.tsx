@@ -1,9 +1,9 @@
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { DEMO_ACCOUNTS } from '@/lib/demo/demo';
+import Link from 'next/link';
 import { satgasStore, type SatgasSession } from '@/lib/store';
 import { login } from '@/lib/vault/vault-client';
-import type { Info, Run } from './useDemo';
+import type { DemoAccount, Info, Run } from './useDemo';
 
 type Props = { busy: boolean; run: Run };
 
@@ -33,10 +33,10 @@ function AccountRow({
   );
 }
 
-/** Masuk ke akun pelapor rekaan, dan ke peran Satgas rekaan. */
+/** Masuk ke peran Satgas demo; akun pelapor hanya ada bila fixture uji dimuat, selain itu pelapor membuat brankas sendiri. */
 export function DemoLogins({ info, busy, run }: Props & { info: Info | null }) {
   const router = useRouter();
-  const asReporter = (a: (typeof DEMO_ACCOUNTS)[number]) =>
+  const asReporter = (a: DemoAccount) =>
     run(async () => {
       await login(a.caseCode, a.passphrase);
       router.push('/brankas');
@@ -53,7 +53,18 @@ export function DemoLogins({ info, busy, run }: Props & { info: Info | null }) {
         <h2 className="title-md" id="pel">
           Masuk sebagai pelapor
         </h2>
-        {DEMO_ACCOUNTS.map((a) => (
+        {info && info.accounts.length === 0 && (
+          <>
+            <p>
+              Demo ini kosong. Buat brankasmu sendiri, simpan laporan karangan, lalu eskalasi untuk
+              melihatnya di sisi Satgas.
+            </p>
+            <Link href="/mulai" className="btn teal">
+              Buat brankas baru
+            </Link>
+          </>
+        )}
+        {info?.accounts.map((a) => (
           <AccountRow
             key={a.key}
             title={a.nama}

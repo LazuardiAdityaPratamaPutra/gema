@@ -13,7 +13,7 @@ const ROUTES: Record<string, Route> = {
   'GET info': ({ db }) =>
     json({
       institutionId: DEMO_INSTITUTION_ID,
-      accounts: DEMO_ACCOUNTS,
+      accounts: db.meta.contoh ? DEMO_ACCOUNTS : [],
       members: DEMO_MEMBERS,
       password: DEMO_PASSWORD,
       offsetDays: Math.round(db.clock.demoOffsetMs / DAY),

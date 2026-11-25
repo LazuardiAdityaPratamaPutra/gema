@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { island } from '@/lib/ui/island-bus';
 import { api } from '@/lib/api';
 import type { BuktiMeta, Narasi } from '@/lib/laporan/report-format';
 import type { ReporterSession } from '@/lib/store';
@@ -29,7 +30,16 @@ export function useReportDetail(session: ReporterSession | null, id: string) {
   const [r, setR] = useState<ReportView | null>(null);
   const [plain, setPlain] = useState<Plain | null>(null);
   const [inst, setInst] = useState<InstitutionInfo | null>(null);
-  const [msg, setMsg] = useState('');
+  const [msg, setMsgRaw] = useState('');
+  const [tone, setTone] = useState<'ok' | 'err'>('err');
+  const okRef = useRef('');
+  // Pesan sama dengan teks sukses aksi yang sedang berjalan (atau ditandai ok) bernada berhasil.
+  const setMsg = useCallback((m: string, ok = false) => {
+    const good = ok || (m !== '' && m === okRef.current);
+    setTone(good ? 'ok' : 'err');
+    setMsgRaw(m);
+    if (good) island.toast(m.length > 70 ? `${m.slice(0, 67)}…` : m);
+  }, []);
   const [busy, setBusy] = useState(false);
 
   const apply = useCallback(
@@ -52,11 +62,12 @@ export function useReportDetail(session: ReporterSession | null, id: string) {
     fetchReport(session, id)
       .then(apply)
       .catch((e) => setMsg(e.message));
-  }, [session, id, apply]);
+  }, [session, id, apply, setMsg]);
   useEffect(first, [first]);
 
   const act = async (fn: () => Promise<unknown>, ok: string, onDone?: () => void) => {
     setBusy(true);
+    okRef.current = ok;
     setMsg('');
     try {
       await fn();
@@ -73,5 +84,5 @@ export function useReportDetail(session: ReporterSession | null, id: string) {
     first();
   };
 
-  return { r, plain, inst, msg, setMsg, busy, act, retry };
+  return { r, plain, inst, msg, tone, setMsg, busy, act, retry };
 }

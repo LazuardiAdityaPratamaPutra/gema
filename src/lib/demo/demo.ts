@@ -26,20 +26,26 @@ export const DEMO_ACCOUNTS = [
 ] as const;
 
 export const DEMO_MEMBERS = [
-  { email: 'ketua@contoh.ac.id', nama: 'Dr. Sari Wulandari', role: 'Ketua' },
-  { email: 'anggota@contoh.ac.id', nama: 'Raka Pratama', role: 'Anggota' },
-  { email: 'auditor@contoh.ac.id', nama: 'Wulan Prabandari', role: 'Auditor' },
-  { email: 'pimpinan@contoh.ac.id', nama: 'Prof. Anton Mahendra', role: 'Pimpinan' },
-  { email: 'pengawas@lldikti.contoh', nama: 'Pengawas LLDIKTI (fiktif)', role: 'Pengawas' },
+  { email: 'ketua@contoh.ac.id', nama: 'Akun demo: Ketua Satgas', role: 'Ketua' },
+  { email: 'anggota@contoh.ac.id', nama: 'Akun demo: Anggota Satgas', role: 'Anggota' },
+  { email: 'auditor@contoh.ac.id', nama: 'Akun demo: Auditor', role: 'Auditor' },
+  { email: 'pimpinan@contoh.ac.id', nama: 'Akun demo: Pimpinan', role: 'Pimpinan' },
+  { email: 'pengawas@contoh.ac.id', nama: 'Akun demo: Pengawas Kemdiktisaintek', role: 'Pengawas' },
 ] as const;
 
 export const DEMO_PASSWORD = 'contoh-demo-2026';
 
+/** Fakultas UPN Veteran Jawa Timur menurut situs PPMB resmi (ppmb.upnjatim.ac.id), ditambah unit non-fakultas. */
 export const DEMO_UNITS = [
-  { id: 'u-ft', nama: 'Fakultas Teknik', tipe: 'Fakultas' as const },
   { id: 'u-feb', nama: 'Fakultas Ekonomi dan Bisnis', tipe: 'Fakultas' as const },
-  { id: 'u-fisip', nama: 'Fakultas Ilmu Sosial dan Politik', tipe: 'Fakultas' as const },
+  { id: 'u-fp', nama: 'Fakultas Pertanian', tipe: 'Fakultas' as const },
+  { id: 'u-ft', nama: 'Fakultas Teknik dan Sains', tipe: 'Fakultas' as const },
+  { id: 'u-fisip', nama: 'Fakultas Ilmu Sosial, Budaya, dan Politik', tipe: 'Fakultas' as const },
+  { id: 'u-fad', nama: 'Fakultas Arsitektur dan Desain', tipe: 'Fakultas' as const },
+  { id: 'u-fh', nama: 'Fakultas Hukum', tipe: 'Fakultas' as const },
+  { id: 'u-fik', nama: 'Fakultas Ilmu Komputer', tipe: 'Fakultas' as const },
   { id: 'u-fk', nama: 'Fakultas Kedokteran', tipe: 'Fakultas' as const },
+  { id: 'u-pasca', nama: 'Program Pascasarjana', tipe: 'Unit kerja' as const },
   { id: 'u-bem', nama: 'Unit Kegiatan Mahasiswa', tipe: 'Unit kerja' as const },
 ];
 

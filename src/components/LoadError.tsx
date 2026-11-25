@@ -19,7 +19,7 @@ export function LoadError({
     return (
       <section className="card alert" role="alert">
         <h2 className="title-sm m-0">Peranmu tidak punya akses ke {what}</h2>
-        <p className="m-0">
+        <p className="m-0 mt-sm">
           Bagian ini dibatasi untuk peran tertentu. Tidak ada yang salah dengan akunmu, dan tidak
           ada data yang berubah.
         </p>

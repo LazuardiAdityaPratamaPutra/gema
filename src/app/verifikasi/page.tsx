@@ -6,6 +6,7 @@ import { fetchCertificate } from '@/lib/vault/proof';
 import { checkFile, type Result } from './cek';
 import { ResultCard } from './ResultCard';
 import { Ilustrasi } from '@/components/Ilustrasi';
+import { SkeletonLines } from '@/components/Skeleton';
 
 function Verifikasi() {
   const qid = useSearchParams().get('id');
@@ -44,6 +45,7 @@ function Verifikasi() {
           Hanya sidiknya yang dicocokkan dengan catatan.
         </p>
       </header>
+      {qid && !cert && !error && <SkeletonLines label="Mengambil sertifikat" n={2} />}
       {cert && (
         <p className="card tint small">
           Memeriksa terhadap sertifikat <code>{cert.evidenceId}</code>, dicatat {cert.uploadedAt}.
@@ -55,7 +57,12 @@ function Verifikasi() {
         </span>
         <input id="f" type="file" onChange={(e) => void check(e.target.files?.[0])} />
       </label>
-      {busy && <p role="status">Menghitung sidik…</p>}
+      {busy && (
+        <p className="cek-wait" role="status">
+          <i aria-hidden="true" />
+          Menghitung sidik di perangkatmu…
+        </p>
+      )}
       {error && (
         <p className="err" role="alert">
           {error}
@@ -75,7 +82,13 @@ function Verifikasi() {
 }
 export default function Page() {
   return (
-    <Suspense>
+    <Suspense
+      fallback={
+        <div className="narrow cek-muat">
+          <SkeletonLines label="Menyiapkan halaman" n={3} />
+        </div>
+      }
+    >
       <Verifikasi />
     </Suspense>
   );

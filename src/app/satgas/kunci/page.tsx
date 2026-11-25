@@ -73,7 +73,7 @@ function PanelMode({
   setMsg,
 }: Acts & { panel: Mode; setPanel: (m: Mode) => void }) {
   return (
-    <section className="card my-lg" aria-labelledby="panel">
+    <section className="card" aria-labelledby="panel">
       <h2 className="title-sm" id="panel">
         Mode panel: {panel === '2dari3' ? 'Empat Mata aktif' : 'tunggal'}
       </h2>
@@ -139,7 +139,7 @@ function NewKey({ session, setPanel, setMsg }: Acts & { setPanel: (m: Mode) => v
   }
 
   return (
-    <section className="card mt-lg">
+    <section className="card">
       <h2 className="title-sm">Buat kunci baru (Ketua)</h2>
       <p>Kunci dibuat di perangkat ini. Hanya kunci publiknya dikirim ke server.</p>
       <label className="check">
@@ -194,7 +194,7 @@ export default function Kunci() {
   const isKetua = session.member.role === 'Ketua';
 
   return (
-    <div className="narrow">
+    <div className="narrow kunci">
       <header className="ph ph-foto">
         <HeaderPhoto />
         <SatgasBar s={session} />
@@ -214,27 +214,35 @@ export default function Kunci() {
           {msg}
         </p>
       )}
-      <p>
-        Status di tab ini:{' '}
-        <strong>{has ? 'kunci rahasia termuat' : 'belum ada kunci rahasia'}</strong>.
-      </p>
-      <ImportKey session={session} setMsg={setMsg} />
-      <section className="card my-lg" aria-labelledby="rakit">
-        <h2 className="title-sm" id="rakit">
-          Rakit kunci dari dua bagian (Empat Mata)
-        </h2>
-        <p>
-          Dua pemegang membawa bagian kuncinya masing-masing ke perangkat ini. Kunci hanya dirakit
-          di tab ini dan hilang saat tab ditutup. Satu bagian saja tidak berguna.
-        </p>
-        <AssembleKey session={session} setMsg={setMsg} />
-      </section>
-      {isKetua && panel && (
-        <PanelMode session={session} panel={panel} setPanel={setPanel} setMsg={setMsg} />
-      )}
-      {isKetua && !session.institution.demo && (
-        <NewKey session={session} setPanel={setPanel} setMsg={setMsg} />
-      )}
+      <div className="kunci-grid">
+        <div className="kunci-kiri">
+          <p>
+            Status di tab ini:{' '}
+            <strong>{has ? 'kunci rahasia termuat' : 'belum ada kunci rahasia'}</strong>.
+          </p>
+          <ImportKey session={session} setMsg={setMsg} />
+          <section className="card" aria-labelledby="rakit">
+            <h2 className="title-sm" id="rakit">
+              Rakit kunci dari dua bagian (Empat Mata)
+            </h2>
+            <p>
+              Dua pemegang membawa bagian kuncinya masing-masing ke perangkat ini. Kunci hanya
+              dirakit di tab ini dan hilang saat tab ditutup. Satu bagian saja tidak berguna.
+            </p>
+            <AssembleKey session={session} setMsg={setMsg} />
+          </section>
+        </div>
+        {isKetua && (
+          <div className="kunci-kanan">
+            {panel && (
+              <PanelMode session={session} panel={panel} setPanel={setPanel} setMsg={setMsg} />
+            )}
+            {!session.institution.demo && (
+              <NewKey session={session} setPanel={setPanel} setMsg={setMsg} />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -14,10 +14,24 @@ const CONTOH = [
   'Dia sering pegang tangan dan pinggang saya padahal saya sudah menolak',
 ];
 
-function Matches({ enough, hits }: { enough: boolean; hits: ReturnType<typeof understandStory> }) {
+function Matches({
+  enough,
+  started,
+  hits,
+}: {
+  enough: boolean;
+  started: boolean;
+  hits: ReturnType<typeof understandStory>;
+}) {
   return (
     <>
-      {!enough && <p className="hasil-empty">Hasilnya muncul di sini saat kamu menulis.</p>}
+      {!enough && (
+        <p className="hasil-empty">
+          {started
+            ? 'Tulis sedikit lagi, minimal empat kata, lalu hasilnya muncul di sini.'
+            : 'Hasilnya muncul di sini saat kamu menulis.'}
+        </p>
+      )}
       {enough && hits.length === 0 && (
         <div className="hasil-card">
           <p className="hasil-title">Kami belum bisa mencocokkannya.</p>
@@ -28,7 +42,7 @@ function Matches({ enough, hits }: { enough: boolean; hits: ReturnType<typeof un
         </div>
       )}
       {hits.length > 0 && (
-        <div className="hasil-card">
+        <div className="hasil-card" key={hits.map((h) => h.form.id).join()}>
           <p className="hasil-title">Yang kamu ceritakan mirip dengan bentuk yang diatur:</p>
           <ol className="bentuk">
             {hits.map((h) => (
@@ -104,7 +118,7 @@ export default function Pahami() {
           <h2 id="hasil" className="sr">
             Hasil
           </h2>
-          <Matches enough={enough} hits={hits} />
+          <Matches enough={enough} started={text.trim() !== ''} hits={hits} />
           <div className="row" style={{ marginTop: '1.2rem' }}>
             <Link className="btn teal" href="/mulai" onClick={() => carry(text)}>
               Simpan dulu, tanpa nama

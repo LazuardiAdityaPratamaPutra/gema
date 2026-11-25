@@ -1,4 +1,33 @@
 /* Token desain. Satu sumber untuk warna, tipografi, dan gerak. Zona halaman menimpa sebagian di 07-palet-dan-pita.css. */
+/* Font cadangan berukuran sama dengan font asli, agar pergantian font tidak menggeser tata letak (CLS). */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial'), local('Liberation Sans');
+  font-weight: 100 599;
+  size-adjust: 100%;
+}
+
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+  font-weight: 600 900;
+  size-adjust: 97.5%;
+}
+
+@font-face {
+  font-family: 'Atkinson Fallback';
+  src: local('Arial'), local('Liberation Sans');
+  font-weight: 100 599;
+  size-adjust: 98.4%;
+}
+
+@font-face {
+  font-family: 'Atkinson Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold');
+  font-weight: 600 900;
+  size-adjust: 99%;
+}
+
 :root {
   /* Kertas, tinta, garis */
 
@@ -30,8 +59,8 @@
 
   /* Tipografi dan gerak */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --display: 'Archivo Variable', arial, sans-serif;
-  --sans: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+  --display: 'Archivo Variable', 'Archivo Fallback', arial, sans-serif;
+  --sans: 'Atkinson Hyperlegible Next Variable', 'Atkinson Fallback', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Skala radius: input dan tombol kecil, kartu, panel besar, pil */

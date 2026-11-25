@@ -37,7 +37,11 @@ export function SaveBanner({
           </li>
         ))}
       </ol>
-      <p className="savestate" data-state={saveState}>
+      <p
+        className="savestate"
+        data-state={saveState}
+        key={saveState === 'saved' ? lastSaved : saveState}
+      >
         {text}
       </p>
       {saveState === 'error' && (

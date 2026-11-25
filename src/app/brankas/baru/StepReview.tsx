@@ -6,7 +6,7 @@ import type { Draft } from '@/lib/laporan/drafts';
 import { fmtBytes } from '@/lib/ui/format';
 import type { FileInput } from '@/lib/laporan/report-build';
 import type { InstitutionInfo } from '@/lib/vault/vault-client';
-import { PERAN_LABEL, hasExtras, type SetField } from './draft-form';
+import { PERAN_LABEL, hasExtras, periodeDipilih, periodeLabel, type SetField } from './draft-form';
 import { MissingFiles, ReviewPart } from './parts';
 
 type Props = {
@@ -65,7 +65,7 @@ function ExtrasList({ d }: { d: Draft }) {
       {d.saksi && <li>Saksi: {d.saksi}</li>}
       {d.dampak && <li>Dampak: {d.dampak}</li>}
       {d.alias && <li>Nama panggilan terlapor: {d.alias}</li>}
-      {d.periode && <li>Periode: {d.periode}</li>}
+      {d.periode && <li>Periode: {periodeDipilih(d.periode).map(periodeLabel).join(', ')}</li>}
     </ul>
   );
 }
@@ -112,6 +112,18 @@ function ReviewSummary({
         <p className="muted small m-0">
           Kapan: {d.kapan || 'belum diisi'}. Di mana: {d.dimana || 'belum diisi'}.
         </p>
+        {(!d.kapan.trim() || !d.dimana.trim()) && (
+          <p className="card warn small" id="belum-lengkap" role="alert">
+            Kapan dan di mana wajib diisi sebelum laporan dikunci.{' '}
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={() => editFrom(1, d.kapan.trim() ? 'dimana' : 'kapan')}
+            >
+              Lengkapi
+            </button>
+          </p>
+        )}
       </ReviewPart>
       <ReviewPart
         title={`Bukti (${files.length} berkas)`}
@@ -176,10 +188,17 @@ export function StepReview(p: Props) {
         onSkip={p.onSkipLost}
       />
       <PatternChoice d={d} set={set} />
-      <p className="small muted">
-        Menyimpan tidak berarti melapor. Tidak ada yang dikirim ke Satgas sampai kamu memilih{' '}
-        <Term k="eskalasi">eskalasi</Term>.
-      </p>
+      <div className="card tint kunci-janji">
+        <strong>Saat kamu menekan Kunci dan simpan</strong>
+        <ul>
+          <li>Isinya dienkripsi di perangkatmu sebelum dikirim ke server.</li>
+          <li>Menyimpan tidak berarti melapor. Tidak ada yang dikirim ke Satgas.</li>
+          <li>
+            Kamu yang memutuskan kapan <Term k="eskalasi">eskalasi</Term>, dan bisa menghapus
+            laporan selamanya dari halamannya.
+          </li>
+        </ul>
+      </div>
       {error && (
         <p className="err" role="alert">
           {error}

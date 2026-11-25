@@ -37,7 +37,7 @@ export const SPECS: Record<string, Spec[]> = {
     {
       nama: 'Dr. Hendra Wijaya, M.T.',
       unitId: 'u-ft',
-      unitNama: 'Fakultas Teknik',
+      unitNama: 'Fakultas Teknik dan Sains',
       attrs: { role: 'dosen', periods: ['2026/2027-ganjil'], location: 'kampus' },
       teks: {
         kapan: 'Akhir Oktober sampai awal November 2026.',
@@ -55,7 +55,7 @@ export const SPECS: Record<string, Spec[]> = {
     {
       nama: 'Hendra Wijaya',
       unitId: 'u-ft',
-      unitNama: 'Fakultas Teknik',
+      unitNama: 'Fakultas Teknik dan Sains',
       attrs: { role: 'dosen', location: 'kampus' },
       teks: {
         kapan: 'Sekitar 2 November 2026, malam hari.',
@@ -73,7 +73,7 @@ export const SPECS: Record<string, Spec[]> = {
     {
       nama: 'Bambang Haryono',
       unitId: 'u-fisip',
-      unitNama: 'Fakultas Ilmu Sosial dan Politik',
+      unitNama: 'Fakultas Ilmu Sosial, Budaya, dan Politik',
       attrs: { role: 'tendik' },
       teks: {
         kapan: 'Sekitar sebulan lalu.',
