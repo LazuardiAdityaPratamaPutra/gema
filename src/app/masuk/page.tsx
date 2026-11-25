@@ -29,6 +29,12 @@ export default function Masuk() {
         </Link>
       </div>
       <div className="alt-line">
+        <span className="muted">Anggota Satgas?</span>
+        <Link href="/satgas/masuk" className="btn ghost sm">
+          Masuk sebagai Satgas
+        </Link>
+      </div>
+      <div className="alt-line">
         <span className="muted">Belum punya brankas?</span>
         <Link href="/mulai" className="btn ghost sm">
           Buat brankas tanpa nama

@@ -11,6 +11,7 @@ import { StatusPill } from './navbar/StatusPill';
 import { isActive, navModel } from './navbar/model';
 import { useMenu } from './navbar/useMenu';
 import { useOnline } from './navbar/useOnline';
+import { useScrolled } from './navbar/useScrolled';
 import { useSignOut } from './navbar/useSignOut';
 import { zoneOf } from './navbar/zone';
 
@@ -21,6 +22,7 @@ export function Navbar() {
   const satgas = satgasStore.use();
   const bus = useIslandState();
   const { open, setOpen, boxRef } = useMenu(path);
+  const scrolled = useScrolled();
   const model = navModel(path, satgas, reporter);
   const signOut = useSignOut(model.kind, satgas, reporter);
   const { links, cta } = model;
@@ -31,7 +33,7 @@ export function Navbar() {
   }, [path]);
 
   return (
-    <header className="nb" ref={boxRef} data-open={open}>
+    <header className="nb" ref={boxRef} data-open={open} data-scrolled={scrolled}>
       {!online && (
         <p className="nb-offline" role="status">
           Koneksi terputus. Draf tetap tersimpan di perangkat ini. Mengunci laporan, eskalasi, dan

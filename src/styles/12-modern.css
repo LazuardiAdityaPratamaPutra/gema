@@ -25,6 +25,10 @@ body {
   backdrop-filter: none;
   padding-top: var(--nb-gap);
   pointer-events: none;
+  transition:
+    background-color 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out),
+    padding-top 220ms var(--ease-out);
 }
 
 .nb > * {
@@ -42,6 +46,13 @@ body {
     0 0 0 1px rgb(255 255 255 / 70%) inset,
     0 1px 2px rgb(16 36 29 / 8%),
     0 10px 30px rgb(16 36 29 / 12%);
+  transition:
+    width 220ms var(--ease-out),
+    height 220ms var(--ease-out),
+    padding 220ms var(--ease-out),
+    border-radius 220ms var(--ease-out),
+    background-color 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out);
 }
 
 .nb-brand {
@@ -972,6 +983,35 @@ html .rj-links a:hover {
 @media (width < 75em) {
   .nb-links + .nb-end {
     margin-left: auto;
+  }
+}
+
+/* ---------- navbar: bilah biasa di puncak halaman, gelembung melayang setelah digulir ---------- */
+/* Tinggi total tetap sama di kedua keadaan (padding atas + tinggi bilah), jadi isi halaman tidak bergeser saat berganti. */
+.nb[data-scrolled='false'] {
+  padding-top: 0;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.nb[data-scrolled='false'] .nb-bar {
+  width: min(1180px, 100% - 2.5rem);
+  height: calc(3.6rem + var(--nb-gap));
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.nb[data-scrolled='false'] .nb-brand {
+  margin-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb[data-scrolled],
+  .nb[data-scrolled] .nb-bar {
+    transition: none;
   }
 }
 
