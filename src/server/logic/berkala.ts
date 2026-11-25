@@ -19,7 +19,7 @@ export async function tick(db: DB) {
     const level = (lateBD >= th.t3 ? 3 : lateBD >= th.t2 ? 2 : 1) as 1 | 2 | 3;
     for (let l = e.tingkat_tangga + 1; l <= level; l++) {
       const L = l as 1 | 2 | 3;
-      const role = L === 1 ? 'Ketua Satgas' : L === 2 ? 'Pimpinan' : 'LLDIKTI (agregat)';
+      const role = L === 1 ? 'Ketua Satgas' : L === 2 ? 'Pimpinan' : 'Kementerian (agregat)';
       db.ladder.push({
         id: uid(8),
         escalation_id: e.id,

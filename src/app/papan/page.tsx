@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { NextStep } from '@/components/NextStep';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonCampusCards } from '@/components/Skeleton';
 import { Ilustrasi } from '@/components/Ilustrasi';
 
 type Row = {
@@ -53,7 +54,7 @@ function CampusCard({ r }: { r: Row }) {
       <h2 id={`h-${r.id}`} style={{ fontSize: '1.35rem', margin: 0 }}>
         {r.nama}
       </h2>
-      {r.fiktif && <span className="pill amber campus-tag">Data fiktif</span>}
+      {r.fiktif && <span className="pill amber campus-tag">Mode demo</span>}
       <p className="muted small">
         {r.kota}, ε = {r.epsilon}
       </p>
@@ -73,9 +74,16 @@ function CampusCard({ r }: { r: Row }) {
             </tr>
           </thead>
           <tbody>
-            {r.kuartal.map((k) => (
-              <QuarterRow key={k.kuartal} k={k} />
-            ))}
+            {r.kuartal.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="muted">
+                  Belum ada kuartal yang tercatat. Angka muncul setelah ada kasus tereskalasi yang
+                  jatuh tempo.
+                </td>
+              </tr>
+            ) : (
+              r.kuartal.map((k) => <QuarterRow key={k.kuartal} k={k} />)
+            )}
           </tbody>
         </table>
       </div>
@@ -95,33 +103,40 @@ export default function Papan() {
     <div className="wrap">
       <header className="ph" data-tab="Papan akuntabilitas">
         <Ilustrasi motif="papan" />
-        <h1>Seberapa tepat waktu kampus menangani?</h1>
+        <h1>Seberapa tepat waktu UPN Veteran Jawa Timur menangani?</h1>
         <p className="lede">
           Persentase kasus tereskalasi yang ditangani dalam tenggat, per kuartal. Angka diberi derau
           acak kecil (privasi diferensial) agar tidak ada kasus tunggal yang dapat ditebak. Kuartal
           dengan kasus terlalu sedikit tidak ditampilkan.
         </p>
       </header>
-      {error && <LoadError what="papan kampus" message={error} />}
-      {!rows && !error && <p role="status">Memuat…</p>}
-      <div className="grid g2 mt-lg">
+      {error && <LoadError what="papan" message={error} />}
+      <div className="mt-lg papan-grid" data-loading={!rows && !error}>
+        {!rows && !error && (
+          <>
+            <span className="sr" role="status">
+              Memuat papan
+            </span>
+            <SkeletonCampusCards n={1} />
+          </>
+        )}
         {rows?.map((r) => (
           <CampusCard key={r.id} r={r} />
         ))}
       </div>
       <p className="small muted" style={{ marginTop: '2rem' }}>
-        Batas jujur: angka berderau bisa berbeda beberapa poin dari nilai sebenarnya, dan hanya
-        kampus yang memilih menampilkannya yang muncul di sini.
+        Batas jujur: angka berderau bisa berbeda beberapa poin dari nilai sebenarnya, dan Satgas
+        dapat memilih menampilkan atau menyembunyikan papan ini.
       </p>
       <NextStep
-        title="Kampusmu belum ada di sini?"
+        title="Bagaimana papan ini terisi?"
         acts={[
           { href: '/mulai', label: 'Simpan buktimu dulu' },
           { href: '/satgas/masuk', label: 'Masuk sebagai Satgas', ghost: true },
         ]}
       >
-        Satgas dapat memilih menampilkan angka kepatuhan kampusnya. Penyintas tetap bisa menyimpan
-        bukti tanpa menunggu.
+        Angka muncul dari kasus tereskalasi yang jatuh tempo dalam satu kuartal. Penyintas tetap
+        bisa menyimpan bukti tanpa menunggu.
       </NextStep>
     </div>
   );

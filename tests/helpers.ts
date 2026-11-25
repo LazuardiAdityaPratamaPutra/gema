@@ -20,6 +20,8 @@ import { buildReport } from '@/lib/laporan/report-build';
 
 export const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gema-e2e-'));
 process.env.GEMA_DATA_DIR = dir;
+// Fixture lengkap (pelapor dan kasus rekaan) hanya untuk pengujian; produk dimulai kosong.
+process.env.GEMA_SEED_CONTOH = 'on';
 
 let handle: (req: Request, method: string, seg: string[]) => Promise<Response>;
 
@@ -116,7 +118,7 @@ export async function submitReport(
       saksi: '',
       bukti: '',
       dampak: '',
-      terlapor: { nama, unitId: 'u-ft', unitNama: 'Fakultas Teknik', peran: attrs.role },
+      terlapor: { nama, unitId: 'u-ft', unitNama: 'Fakultas Teknik dan Sains', peran: attrs.role },
       atribut: attrs,
     },
     attrs,

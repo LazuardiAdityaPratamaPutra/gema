@@ -20,7 +20,7 @@ type Props = {
   narasi: Narasi;
   inst: InstitutionInfo | null;
   busy: boolean;
-  setMsg: (m: string) => void;
+  setMsg: (m: string, ok?: boolean) => void;
   act: (fn: () => Promise<unknown>, ok: string, onDone?: () => void) => Promise<void>;
 };
 
@@ -148,7 +148,7 @@ function ConditionForm({ session, r, dek, inst, prioritas, busy, setMsg, act }: 
         onClick={() =>
           act(async () => {
             const res = await setConditionalEscalation(session, r, dek, inst!, condMin, prioritas);
-            if (res.fired) setMsg('Syarat sudah terpenuhi, laporan dieskalasi.');
+            if (res.fired) setMsg('Syarat sudah terpenuhi, laporan dieskalasi.', true);
           }, 'Syarat terpasang. Kamu akan melihat statusnya di sini.')
         }
       >

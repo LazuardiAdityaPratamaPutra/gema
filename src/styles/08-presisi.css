@@ -134,7 +134,7 @@ p.small:not(.card) {
   }
 }
 
-/* ---------- Input: hover, disabled, error ---------- */
+/* ---------- Input: disabled, error (tanpa efek hover agar garis tepi tetap tipis) ---------- */
 input,
 select,
 textarea {
@@ -148,14 +148,6 @@ textarea {
 
 textarea {
   min-height: 120px;
-}
-
-@media (hover: hover) {
-  input:hover:not(:disabled):not(:focus),
-  select:hover:not(:disabled):not(:focus),
-  textarea:hover:not(:disabled):not(:focus) {
-    border-color: var(--pen);
-  }
 }
 
 input:disabled,

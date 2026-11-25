@@ -6,7 +6,7 @@ export const BERANDA: Link_ = { href: '/', label: 'Beranda', hint: 'Halaman utam
 export const GUEST: Link_[] = [
   BERANDA,
   { href: '/pahami', label: 'Pahami', hint: 'Apakah yang kualami termasuk kekerasan?' },
-  { href: '/papan', label: 'Papan', hint: 'Ketepatan waktu penanganan tiap kampus' },
+  { href: '/papan', label: 'Papan', hint: 'Ketepatan waktu penanganan kasus' },
   { href: '/panduan', label: 'Bantuan', hint: 'SAPA 129, Komnas Perempuan, LPSK' },
   { href: '/satgas/masuk', label: 'Satgas', hint: 'Masuk bagi anggota Satgas PPKPT' },
 ];

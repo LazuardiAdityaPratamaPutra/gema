@@ -17,6 +17,7 @@ import '@/styles/10-pinus.css';
 import '@/styles/11-tonal.css';
 import '@/styles/12-modern.css';
 import '@/styles/13-utilitas.css';
+import '@/styles/14-interaksi.css';
 import { Navbar } from '@/components/Navbar';
 import { QuickExit } from '@/components/QuickExit';
 import { Footer } from '@/components/Footer';

@@ -4,6 +4,7 @@ import { useReporter } from '@/components/useReporter';
 import { listReports, type ReportView } from '@/lib/vault/vault-client';
 import { loadDraft, type Draft } from '@/lib/laporan/drafts';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonFiles, SkeletonPage } from '@/components/Skeleton';
 import { FileCard } from './FileCard';
 import { DecoyVault, DraftCard, EmptyVault, VaultHeader } from './VaultParts';
 
@@ -30,7 +31,7 @@ export default function Brankas() {
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
 
@@ -45,7 +46,7 @@ export default function Brankas() {
     <div className="wrap vault">
       <VaultHeader list={list} />
       {error && <LoadError what="brankasmu" message={error} />}
-      {!reports && !error && <p role="status">Memuat…</p>}
+      {!reports && !error && <SkeletonFiles />}
 
       {draft && <DraftCard draft={draft} />}
 

@@ -72,7 +72,12 @@ function CaseRow({ c, role }: { c: Case; role: Role }) {
         )}
         {c.unit && <div className="muted small">{c.unit}</div>}
       </td>
-      <td>{c.status}</td>
+      <td>
+        <span className="stat" data-s={c.status}>
+          <i aria-hidden="true" />
+          {c.status}
+        </span>
+      </td>
       <td>{c.penanggungJawab ?? <span className="muted">Belum ditugaskan</span>}</td>
       <td>
         {fmtDate(c.sla.due)}{' '}

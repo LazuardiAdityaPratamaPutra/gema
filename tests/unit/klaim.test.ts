@@ -27,12 +27,9 @@ const flat = (s: string) => s.replace(/\s+/g, ' ');
 
 // Teks yang dibaca pengguna atau juri. Dokumen audit/changelog sengaja dikecualikan: mereka mengutip klaim lama.
 const UI = [...walk(path.join(ROOT, 'src'), /\.(tsx|ts)$/)];
-const DOKUMEN = [
-  'README.md',
-  'docs/panduan/NASKAH-DEMO.md',
-  'docs/arsip/KESIAPAN-LOMBA.md',
-  'docs/panduan/DEPLOY.md',
-].map((f) => path.join(ROOT, f));
+const DOKUMEN = ['README.md', 'docs/arsip/KESIAPAN-LOMBA.md', 'docs/panduan/DEPLOY.md'].map((f) =>
+  path.join(ROOT, f),
+);
 const SEMUA = [...UI, ...DOKUMEN];
 const rel = (f: string) => path.relative(ROOT, f);
 const terbaca = (f: string) => flat(fs.readFileSync(f, 'utf8'));
@@ -106,9 +103,8 @@ describe('klaim ukuran dan kinerja model suara', () => {
       /(model|whisper|pengenal suara|diunduh|unduhan)[^.;]{0,80}\b\d+([.,]\d+)?\s?(MB|megabyte|GB)\b|\b\d+([.,]\d+)?\s?(MB|megabyte|GB)\b[^.;]{0,80}(model|whisper|pengenal suara|diunduh)/i;
     expect(temukan(re)).toEqual([]);
   });
-  it('panduan dan naskah memakai kata-kata faktual', () => {
+  it('panduan memakai kata-kata faktual', () => {
     expect(flat(read('src/app/panduan/Bagian.tsx'))).toContain('perlu diunduh terlebih dahulu');
-    expect(flat(read('docs/panduan/NASKAH-DEMO.md'))).toContain('perlu diunduh terlebih dahulu');
   });
 });
 

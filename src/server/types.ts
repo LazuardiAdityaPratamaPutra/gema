@@ -257,5 +257,5 @@ export type DB = {
   approvals: Approval[];
   runtime: Runtime;
   clock: { demoOffsetMs: number };
-  meta: { seededAt: number };
+  meta: { seededAt: number; contoh?: boolean };
 };

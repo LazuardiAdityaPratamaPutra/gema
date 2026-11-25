@@ -6,13 +6,13 @@ import type { DB } from '../types';
 import { uid } from '../util';
 import { hashPassword } from './password';
 
-/** Institusi fiktif, unit, rujukan, dan akun Satgas demo. */
+/** Institusi (UPN Veteran Jawa Timur), unit, rujukan, dan akun Satgas demo. Tidak memuat laporan atau kasus. */
 export function seedInstitutions(db: DB) {
   const inst = DEMO_INSTITUTION_ID;
   db.institutions[inst] = {
     id: inst,
-    nama: 'Universitas Contoh',
-    kota: 'Kota Fiktif',
+    nama: 'UPN Veteran Jawa Timur',
+    kota: 'Surabaya',
     demo: true,
     public_key_satgas: DEMO_SATGAS_PUBLIC,
     sla_hari: 3, // Permendikbudristek 55/2024 Pasal 53: laporan ditindaklanjuti paling lambat 3 hari kerja
@@ -21,29 +21,16 @@ export function seedInstitutions(db: DB) {
     ambang_tangga: { t1: 0, t2: 3, t3: 10 },
     dp_epsilon: 1,
     panel_mode: 'tunggal',
+    // Kontak Satgas berasal dari profil WhatsApp Bisnis resminya (diberikan pengelola, 25 Nov 2026).
     rujukan: [
       {
-        nama: 'Unit Layanan Psikologi Universitas Contoh',
-        jenis: 'psikolog',
-        kontak: 'Gedung Rektorat lt. 2 · ext. 2210 (fiktif)',
-        catatan: 'Gratis untuk mahasiswa dan pegawai',
+        nama: 'Satgas PPKS UPN "Veteran" Jawa Timur',
+        jenis: 'lainnya',
+        kontak: 'WhatsApp +62 896-7509-8855, surel ppks@upnjatim.ac.id',
+        catatan: 'tercantum buka 24 jam',
       },
-      {
-        nama: 'Lembaga Konsultasi Bantuan Hukum Fakultas Hukum',
-        jenis: 'hukum',
-        kontak: 'lkbh@contoh.ac.id (fiktif)',
-        catatan: 'Pendampingan hukum tanpa biaya',
-      },
-      { nama: 'Klinik Pratama Kampus', jenis: 'medis', kontak: 'Gedung Klinik · 24 jam (fiktif)' },
     ],
   };
-  // Institusi fiktif lain hanya untuk memperagakan Papan Kepatuhan (tanpa unit → tidak bisa dipilih pelapor)
-  for (const [id, nama, kota] of [
-    ['inst-poli', 'Politeknik Contoh Nusantara', 'Kota Fiktif B'],
-    ['inst-itc', 'Institut Teknologi Contoh', 'Kota Fiktif C'],
-  ] as const) {
-    db.institutions[id] = { ...db.institutions[inst], id, nama, kota, fp_mode: 'hmac' };
-  }
   for (const u of DEMO_UNITS) db.units.push({ ...u, institution_id: inst });
 
   for (const m of DEMO_MEMBERS) {

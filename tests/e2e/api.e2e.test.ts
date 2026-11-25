@@ -376,7 +376,8 @@ describe('anchor Merkle dan verifikasi publik', () => {
 describe('Papan Kepatuhan', () => {
   it('hanya agregat berderau; tanpa data kasus; menyatakan epsilon', async () => {
     const r = await call('GET', 'public/compliance');
-    expect(r.data.length).toBeGreaterThanOrEqual(3);
+    // lingkup satu universitas: hanya UPN Veteran Jawa Timur
+    expect(r.data.map((i: { nama: string }) => i.nama)).toEqual(['UPN Veteran Jawa Timur']);
     const flat = JSON.stringify(r.data);
     expect(flat).not.toContain('KS-');
     for (const inst of r.data) {

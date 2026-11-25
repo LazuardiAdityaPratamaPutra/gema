@@ -3,9 +3,10 @@ import { HeaderPhoto } from '@/components/HeaderPhoto';
 import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonPage, SkeletonTable } from '@/components/Skeleton';
 import { AggregateCard, CaseTable, LadderPanel, UrgentCase } from './KasusParts';
 import { WaitingPanel } from './WaitingPanel';
-import { useKasusData, useWaiting } from './useKasus';
+import { CASE_ROLES, useKasusData, useWaiting } from './useKasus';
 
 export default function Kasus() {
   const { session } = useSatgas();
@@ -14,7 +15,7 @@ export default function Kasus() {
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
   return (
@@ -30,6 +31,9 @@ export default function Kasus() {
       {ladder.length > 0 && <LadderPanel ladder={ladder} />}
       {cases && cases.length > 0 && ['Ketua', 'Anggota'].includes(session.member.role) && (
         <UrgentCase c={cases[0]} />
+      )}
+      {!cases && !err && CASE_ROLES.includes(session.member.role) && (
+        <SkeletonTable label="Memuat daftar kasus" />
       )}
       {cases && <CaseTable cases={cases} role={session.member.role} />}
     </div>

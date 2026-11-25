@@ -2,7 +2,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
+export type DemoAccount = {
+  key: string;
+  nama: string;
+  peran: string;
+  caseCode: string;
+  passphrase: string;
+};
+
 export type Info = {
+  accounts: DemoAccount[];
   offsetDays: number;
   pendingAnchors: number;
   members: { email: string; nama: string; role: string }[];

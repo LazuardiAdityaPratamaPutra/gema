@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { ReporterSession } from '@/lib/store';
 import { makeOwnerProof, type ReportView } from '@/lib/vault/vault-client';
+import { salin } from '@/lib/ui/salin';
 
 /** Pelapor membuktikan ia pemilik laporan kepada Satgas tanpa membuka identitas atau isi. */
 export function OwnerProofReporter({
@@ -71,7 +72,12 @@ export function OwnerProofReporter({
           <code className="share">{proof}</code>
           <button
             className="btn ghost sm mt-sm"
-            onClick={() => void navigator.clipboard?.writeText(proof).then(() => setCopied(true))}
+            data-done={copied}
+            onClick={() =>
+              void salin(proof).then((ok) => {
+                if (ok) setCopied(true);
+              })
+            }
           >
             {copied ? 'Tersalin' : 'Salin bukti'}
           </button>

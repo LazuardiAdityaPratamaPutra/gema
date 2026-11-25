@@ -6,6 +6,7 @@ import { useSatgas } from '@/components/useSatgas';
 import { api } from '@/lib/api';
 import { fmtDateTime, shortHash } from '@/lib/ui/format';
 import { LoadError } from '@/components/LoadError';
+import { SkeletonPage, SkeletonTable } from '@/components/Skeleton';
 
 type Entry = {
   id: string;
@@ -30,7 +31,7 @@ export default function Audit() {
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
   // Rantai: entri[i].prev_hash harus sama dengan entri[i+1].hash (daftar terbaru lebih dulu).
@@ -49,46 +50,56 @@ export default function Audit() {
         </p>
       </header>
       {err && <LoadError what="jejak audit" message={err} />}
+      {!e && !err && <SkeletonTable label="Memuat jejak audit" rows={5} />}
       {e && (
-        <p className={`card ${broken ? 'alert' : 'tint'}`} role="status">
-          {broken
-            ? 'Rantai tidak utuh: ada entri yang berubah.'
-            : `Rantai utuh pada ${e.entries.length} entri terakhir dari ${e.total}.`}
+        <p
+          className={`card integrity ${broken ? 'alert' : 'tint'}`}
+          role="status"
+          data-ok={!broken}
+        >
+          <b>{broken ? 'Rantai tidak utuh' : 'Rantai utuh'}</b>
+          <span>
+            {broken
+              ? 'Ada entri yang berubah. Periksa entri yang ditandai sebelum melanjutkan.'
+              : `Dihitung di peramban ini: ${e.entries.length} entri terakhir dari ${e.total} saling mengait tanpa putus.`}
+          </span>
         </p>
       )}
-      <div
-        className="tablewrap card"
-        style={{ padding: 0, marginTop: '1rem' }}
-        role="region"
-        aria-label="Entri jejak audit"
-        tabIndex={0}
-      >
-        <table>
-          <caption className="sr">Entri jejak audit</caption>
-          <thead>
-            <tr>
-              <th scope="col">Waktu</th>
-              <th scope="col">Aktor</th>
-              <th scope="col">Aksi</th>
-              <th scope="col">Objek</th>
-              <th scope="col">Hash</th>
-            </tr>
-          </thead>
-          <tbody>
-            {e?.entries.map((x) => (
-              <tr key={x.id}>
-                <td>{fmtDateTime(x.at)}</td>
-                <td>{x.aktor}</td>
-                <td>{x.aksi}</td>
-                <td>{x.objek}</td>
-                <td>
-                  <code>{shortHash(x.hash, 6)}</code>
-                </td>
+      {e && (
+        <div
+          className="tablewrap card"
+          style={{ padding: 0, marginTop: '1rem' }}
+          role="region"
+          aria-label="Entri jejak audit"
+          tabIndex={0}
+        >
+          <table>
+            <caption className="sr">Entri jejak audit</caption>
+            <thead>
+              <tr>
+                <th scope="col">Waktu</th>
+                <th scope="col">Aktor</th>
+                <th scope="col">Aksi</th>
+                <th scope="col">Objek</th>
+                <th scope="col">Hash</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {e?.entries.map((x) => (
+                <tr key={x.id}>
+                  <td>{fmtDateTime(x.at)}</td>
+                  <td>{x.aktor}</td>
+                  <td>{x.aksi}</td>
+                  <td>{x.objek}</td>
+                  <td>
+                    <code>{shortHash(x.hash, 6)}</code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

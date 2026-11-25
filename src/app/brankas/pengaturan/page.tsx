@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Term } from '@/components/Term';
+import { SkeletonPage } from '@/components/Skeleton';
 import { useReporter } from '@/components/useReporter';
 import { KodePaksa } from './KodePaksa';
 import { Passkey } from './Passkey';
@@ -10,12 +11,12 @@ import { useRun } from './useRun';
 
 export default function Pengaturan() {
   const { session } = useReporter();
-  const { busy, msg, run } = useRun();
+  const { busy, msg, ok, run } = useRun();
   const justRecovered = useSearchParams().get('pulih') === '1';
   if (!session)
     return (
       <div className="narrow">
-        <p role="status">Memeriksa sesi…</p>
+        <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
 
@@ -38,7 +39,15 @@ export default function Pengaturan() {
           berlaku; pasang yang baru di bawah.
         </p>
       )}
-      <KodePaksa session={session} busy={busy} msg={msg} run={run} />
+      {msg && (
+        <p
+          className={`umpan-lekat ${ok ? 'card tint small umpan-ok' : 'card warn small'}`}
+          role={ok ? 'status' : 'alert'}
+        >
+          {msg}
+        </p>
+      )}
+      <KodePaksa session={session} busy={busy} run={run} />
       <Passkey session={session} busy={busy} run={run} />
       <Pemulihan session={session} busy={busy} run={run} />
       <p className="small muted mt-lg">

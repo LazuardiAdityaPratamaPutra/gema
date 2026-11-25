@@ -2,15 +2,17 @@
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useSatgas } from '@/components/useSatgas';
+import { LoadError } from '@/components/LoadError';
+import { SkeletonPage } from '@/components/Skeleton';
 import { ClusterNote, DosirHeader, LaporanCard, LockedDosir } from './DosirParts';
 import { IsiTerbaca } from './IsiTerbaca';
 import { Penanggung } from './Penanggung';
+import { StatusPimpinan } from './StatusPimpinan';
 import { Perkembangan } from './Perkembangan';
 import { assistInputOf } from './dosir';
 import { useDosir, useKampus, useTeam } from './useDosir';
 
-export default function Dosir() {
-  const { id } = useParams<{ id: string }>();
+function DosirStaf({ id }: { id: string }) {
   const { session } = useSatgas();
   const x = useDosir(session, id);
   const team = useTeam(session);
@@ -23,7 +25,14 @@ export default function Dosir() {
   if (!session || !d)
     return (
       <div className="narrow">
-        <p role="status">{msg || 'Membuka dosir…'}</p>
+        {msg ? (
+          <>
+            <h1 className="title-md">Dosir kasus</h1>
+            <LoadError what="dosir kasus ini" message={msg} />
+          </>
+        ) : (
+          <SkeletonPage label="Membuka dosir" />
+        )}
       </div>
     );
   const canRead = session.member.role === 'Ketua' || session.member.role === 'Anggota';
@@ -62,4 +71,11 @@ export default function Dosir() {
       )}
     </div>
   );
+}
+
+export default function Dosir() {
+  const { id } = useParams<{ id: string }>();
+  const { session } = useSatgas();
+  if (session?.member.role === 'Pimpinan') return <StatusPimpinan session={session} id={id} />;
+  return <DosirStaf id={id} />;
 }

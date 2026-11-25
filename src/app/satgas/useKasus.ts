@@ -31,7 +31,7 @@ export type Ladder = {
   ke: string;
 }[];
 
-const CASE_ROLES = ['Ketua', 'Anggota', 'Pimpinan'];
+export const CASE_ROLES = ['Ketua', 'Anggota', 'Pimpinan'];
 const LADDER_ROLES = ['Ketua', 'Pimpinan', 'Pengawas'];
 
 /** Permintaan Empat Mata yang menunggu persetujuan sesi ini, disegarkan tiap 5 detik. */

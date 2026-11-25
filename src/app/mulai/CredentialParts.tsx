@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { formatCaseCode } from '@gema/crypto';
 import { island } from '@/lib/ui/island-bus';
+import { SkeletonLines } from '@/components/Skeleton';
 import { buildRecoveryCard, triggerDownload } from '@/lib/vault/proof';
 
 export type Cred = { caseCode: string; passphrase: string };
@@ -7,9 +9,9 @@ export type Cred = { caseCode: string; passphrase: string };
 /** Kode Kasus dan enam kata sandi yang baru dibuat; atau keterangan sedang disiapkan. */
 export function CredentialCard({ cred }: { cred: Cred | null }) {
   return (
-    <div className="card" aria-live="polite">
+    <div className={cred ? 'card' : 'card cred-wait'} aria-live="polite">
       {!cred ? (
-        <p className="m-0">Menyiapkan kunci…</p>
+        <SkeletonLines label="Menyiapkan kunci" />
       ) : (
         <>
           <div className="field">
@@ -39,6 +41,7 @@ export function CredentialCard({ cred }: { cred: Cred | null }) {
 
 /** Unduh kartu cetak atau salin kode dan kata sandi untuk disimpan pelapor. */
 export function CredentialActions({ cred }: { cred: Cred | null }) {
+  const [copied, setCopied] = useState(false);
   return (
     <>
       <div className="row my-md">
@@ -61,17 +64,22 @@ export function CredentialActions({ cred }: { cred: Cred | null }) {
           className="btn ghost sm"
           type="button"
           disabled={!cred}
+          data-done={copied}
           onClick={() =>
             cred &&
             void navigator.clipboard
               ?.writeText(`${formatCaseCode(cred.caseCode)}\n${cred.passphrase}`)
               .then(
-                () => island.toast('Kode dan kata sandi disalin'),
+                () => {
+                  island.toast('Kode dan kata sandi disalin');
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2200);
+                },
                 () => island.toast('Gagal menyalin, catat manual'),
               )
           }
         >
-          Salin
+          {copied ? 'Tersalin' : 'Salin'}
         </button>
       </div>
       <p className="small muted">

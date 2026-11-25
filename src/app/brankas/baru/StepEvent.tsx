@@ -6,7 +6,7 @@ import type { Draft } from '@/lib/laporan/drafts';
 import { fmtBytes } from '@/lib/ui/format';
 import type { FileInput } from '@/lib/laporan/report-build';
 import { MAX_FILE, MAX_FILES } from '@/lib/laporan/report-format';
-import type { SetField } from './draft-form';
+import { periodeDipilih, periodeLabel, periodeOpsi, type SetField } from './draft-form';
 import { MissingFiles } from './parts';
 
 type Props = {
@@ -107,15 +107,7 @@ function MoreDetails({
         <input id="alias" value={d.alias} onChange={(e) => set('alias', e.target.value)} />
       </div>
       <div className="grid g2" style={{ gap: '1rem' }}>
-        <div className="field">
-          <label htmlFor="periode">Periode</label>
-          <input
-            id="periode"
-            value={d.periode}
-            onChange={(e) => set('periode', e.target.value)}
-            placeholder="2025-1, 2025-2"
-          />
-        </div>
+        <PeriodeField d={d} set={set} />
         <div className="field">
           <label htmlFor="lokasi">Lokasi umum</label>
           <select id="lokasi" value={d.lokasi} onChange={(e) => set('lokasi', e.target.value)}>
@@ -133,6 +125,45 @@ function MoreDetails({
   );
 }
 
+/** Periode kejadian sebagai pilihan semester (maksimal dua), bukan ketikan, agar nilainya baku dan bisa dicocokkan. */
+function PeriodeField({ d, set }: Pick<Props, 'd' | 'set'>) {
+  const dipilih = periodeDipilih(d.periode);
+  const opsi = periodeOpsi();
+  const semua = [
+    ...opsi,
+    ...dipilih
+      .filter((v) => !opsi.some((o) => o.value === v))
+      .map((v) => ({ value: v, label: periodeLabel(v) })),
+  ];
+  const penuh = dipilih.length >= 2;
+  const ubah = (v: string, on: boolean) =>
+    set('periode', (on ? [...dipilih, v] : dipilih.filter((x) => x !== v)).join(', '));
+  return (
+    <fieldset className="field relasi">
+      <legend>Periode kejadian</legend>
+      <p className="small muted m-0" id="periode-info">
+        Pilih sampai dua semester. {penuh ? 'Sudah dua; lepas satu untuk mengganti.' : ''}
+      </p>
+      <div className="choices" aria-describedby="periode-info">
+        {semua.map((o) => {
+          const on = dipilih.includes(o.value);
+          return (
+            <label key={o.value} className="choice">
+              <input
+                type="checkbox"
+                checked={on}
+                disabled={!on && penuh}
+                onChange={(e) => ubah(o.value, e.target.checked)}
+              />
+              <span>{o.label}</span>
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 /** Langkah 2: kejadian, bukti, dan detail tambahan. */
 export function StepEvent(p: Props) {
   const { d, set, files, fileErr, lostFiles, filled, fileInput, headRef } = p;
@@ -142,8 +173,8 @@ export function StepEvent(p: Props) {
         Apa yang terjadi?
       </h1>
       <p className="muted">
-        Tulis sebanyak yang kamu mampu. Bagian yang terlalu berat boleh dikosongkan atau ditulis
-        nanti. Kamu bisa kembali melengkapi.
+        Tulis sebanyak yang kamu mampu. Kapan dan di mana perlu diisi, tetapi kira-kira saja sudah
+        cukup. Bagian lain boleh dikosongkan atau ditulis nanti, dan kamu bisa kembali melengkapi.
       </p>
       <div className="field">
         <label htmlFor="apa">Kejadian</label>
@@ -153,12 +184,24 @@ export function StepEvent(p: Props) {
       </div>
       <div className="grid g2" style={{ gap: '1rem' }}>
         <div className="field">
-          <label htmlFor="kapan">Kapan</label>
-          <input id="kapan" value={d.kapan} onChange={(e) => set('kapan', e.target.value)} />
+          <label htmlFor="kapan">Kapan (wajib)</label>
+          <input
+            id="kapan"
+            value={d.kapan}
+            aria-required="true"
+            placeholder="Kira-kira juga boleh, misalnya Oktober 2026"
+            onChange={(e) => set('kapan', e.target.value)}
+          />
         </div>
         <div className="field">
-          <label htmlFor="dimana">Di mana</label>
-          <input id="dimana" value={d.dimana} onChange={(e) => set('dimana', e.target.value)} />
+          <label htmlFor="dimana">Di mana (wajib)</label>
+          <input
+            id="dimana"
+            value={d.dimana}
+            aria-required="true"
+            placeholder="Misalnya ruang dosen, gedung, atau aplikasi chat"
+            onChange={(e) => set('dimana', e.target.value)}
+          />
         </div>
       </div>
       <EvidencePicker fileInput={fileInput} onAddFiles={p.onAddFiles} />

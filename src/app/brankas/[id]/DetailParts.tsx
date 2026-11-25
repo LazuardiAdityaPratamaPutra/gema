@@ -6,9 +6,15 @@ import type { ReportView } from '@/lib/vault/vault-client';
 
 export function NewBanner() {
   return (
-    <div className="card tint" role="status" style={{ marginBottom: '1.5rem' }}>
-      <strong>Tersimpan dan terkunci.</strong> Hanya kamu yang bisa membacanya. Tidak ada yang
-      dikirim ke Satgas.
+    <div className="card tint sukses" role="status" style={{ marginBottom: '1.5rem' }}>
+      <strong className="sukses-judul">Tersimpan dan terkunci.</strong>
+      <ul>
+        <li>Terenkripsi di perangkatmu sebelum disimpan.</li>
+        <li>Hanya kamu yang bisa membacanya.</li>
+        <li>
+          Tidak ada yang dikirim ke Satgas. Kamu yang memutuskan kapan, di bagian bawah halaman ini.
+        </li>
+      </ul>
     </div>
   );
 }

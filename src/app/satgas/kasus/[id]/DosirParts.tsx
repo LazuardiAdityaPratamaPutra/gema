@@ -12,7 +12,7 @@ import { RELASI_LABEL } from '@gema/pendamping';
 import type { Detail } from './dosir';
 
 /** Kepala halaman: foto, bilah Satgas, tautan kembali, dan judul. */
-function Head({
+export function Head({
   session,
   title,
   children,

@@ -79,28 +79,36 @@ function CampusFields({
 }: Fields & { insts: InstitutionInfo[]; inst: InstitutionInfo | undefined }) {
   return (
     <>
-      <div className="field">
-        <label htmlFor="inst">Perguruan tinggi</label>
-        <select
-          id="inst"
-          value={d.institutionId}
-          onChange={(e) => {
-            set('institutionId', e.target.value);
-            set('unitId', '');
-          }}
-        >
-          <option value="">Pilih…</option>
-          {insts.map((i) => (
-            <option key={i.id} value={i.id}>
-              {i.nama}
-              {i.demo ? ' (demo)' : ''}
-            </option>
-          ))}
-        </select>
-      </div>
+      {insts.length === 1 ? (
+        <p className="small">
+          Perguruan tinggi: <strong>{insts[0].nama}</strong>
+          {insts[0].demo ? ' (demo)' : ''}
+        </p>
+      ) : (
+        <div className="field">
+          <label htmlFor="inst">Perguruan tinggi</label>
+          <select
+            id="inst"
+            value={d.institutionId}
+            onChange={(e) => {
+              set('institutionId', e.target.value);
+              set('unitId', '');
+            }}
+          >
+            <option value="">Pilih…</option>
+            {insts.map((i) => (
+              <option key={i.id} value={i.id}>
+                {i.nama}
+                {i.demo ? ' (demo)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       {inst?.demo && (
         <p className="card warn small" role="note">
-          Ini kampus demo. Semua datanya fiktif, jadi jangan masukkan cerita atau bukti sungguhan.
+          Ini mode demo. Datanya dipakai bersama dan bukan untuk kasus nyata, jadi jangan masukkan
+          cerita atau bukti sungguhan.
         </p>
       )}
       {inst && (
