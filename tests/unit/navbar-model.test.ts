@@ -55,7 +55,7 @@ describe('navModel', () => {
     expect(ketua.who).toBe('Ketua');
     expect(ketua.home).toBe('/satgas');
     expect(ketua.links.map((l) => l.label)).toEqual(
-      expect.arrayContaining(['Kasus', 'Jejak audit', 'Kunci']),
+      expect.arrayContaining(['Kasus', 'Audit', 'Kunci']),
     );
     const auditor = navModel('/satgas/audit', satgas('Auditor'), null);
     expect(auditor.links.map((l) => l.label)).not.toContain('Kunci');
