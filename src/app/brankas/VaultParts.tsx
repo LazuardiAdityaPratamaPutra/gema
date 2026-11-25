@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { logout, type ReportView } from '@/lib/vault/vault-client';
 import { fmtWhen } from '@/lib/ui/format';
 import type { Draft } from '@/lib/laporan/drafts';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 /** Kode Paksa: isi yang tampak sepenuhnya berasal dari vault tiruan. */
 export function DecoyVault({ judul, isi, token }: { judul: string; isi: string; token: string }) {
@@ -70,6 +71,7 @@ export function DraftCard({ draft }: { draft: Draft }) {
 export function EmptyVault() {
   return (
     <section className="vault-empty" aria-labelledby="kosong">
+      <Ilustrasi motif="brankas" />
       <h2 id="kosong">Brankasmu masih kosong.</h2>
       <p>Tidak ada batas waktu. Mulai kapan pun kamu siap, dan hanya kamu yang melihat isinya.</p>
       <div className="row">

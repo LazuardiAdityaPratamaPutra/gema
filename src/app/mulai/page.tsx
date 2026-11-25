@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { CredentialActions, CredentialCard } from './CredentialParts';
 import { useNewVault } from './useNewVault';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 export default function Mulai() {
   const { cred, busy, error, go } = useNewVault();
@@ -10,6 +11,7 @@ export default function Mulai() {
   return (
     <div className="narrow">
       <header className="ph" data-tab="Brankas baru">
+        <Ilustrasi motif="brankas" />
         <h1>Kode dan kata sandimu</h1>
         <p className="lede">
           Ini satu-satunya kunci brankasmu. Dibuat di perangkat ini, tidak dikirim ke mana pun dalam

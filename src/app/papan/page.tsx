@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { NextStep } from '@/components/NextStep';
 import { LoadError } from '@/components/LoadError';
+import { Ilustrasi } from '@/components/Ilustrasi';
 
 type Row = {
   id: string;
@@ -49,12 +50,10 @@ function QuarterRow({ k }: { k: Quarter }) {
 function CampusCard({ r }: { r: Row }) {
   return (
     <section className="card" aria-labelledby={`h-${r.id}`}>
-      <div className="row row-between">
-        <h2 id={`h-${r.id}`} style={{ fontSize: '1.35rem', margin: 0 }}>
-          {r.nama}
-        </h2>
-        {r.fiktif && <span className="pill amber">Data fiktif</span>}
-      </div>
+      <h2 id={`h-${r.id}`} style={{ fontSize: '1.35rem', margin: 0 }}>
+        {r.nama}
+      </h2>
+      {r.fiktif && <span className="pill amber campus-tag">Data fiktif</span>}
       <p className="muted small">
         {r.kota}, ε = {r.epsilon}
       </p>
@@ -95,6 +94,7 @@ export default function Papan() {
   return (
     <div className="wrap">
       <header className="ph" data-tab="Papan akuntabilitas">
+        <Ilustrasi motif="papan" />
         <h1>Seberapa tepat waktu kampus menangani?</h1>
         <p className="lede">
           Persentase kasus tereskalasi yang ditangani dalam tenggat, per kuartal. Angka diberi derau
