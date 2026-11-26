@@ -60,6 +60,7 @@ const ROUTES: Record<string, Route> = {
         demo: inst.demo,
         slaHari: inst.sla_hari,
         publicKey: inst.public_key_satgas,
+        kunciSiap: inst.demo || inst.kunci_siap !== false,
         panelMode: inst.panel_mode,
       },
       now: nowFor(db, inst.id),
@@ -123,12 +124,14 @@ async function login({ req, db }: Ctx) {
     throw new HttpError(429, 'Terlalu banyak percobaan.');
   const x = await bodyOf(satgasLoginBody, req);
   const members = Object.values(db.members);
-  let m =
+  // Masuk tanpa sandi hanya untuk akun peran institusi demo dan hanya saat Mode Demo aktif.
+  // Di luar itu, `demoRole` diabaikan sepenuhnya: sandi selalu diperiksa, juga bila email diberikan.
+  const demoMember =
     x.demoRole && demoEnabled()
       ? members.find((mm) => mm.institution_id === DEMO_INSTITUTION_ID && mm.role === x.demoRole)
       : undefined;
-  if (!m) m = members.find((mm) => mm.email === String(x.email ?? '').toLowerCase());
-  if (!m || (!x.demoRole && !checkPassword(String(x.password ?? ''), m.pass_hash)))
+  const m = demoMember ?? members.find((mm) => mm.email === String(x.email ?? '').toLowerCase());
+  if (!m || (!demoMember && !checkPassword(String(x.password ?? ''), m.pass_hash)))
     throw new HttpError(401, 'Email atau kata sandi tidak cocok.');
   const token = issueSession({
     kind: 'satgas',
@@ -145,6 +148,9 @@ async function login({ req, db }: Ctx) {
       id: m.institution_id,
       nama: db.institutions[m.institution_id].nama,
       demo: db.institutions[m.institution_id].demo,
+      kunciSiap:
+        db.institutions[m.institution_id].demo ||
+        db.institutions[m.institution_id].kunci_siap !== false,
     },
   });
 }
@@ -293,6 +299,7 @@ async function replaceKey({ req, db }: Ctx) {
   )
     throw new HttpError(400, 'Kunci publik tidak valid');
   inst.public_key_satgas = { suite: k.suite, ecdh: k.ecdh, mlkem: k.mlkem };
+  inst.kunci_siap = true;
   audit(db, `${s.role}:${memberOf(db, s).nama}`, 'ganti-kunci-satgas', 'kunci publik institusi');
   persist(db);
   return json({ ok: true });

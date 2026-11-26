@@ -6,6 +6,7 @@ import type { Draft } from '@/lib/laporan/drafts';
 import { fmtBytes } from '@/lib/ui/format';
 import type { FileInput } from '@/lib/laporan/report-build';
 import type { InstitutionInfo } from '@/lib/vault/vault-client';
+import { kapanLabel, kapanSah } from '@/lib/laporan/kapan';
 import { PERAN_LABEL, hasExtras, periodeDipilih, periodeLabel, type SetField } from './draft-form';
 import { MissingFiles, ReviewPart } from './parts';
 
@@ -110,15 +111,15 @@ function ReviewSummary({
       >
         <p className="review-text">{d.apa}</p>
         <p className="muted small m-0">
-          Kapan: {d.kapan || 'belum diisi'}. Di mana: {d.dimana || 'belum diisi'}.
+          Kapan: {kapanLabel(d.kapan) || 'belum diisi'}. Di mana: {d.dimana || 'belum diisi'}.
         </p>
-        {(!d.kapan.trim() || !d.dimana.trim()) && (
+        {(!kapanSah(d.kapan) || !d.dimana.trim()) && (
           <p className="card warn small" id="belum-lengkap" role="alert">
             Kapan dan di mana wajib diisi sebelum laporan dikunci.{' '}
             <button
               type="button"
               className="btn ghost sm"
-              onClick={() => editFrom(1, d.kapan.trim() ? 'dimana' : 'kapan')}
+              onClick={() => editFrom(1, kapanSah(d.kapan) ? 'dimana' : 'kapan')}
             >
               Lengkapi
             </button>

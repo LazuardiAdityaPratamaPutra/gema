@@ -1,4 +1,5 @@
 import type { Draft } from '@/lib/laporan/drafts';
+import { kapanMode, kapanSah } from '@/lib/laporan/kapan';
 
 export const EMPTY: Draft = {
   kapan: '',
@@ -36,7 +37,7 @@ export type SetField = <K extends keyof Draft>(k: K, v: Draft[K]) => void;
 /** Apakah isian tiap langkah sudah cukup untuk lanjut. Langkah terakhir (tinjauan) selalu boleh. */
 export const stepReady = (d: Draft): boolean[] => [
   !!d.institutionId && !!d.unitId && d.nama.trim().length >= 3,
-  d.apa.trim().length >= 10 && d.kapan.trim() !== '' && d.dimana.trim() !== '',
+  d.apa.trim().length >= 10 && kapanSah(d.kapan) && d.dimana.trim() !== '',
   true,
 ];
 
@@ -51,7 +52,10 @@ export function missingHint(d: Draft, step: number): string {
   if (step === 1) {
     if (d.apa.trim().length < 10)
       return 'Ceritakan apa yang terjadi, minimal 10 huruf. Boleh singkat.';
-    if (!d.kapan.trim()) return 'Isi kapan kejadiannya. Kira-kira juga boleh.';
+    if (kapanMode(d.kapan) !== 'kosong' && !kapanSah(d.kapan))
+      return 'Tanggal kejadian tidak boleh di masa depan. Pilih tanggal yang sudah lewat.';
+    if (!d.kapan.trim())
+      return 'Pilih kapan kejadiannya di kalender. Hanya ingat bulannya? Centang pilihan di bawahnya.';
     if (!d.dimana.trim()) return 'Isi di mana kejadiannya. Tempat umum juga boleh.';
   }
   return '';

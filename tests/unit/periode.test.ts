@@ -7,6 +7,7 @@ import {
   periodeOpsi,
   stepReady,
 } from '@/app/brankas/baru/draft-form';
+import { bulanIni, hariIni, kapanLabel, kapanMode, kapanSah } from '@/lib/laporan/kapan';
 
 describe('periode kejadian sebagai pilihan', () => {
   it('Agustus sampai Desember memulai semester ganjil tahun ajaran itu', () => {
@@ -48,5 +49,46 @@ describe('Kapan dan Di mana wajib', () => {
     expect(missingHint(dasar, 1)).toMatch(/kapan/i);
     expect(missingHint({ ...dasar, kapan: 'x' }, 1)).toMatch(/di mana/i);
     expect(missingHint({ ...dasar, kapan: 'x', dimana: 'y' }, 1)).toBe('');
+  });
+});
+
+describe('kapan (kalender)', () => {
+  it('hariIni dan bulanIni memakai zona waktu perangkat', () => {
+    const d = new Date(2026, 10, 26, 23, 30);
+    expect(hariIni(d)).toBe('2026-11-26');
+    expect(bulanIni(d)).toBe('2026-11');
+  });
+  it('kapanMode membedakan tanggal, bulan, teks lama, dan kosong', () => {
+    expect(kapanMode('2026-10-15')).toBe('tanggal');
+    expect(kapanMode('2026-10')).toBe('bulan');
+    expect(kapanMode('Sekitar sebulan lalu.')).toBe('lama');
+    expect(kapanMode('  ')).toBe('kosong');
+  });
+  it('kapanLabel terbaca manusia dan membiarkan teks lama', () => {
+    expect(kapanLabel('2026-10-05')).toBe('5 Oktober 2026');
+    expect(kapanLabel('2026-12')).toBe('Desember 2026');
+    expect(kapanLabel('Sekitar 2 November 2026, malam hari.')).toBe(
+      'Sekitar 2 November 2026, malam hari.',
+    );
+    expect(kapanLabel('2026-13-01')).toBe('2026-13-01');
+    expect(kapanLabel('')).toBe('');
+  });
+  it('kapanSah menolak kosong dan masa depan, menerima masa lalu dan teks lama', () => {
+    const sekarang = new Date(2026, 10, 26);
+    expect(kapanSah('', sekarang)).toBe(false);
+    expect(kapanSah('2026-11-26', sekarang)).toBe(true);
+    expect(kapanSah('2026-11-27', sekarang)).toBe(false);
+    expect(kapanSah('2026-11', sekarang)).toBe(true);
+    expect(kapanSah('2026-12', sekarang)).toBe(false);
+    expect(kapanSah('Sekitar sebulan lalu.', sekarang)).toBe(true);
+  });
+  it('stepReady menolak tanggal di masa depan', () => {
+    const dasar = { ...EMPTY, apa: 'Cerita kejadian yang cukup panjang.', dimana: 'Ruang dosen' };
+    expect(stepReady({ ...dasar, kapan: '2099-01-01' })[1]).toBe(false);
+    expect(missingHint({ ...dasar, kapan: '2099-01-01' }, 1)).toMatch(/masa depan/i);
+  });
+  it('tanggal dari kalender dianggap terisi oleh stepReady', () => {
+    const dasar = { ...EMPTY, apa: 'Cerita kejadian yang cukup panjang.' };
+    expect(stepReady({ ...dasar, kapan: '2026-10-15', dimana: 'Ruang dosen' })[1]).toBe(true);
   });
 });

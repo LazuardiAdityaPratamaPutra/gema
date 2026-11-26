@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useLockNote } from '@/lib/vault/lock-note';
+import { DemoLink } from '@/components/DemoLink';
 import { LoginForm } from './LoginForm';
 import { useLogin } from './useLogin';
 import { Ilustrasi } from '@/components/Ilustrasi';
@@ -39,9 +40,7 @@ export default function Masuk() {
         <Link href="/mulai" className="btn ghost sm">
           Buat brankas tanpa nama
         </Link>
-        <Link href="/demo" className="btn ghost sm">
-          Coba demo
-        </Link>
+        <DemoLink className="btn ghost sm">Coba demo</DemoLink>
       </div>
     </div>
   );

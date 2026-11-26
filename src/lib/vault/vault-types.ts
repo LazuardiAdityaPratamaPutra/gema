@@ -4,6 +4,8 @@ export type InstitutionInfo = {
   nama: string;
   kota: string;
   demo: boolean;
+  /** false pada kampus sungguhan yang Ketuanya belum membuat kunci; eskalasi belum bisa */
+  kunciSiap?: boolean;
   fpMode: 'oprf' | 'hmac';
   slaHari: number;
   publicKey: { suite: string; ecdh: string; mlkem: string };

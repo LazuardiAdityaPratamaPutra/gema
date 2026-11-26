@@ -3,6 +3,7 @@ import { VeilBar } from '@/components/Veil';
 import type { Narasi } from '@/lib/laporan/report-format';
 import { fmtDate } from '@/lib/ui/format';
 import type { ReportView } from '@/lib/vault/vault-client';
+import { kapanLabel } from '@/lib/laporan/kapan';
 
 export function NewBanner() {
   return (
@@ -68,7 +69,7 @@ export function ReportBody({ n }: { n: Narasi }) {
   const rows = (
     [
       ['Kejadian', n.apa],
-      ['Kapan', n.kapan],
+      ['Kapan', kapanLabel(n.kapan)],
       ['Di mana', n.dimana],
       ['Saksi', n.saksi],
       ['Dampak', n.dampak],

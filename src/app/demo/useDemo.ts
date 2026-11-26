@@ -15,6 +15,7 @@ export type Info = {
   offsetDays: number;
   pendingAnchors: number;
   members: { email: string; nama: string; role: string }[];
+  password: string;
 };
 
 /** Keadaan Mode Demo dari server, dan pembungkus aksi: tombol terkunci, hasilnya jadi satu pesan. */

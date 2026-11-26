@@ -8,7 +8,7 @@ import { generateHybridKeypair } from '@gema/pq-kem';
 import { loadSatgasSecret, parseSecretFile, storeSatgasSecret } from '@/lib/vault/satgas-key';
 import { triggerDownload } from '@/lib/vault/proof';
 import { combineSatgasSecret, splitSatgasSecret } from '@/lib/vault/key-shares';
-import type { SatgasSession } from '@/lib/store';
+import { satgasStore, type SatgasSession } from '@/lib/store';
 
 type KeyFormProps = { session: SatgasSession; setMsg: (m: string) => void };
 
@@ -125,6 +125,7 @@ function NewKey({ session, setPanel, setMsg }: Acts & { setPanel: (m: Mode) => v
       );
     }
     await api('satgas/key', { token: session.token, body: { publicKey } });
+    satgasStore.set({ ...session, institution: { ...session.institution, kunciSiap: true } });
     if (split) {
       await api('satgas/panel', { token: session.token, body: { mode: '2dari3' } });
       setPanel('2dari3');

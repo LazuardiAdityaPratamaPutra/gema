@@ -17,6 +17,8 @@ export type Institution = {
   kota: string;
   demo: boolean;
   public_key_satgas: HybridPublicKey;
+  /** false pada institusi sungguhan sampai Ketua membuat kunci sendiri; selama itu eskalasi ditolak */
+  kunci_siap?: boolean;
   sla_hari: number;
   fp_mode: FpMode;
   papan_publik: boolean;
@@ -257,5 +259,5 @@ export type DB = {
   approvals: Approval[];
   runtime: Runtime;
   clock: { demoOffsetMs: number };
-  meta: { seededAt: number; contoh?: boolean };
+  meta: { seededAt: number; contoh?: boolean; adminDiperbarui?: number };
 };

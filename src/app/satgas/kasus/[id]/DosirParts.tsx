@@ -8,6 +8,7 @@ import type { Narasi } from '@/lib/laporan/report-format';
 import type { SatgasSession } from '@/lib/store';
 import { fmtDateTime } from '@/lib/ui/format';
 import type { InstitutionInfo } from '@/lib/vault/vault-client';
+import { kapanLabel } from '@/lib/laporan/kapan';
 import { RELASI_LABEL } from '@gema/pendamping';
 import type { Detail } from './dosir';
 
@@ -108,7 +109,7 @@ export function LaporanCard({ narasi }: { narasi: Narasi }) {
         </p>
         <p style={{ whiteSpace: 'pre-wrap' }}>{narasi.apa}</p>
         <p className="muted small">
-          {[narasi.kapan, narasi.dimana]
+          {[kapanLabel(narasi.kapan), narasi.dimana]
             .filter(Boolean)
             .map((x) => x.trim().replace(/[.,]$/, ''))
             .join(', ')}

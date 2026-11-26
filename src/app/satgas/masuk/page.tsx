@@ -1,7 +1,7 @@
 'use client';
 import { HeaderPhoto } from '@/components/HeaderPhoto';
-import Link from 'next/link';
 import { useLockNote } from '@/lib/vault/lock-note';
+import { DemoAkun } from './DemoAkun';
 import { LoginForm } from './LoginForm';
 import { useSatgasLogin } from './useSatgasLogin';
 
@@ -21,12 +21,7 @@ export default function SatgasMasuk() {
         </p>
       )}
       <LoginForm l={login} />
-      <div className="alt-line">
-        <span className="muted">Ingin mencoba tanpa akun?</span>
-        <Link href="/demo" className="btn ghost sm">
-          Masuk lewat halaman Demo
-        </Link>
-      </div>
+      <DemoAkun l={login} />
     </div>
   );
 }

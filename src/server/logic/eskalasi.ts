@@ -18,6 +18,14 @@ type EscalationInput = { escalationId: string; wrapped: Escalation['dek_wrapped_
 
 /** Pemeriksaan bersama eskalasi langsung dan bersyarat: belum dieskalasi, ID baru, kunci lengkap. */
 function assertEscalatable(db: DB, r: Report, body: EscalationInput) {
+  // Institusi sungguhan belum punya kunci milik Ketua: kunci yang terpasang hanya penampung, jadi jangan
+  // ada dosir nyata yang dikunci ke sana.
+  const inst = db.institutions[r.institution_id];
+  if (inst && !inst.demo && inst.kunci_siap === false)
+    throw new HttpError(
+      409,
+      'Satgas kampus ini belum menyiapkan kunci, jadi eskalasi belum bisa dilakukan. Laporanmu tetap tersimpan.',
+    );
   if (r.status === 'tereskalasi') throw new HttpError(409, 'Laporan ini sudah dieskalasi.');
   if (!body.escalationId || db.escalations[body.escalationId])
     throw new HttpError(409, 'ID eskalasi tidak valid');

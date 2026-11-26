@@ -122,9 +122,14 @@ export const noteBody = z.object({ catatan_ciphertext: long });
 
 export const verifyOwnerBody = z.object({ challenge: short, proof: long });
 
+/** Kunci publik hibrida: ECDH P-256 (44 huruf) dan ML-KEM-768 (1579 huruf), jadi bagian ML-KEM tidak boleh `short`. */
 export const replaceKeyBody = z.object({
   publicKey: z
-    .object({ suite: short.optional(), ecdh: short.optional(), mlkem: short.optional() })
+    .object({
+      suite: short.optional(),
+      ecdh: short.optional(),
+      mlkem: z.string().max(4096).optional(),
+    })
     .optional(),
 });
 

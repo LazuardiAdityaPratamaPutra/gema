@@ -4,6 +4,7 @@ import { SatgasBar } from '@/components/SatgasBar';
 import { useSatgas } from '@/components/useSatgas';
 import { LoadError } from '@/components/LoadError';
 import { SkeletonPage, SkeletonTable } from '@/components/Skeleton';
+import { KunciBelumSiap } from './KunciBelumSiap';
 import { AggregateCard, CaseTable, LadderPanel, UrgentCase } from './KasusParts';
 import { WaitingPanel } from './WaitingPanel';
 import { CASE_ROLES, useKasusData, useWaiting } from './useKasus';
@@ -25,6 +26,7 @@ export default function Kasus() {
         <SatgasBar s={session} />
         <h1>{session.member.role === 'Pengawas' ? 'Pengawasan' : 'Kasus tereskalasi'}</h1>
       </header>
+      <KunciBelumSiap session={session} />
       {err && <LoadError what="daftar kasus" message={err} />}
       <WaitingPanel session={session} waiting={waiting} setWaiting={setWaiting} setErr={setErr} />
       {agregat !== null && <AggregateCard agregat={agregat} />}
