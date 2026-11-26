@@ -765,16 +765,19 @@ details.more {
   }
 }
 
-/* tautan teks: hover memakai warna palet (bukan blok kuning), kontras tetap terjaga */
+/* tautan teks: hover hanya menebalkan garis bawah dan menggelapkan warna, tanpa kotak latar */
 a:hover,
+main a:not([class]):hover,
 .rj-links a:hover {
-  background: var(--tint-2);
+  background: transparent;
   color: var(--ink);
+  text-decoration-thickness: 2px;
 }
 
 .t-hero a:hover:not(.btn) {
-  background: rgb(255 255 255 / 20%);
+  background: transparent;
   color: #fff;
+  text-decoration-thickness: 2px;
 }
 
 /* beranda: layar pertama pas satu layar penuh di desktop */
@@ -876,7 +879,7 @@ a:hover,
   }
 }
 
-/* ---------- navbar desktop: menu di tengah ruang antara logo dan tombol, kontrol sama tinggi ---------- */
+/* ---------- navbar desktop: menu menempel di samping logo agar tidak bergeser antarhalaman, kontrol sama tinggi ---------- */
 @media (width >= 75em) {
   .nb-bar:has(.nb-links) {
     display: grid;
@@ -890,8 +893,8 @@ a:hover,
   }
 
   .nb-bar:has(.nb-links) .nb-links {
-    justify-self: center;
-    margin-inline: 0;
+    justify-self: start;
+    margin-inline: 0.75rem 0;
   }
 
   .nb-bar:has(.nb-links) .nb-end {
