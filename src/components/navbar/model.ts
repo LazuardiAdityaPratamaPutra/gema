@@ -66,8 +66,10 @@ export function navModel(
   reporter: ReporterSession | null,
 ): NavModel {
   const m = modelFor(path, satgas, reporter);
-  // Aksi utama tidak ditampilkan di halaman tujuannya sendiri.
-  return m.cta && path === m.cta.href ? { ...m, cta: null } : m;
+  // Aksi utama tidak ditampilkan di halaman tujuannya sendiri, dan tidak diulang di beranda
+  // pengunjung karena hero sudah memuat tombol yang sama.
+  const berandaTamu = m.kind === 'guest' && path === '/';
+  return m.cta && (path === m.cta.href || berandaTamu) ? { ...m, cta: null } : m;
 }
 
 /** Tautan menyala bila halaman ini miliknya, kecuali ada tautan lain yang lebih spesifik. */

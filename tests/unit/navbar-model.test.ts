@@ -32,6 +32,11 @@ describe('navModel', () => {
     expect(navModel('/brankas/baru', null, reporter()).cta).toBeNull();
   });
 
+  it('beranda pengunjung tidak mengulang ajakan yang sudah ada di hero', () => {
+    expect(navModel('/', null, null).cta).toBeNull();
+    expect(navModel('/pahami', null, null).cta?.href).toBe('/mulai');
+  });
+
   it('pelapor: menu brankas, keterangan, dan ajakan laporan baru', () => {
     const m = navModel('/brankas', null, reporter());
     expect(m.kind).toBe('reporter');
