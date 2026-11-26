@@ -401,14 +401,6 @@
   color: var(--ink-2);
 }
 
-@media (width >= 75em) {
-  .nb-qx-info {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
 /* penanda permanen: data di instalasi ini fiktif */
 
 .nb-offline {

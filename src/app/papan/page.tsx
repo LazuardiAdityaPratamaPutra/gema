@@ -51,13 +51,17 @@ function QuarterRow({ k }: { k: Quarter }) {
 function CampusCard({ r }: { r: Row }) {
   return (
     <section className="card" aria-labelledby={`h-${r.id}`}>
-      <h2 id={`h-${r.id}`} style={{ fontSize: '1.35rem', margin: 0 }}>
-        {r.nama}
-      </h2>
-      {r.fiktif && <span className="pill amber campus-tag">Mode demo</span>}
-      <p className="muted small">
-        {r.kota}, ε = {r.epsilon}
-      </p>
+      <header className="campus-head">
+        <h2 id={`h-${r.id}`} style={{ fontSize: '1.35rem', margin: 0 }}>
+          {r.nama}
+        </h2>
+        <p className="campus-meta muted small">
+          {r.fiktif && <span className="pill amber">Mode demo</span>}
+          <span>
+            {r.kota}, ε = {r.epsilon}
+          </span>
+        </p>
+      </header>
       <div
         className="tablewrap"
         role="region"

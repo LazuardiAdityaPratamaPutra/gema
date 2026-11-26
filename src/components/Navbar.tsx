@@ -79,22 +79,22 @@ export function Navbar() {
         </Link>
         <NavLinks links={links} active={active} />
         <div className="nb-end">
-          {cta && (
-            <Link href={cta.href} className="nb-cta">
-              {/* nama aksesibel = teks yang tampak (WCAG 2.5.3): CSS menyembunyikan salah satunya */}
-              <span className="nb-cta-long">{cta.label}</span>
-              <span className="nb-cta-short">{cta.short}</span>
-            </Link>
-          )}
           {model.kind === 'guest' && path !== '/masuk' && (
             <Link href="/masuk" className="nb-ghost nb-signout">
-              Masuk
+              Masuk dengan kode
             </Link>
           )}
           {signOut && (
             <button type="button" className="nb-ghost nb-signout" onClick={signOut}>
               Keluar akun
             </button>
+          )}
+          {cta && (
+            <Link href={cta.href} className="nb-cta">
+              {/* nama aksesibel = teks yang tampak (WCAG 2.5.3): CSS menyembunyikan salah satunya */}
+              <span className="nb-cta-long">{cta.label}</span>
+              <span className="nb-cta-short">{cta.short}</span>
+            </Link>
           )}
           <QuickExitButton />
           <button

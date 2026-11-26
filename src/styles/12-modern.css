@@ -905,6 +905,35 @@ a:hover,
   gap: 0.5rem;
 }
 
+/* Keluar cepat dan tombol "?" adalah satu kontrol: disatukan agar "?" tidak terbaca sebagai bantuan umum */
+@media (width >= 75em) {
+  .nb-qx-wrap {
+    gap: 0;
+  }
+
+  .nb-qx {
+    padding-right: 0.85rem;
+    border-radius: 999px 0 0 999px;
+  }
+
+  .nb-qx-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    border-radius: 0 999px 999px 0;
+    background: #fadadd;
+    color: #8f1226;
+    box-shadow: inset 1px 0 0 rgb(143 18 38 / 18%);
+  }
+}
+
+@media (width >= 75em) and (hover: hover) {
+  .nb-qx-info:hover {
+    background: #f4c3c8;
+  }
+}
+
 /* layar sentuh: kontrol navbar tetap 44 px agar mudah diketuk */
 @media (width < 75em) {
   .nb-cta,
@@ -1102,10 +1131,21 @@ html .rj-links a:hover {
   }
 }
 
-/* Papan: label "Data fiktif" selalu tepat di bawah nama kampus */
-.campus-tag {
-  display: inline-block;
-  margin-top: 0.45rem;
+/* Papan: nama kampus di kiri, label dan kota di kanan; di layar sempit turun ke bawahnya */
+.campus-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.campus-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
 }
 
 /* ---------- Bantuan di desktop: dua kolom (bantuan segera di kiri, penjelasan di kanan) ---------- */

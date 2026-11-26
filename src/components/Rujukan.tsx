@@ -52,9 +52,6 @@ export function Rujukan({
           </li>
         ))}
       </ul>
-      <p className="small muted" style={{ margin: '.6rem 0 0' }}>
-        Nomor diperiksa November 2026. Pastikan lagi di situs resmi layanan sebelum menghubungi.
-      </p>
     </div>
   );
 }
