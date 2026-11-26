@@ -349,7 +349,6 @@ html[data-zone='demo'] .ph {
 .cal-head,
 .cal-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
   gap: 0.45rem;
 }
 
@@ -431,7 +430,6 @@ html[data-zone='demo'] .ph {
 
 @media (width <= 53.75em) {
   .clock {
-    grid-template-columns: 1fr;
     grid-template-areas: 'copy' 'cal' 'lamps';
   }
 

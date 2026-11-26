@@ -8,10 +8,58 @@ import { fmtDateTime } from '@/lib/ui/format';
 import { island } from '@/lib/ui/island-bus';
 import type { Case } from '../../useKasus';
 import { Head } from './DosirParts';
+import { MundurKasus } from './MundurKasus';
 import { STATUSES } from './dosir';
 
 /** Tahap tepat sebelum Selesai; status hanya maju satu langkah, jadi Pimpinan bertindak di sini. */
 const TAHAP_AKHIR = STATUSES[STATUSES.length - 2];
+
+/** Judul kasus dengan status dan tenggat. */
+function KepalaStatus({ session, c }: { session: SatgasSession; c: Case }) {
+  return (
+    <Head session={session} title={c.alias}>
+      <p className="muted">
+        {c.unit ? `${c.unit}, ` : ''}status{' '}
+        <strong style={{ color: 'inherit' }}>
+          <span className="stat" data-s={c.status}>
+            <i aria-hidden="true" />
+            {c.status}
+          </span>
+        </strong>
+        , tenggat {fmtDateTime(c.sla.due)}
+        {c.sla.terlambat && (
+          <>
+            {' '}
+            <span className="pill rose">Terlambat T{c.sla.tingkat}</span>
+          </>
+        )}
+      </p>
+    </Head>
+  );
+}
+
+/** Yang boleh dilakukan Pimpinan: menandai selesai di tahap akhir, atau penjelasan mengapa belum bisa. */
+function AksiPimpinan({ c, busy, onSelesai }: { c: Case; busy: boolean; onSelesai: () => void }) {
+  return (
+    <>
+      {c.mundur ? (
+        <p className="card tint small">
+          Kamu sudah mundur dari kasus ini karena konflik kepentingan, jadi tidak bisa menindaknya.
+        </p>
+      ) : c.status === TAHAP_AKHIR ? (
+        <button className="btn teal" disabled={busy} aria-busy={busy} onClick={onSelesai}>
+          Tandai selesai
+        </button>
+      ) : (
+        c.status !== 'Selesai' && (
+          <p className="small muted">
+            Kamu dapat menandai kasus selesai setelah Satgas membawanya ke tahap {TAHAP_AKHIR}.
+          </p>
+        )
+      )}
+    </>
+  );
+}
 
 /**
  * Tampilan Pimpinan: hanya status dan tenggat dari daftar kasus, tanpa membuka dosir.
@@ -62,24 +110,7 @@ export function StatusPimpinan({ session, id }: { session: SatgasSession; id: st
     );
   return (
     <div className="wrap" style={{ maxWidth: 900 }}>
-      <Head session={session} title={c.alias}>
-        <p className="muted">
-          {c.unit ? `${c.unit}, ` : ''}status{' '}
-          <strong style={{ color: 'inherit' }}>
-            <span className="stat" data-s={c.status}>
-              <i aria-hidden="true" />
-              {c.status}
-            </span>
-          </strong>
-          , tenggat {fmtDateTime(c.sla.due)}
-          {c.sla.terlambat && (
-            <>
-              {' '}
-              <span className="pill rose">Terlambat T{c.sla.tingkat}</span>
-            </>
-          )}
-        </p>
-      </Head>
+      <KepalaStatus session={session} c={c} />
       <p className="card tint small">
         Sebagai Pimpinan kamu melihat status dan tenggat saja. Isi laporan dan bukti tidak terbuka
         untuk peran ini.
@@ -89,22 +120,8 @@ export function StatusPimpinan({ session, id }: { session: SatgasSession; id: st
           {err}
         </p>
       )}
-      {c.status === TAHAP_AKHIR ? (
-        <button
-          className="btn teal"
-          disabled={busy}
-          aria-busy={busy}
-          onClick={() => void selesai()}
-        >
-          Tandai selesai
-        </button>
-      ) : (
-        c.status !== 'Selesai' && (
-          <p className="small muted">
-            Kamu dapat menandai kasus selesai setelah Satgas membawanya ke tahap {TAHAP_AKHIR}.
-          </p>
-        )
-      )}
+      <AksiPimpinan c={c} busy={busy} onSelesai={() => void selesai()} />
+      {!c.mundur && c.status !== 'Selesai' && <MundurKasus session={session} caseId={id} />}
     </div>
   );
 }

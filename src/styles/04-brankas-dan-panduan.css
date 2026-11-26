@@ -30,7 +30,6 @@ details.fold > summary h2 {
 
 details.fold > summary span {
   font: 500 0.72rem var(--mono);
-  padding: 0.25rem 0.6rem;
   border-radius: 999px;
 }
 
@@ -333,7 +332,6 @@ details.fold:last-of-type {
 }
 
 .savestate {
-  margin: 0.6rem 0 0;
   font: 400 0.85rem var(--sans);
   color: var(--muted);
 }
@@ -400,4 +398,15 @@ html[data-veil='on'] .sensitive {
   background: var(--ink);
   color: #fff;
   box-shadow: 0 12px 28px rgb(14 15 18 / 35%);
+}
+
+.lede-list {
+  margin: 0.6rem 0 0;
+  padding-left: 1.2rem;
+  max-width: var(--measure-wide);
+  color: var(--ink-2);
+}
+
+.lede-list li + li {
+  margin-top: 0.4rem;
 }

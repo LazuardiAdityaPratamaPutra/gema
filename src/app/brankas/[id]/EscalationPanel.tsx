@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { isDependent } from '@gema/pendamping';
 import { OwnerProofReporter } from '@/components/OwnerProofReporter';
 import { api } from '@/lib/api';
+import { buildCatatanPenanganan } from '@/lib/laporan/catatan-penanganan';
 import { fmtDate, fmtDateTime } from '@/lib/ui/format';
+import { triggerDownload } from '@/lib/vault/proof';
 import type { ReporterSession } from '@/lib/store';
 import {
   clearConditionalEscalation,
@@ -26,6 +28,77 @@ type Props = {
 
 type Esc = NonNullable<ReportView['escalation']>;
 
+/** Tenggat tindak lanjut Satgas beserta sisa atau keterlambatannya. */
+function TenggatSatgas({ sla }: { sla: Esc['sla'] }) {
+  return (
+    <p>
+      Tenggat Satgas: <strong>{fmtDate(sla.due)}</strong>
+      {sla.terlambat
+        ? `, terlambat ${sla.hariTerlambat} hari kerja, tingkat ${sla.tingkat}`
+        : sla.hariSisa != null
+          ? `, sisa ${sla.hariSisa} hari kerja`
+          : ''}
+    </p>
+  );
+}
+
+/** Penjelasan singkat tangga eskalasi untuk pelapor. */
+function LangkahBerikut() {
+  return (
+    <details className="more" open>
+      <summary>Apa yang terjadi selanjutnya</summary>
+      <ol>
+        <li>Satgas punya waktu sampai tenggat di atas untuk menindaklanjuti laporanmu.</li>
+        <li>
+          Bila terlambat, peringatan naik ke Ketua Satgas, lalu Pimpinan, lalu pengawas kementerian
+          yang hanya melihat angka.
+        </li>
+        <li>Statusnya kamu pantau di halaman ini. Tidak ada kabar lewat email atau telepon.</li>
+      </ol>
+    </details>
+  );
+}
+
+/** Riwayat kejadian kasus, dari yang tertua. */
+function RiwayatKasus({ events }: { events: Esc['events'] }) {
+  return (
+    <ul className="timeline">
+      {events.map((e, i) => (
+        <li key={i}>
+          <strong>{e.label}</strong>{' '}
+          <span className="muted small">
+            {fmtDateTime(e.at)}, {e.actor}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Ajakan dan tombol unduh catatan penanganan untuk dibawa ke pihak luar. */
+function BawaKePihakLain({ r, alias }: { r: ReportView; alias: string }) {
+  return (
+    <details className="more">
+      <summary>Bawa kasus ini ke pihak lain</summary>
+      <p>
+        Bila Satgas tidak bergerak, kamu bisa menyerahkan catatan ini ke pihak yang kamu pilih,
+        misalnya Kemendikbudristek, Komnas Perempuan, lembaga bantuan hukum, atau media. Isinya
+        kronologi dan tenggat saja, tanpa namamu dan tanpa isi laporan.
+      </p>
+      <button
+        className="btn ghost sm"
+        onClick={() =>
+          void buildCatatanPenanganan(r).then((html) =>
+            triggerDownload(`catatan-penanganan-${alias}.html`, html, 'text/html'),
+          )
+        }
+      >
+        Unduh catatan penanganan
+      </button>
+    </details>
+  );
+}
+
 /** Status eskalasi yang sudah berjalan: tenggat, riwayat, dan tombol tarik bila belum dibuka. */
 function EscalatedStatus({
   session,
@@ -38,30 +111,18 @@ function EscalatedStatus({
   return (
     <>
       <p>
-        <span className="pill amber">Dieskalasi</span> sebagai <strong>{e.alias}</strong> pada{' '}
-        {fmtDateTime(e.escalatedAt)}.
+        <span className="pill amber">Terkirim ke Satgas</span> pada {fmtDateTime(e.escalatedAt)}. Di
+        Satgas, kasusmu dikenal sebagai <strong>{e.alias}</strong>, bukan dengan namamu.
       </p>
-      <p>
-        Tenggat Satgas: <strong>{fmtDate(e.sla.due)}</strong>
-        {e.sla.terlambat
-          ? `, terlambat ${e.sla.hariTerlambat} hari kerja, tingkat ${e.sla.tingkat}`
-          : e.sla.hariSisa != null
-            ? `, sisa ${e.sla.hariSisa} hari kerja`
-            : ''}
-      </p>
-      <ul className="timeline">
-        {e.events.map((e, i) => (
-          <li key={i}>
-            <strong>{e.label}</strong>{' '}
-            <span className="muted small">
-              {fmtDateTime(e.at)}, {e.actor}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <TenggatSatgas sla={e.sla} />
+      <LangkahBerikut />
+      <RiwayatKasus events={e.events} />
+      <BawaKePihakLain r={r} alias={e.alias} />
       {e.opened ? (
         <p className="small muted" role="status">
-          Satgas sudah membuka kasus ini, jadi persetujuan tidak dapat ditarik.
+          Satgas membuka kasus ini pada{' '}
+          {e.openedAt ? fmtDateTime(e.openedAt) : 'waktu yang tidak tercatat'}, jadi persetujuan
+          tidak dapat ditarik.
         </p>
       ) : (
         <button
@@ -76,11 +137,11 @@ function EscalatedStatus({
                   method: 'POST',
                   body: {},
                 }),
-              'Eskalasi ditarik. Satgas tidak lagi dapat membuka isi.',
+              'Laporan ditarik dari Satgas. Satgas tidak lagi dapat membuka isi.',
             )
           }
         >
-          Tarik eskalasi
+          Tarik laporan dari Satgas
         </button>
       )}
       <OwnerProofReporter session={session} report={r} dek={dek} alias={e.alias} />
@@ -132,7 +193,7 @@ function ConditionForm({ session, r, dek, inst, prioritas, busy, setMsg, act }: 
         terpenuhi.
       </p>
       <div className="field">
-        <label htmlFor="cond-min">Eskalasi bila jumlah pelapor (termasuk aku) mencapai</label>
+        <label htmlFor="cond-min">Kirim bila jumlah pelapor (termasuk aku) mencapai</label>
         <select id="cond-min" value={condMin} onChange={(e) => setCondMin(Number(e.target.value))}>
           {[2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
@@ -148,7 +209,7 @@ function ConditionForm({ session, r, dek, inst, prioritas, busy, setMsg, act }: 
         onClick={() =>
           act(async () => {
             const res = await setConditionalEscalation(session, r, dek, inst!, condMin, prioritas);
-            if (res.fired) setMsg('Syarat sudah terpenuhi, laporan dieskalasi.', true);
+            if (res.fired) setMsg('Syarat sudah terpenuhi, laporan terkirim ke Satgas.', true);
           }, 'Syarat terpasang. Kamu akan melihat statusnya di sini.')
         }
       >
@@ -162,7 +223,7 @@ function ConditionForm({ session, r, dek, inst, prioritas, busy, setMsg, act }: 
 function ConditionalBox(p: CondProps) {
   return (
     <div className="cond">
-      <h3 className="title-sm">Atau: eskalasi otomatis bila ada yang cocok</h3>
+      <h3 className="title-sm">Atau: kirim otomatis bila ada pelapor lain yang cocok</h3>
       {p.r.conditional ? (
         <InstalledCondition session={p.session} r={p.r} busy={p.busy} act={p.act} />
       ) : (
@@ -221,7 +282,7 @@ function EscalateConfirm({
 }) {
   return (
     <div className="card warn">
-      <h3 className="title-sm">Sebelum kamu mengeskalasi</h3>
+      <h3 className="title-sm">Sebelum kamu mengirim</h3>
       <ul className="konfirmasi">
         <li>
           <strong>Siapa yang bisa membaca.</strong> Satgas akan dapat membaca isi laporan dan
@@ -233,8 +294,8 @@ function EscalateConfirm({
           Periksa dulu isinya.
         </li>
         <li>
-          <strong>Penarikan.</strong> Kamu bisa menarik eskalasi selama Satgas belum membuka
-          kasusnya; setelah dibuka, tidak bisa ditarik.
+          <strong>Penarikan.</strong> Kamu bisa menarik laporan yang sudah dikirim selama Satgas
+          belum membuka kasusnya; setelah dibuka, tidak bisa ditarik.
         </li>
       </ul>
       <div className="row">
@@ -245,12 +306,12 @@ function EscalateConfirm({
           onClick={() =>
             act(
               () => escalateReport(session, r, dek, inst!, mode, prioritas),
-              'Laporan dieskalasi. Tenggat berjalan.',
+              'Laporan terkirim ke Satgas. Tenggat berjalan.',
               onCancel,
             )
           }
         >
-          Ya, eskalasikan
+          Ya, kirim ke Satgas
         </button>
         <button className="btn ghost" onClick={onCancel}>
           Batal
@@ -270,15 +331,16 @@ export function EscalationPanel({ session, r, dek, narasi, inst, busy, setMsg, a
   return (
     <section aria-labelledby="esk" className="card my-xl">
       <h2 className="title-md" id="esk">
-        Eskalasi ke Satgas
+        Kirim ke Satgas
       </h2>
       {r.escalation ? (
         <EscalatedStatus session={session} r={r} e={r.escalation} dek={dek} busy={busy} act={act} />
       ) : (
         <>
           <p>
-            Eskalasi mengirim kunci laporan ke Satgas, terenkripsi untuk mereka saja. Setelah itu
-            tenggat berjalan dan kamu dapat memantaunya di sini. Penarikan hanya dapat dilakukan
+            Sampai kamu menekan tombol di bawah, tidak ada yang sampai ke Satgas. Setelah dikirim
+            (istilah resminya eskalasi), laporanmu hanya terbuka untuk Satgas, tenggat penanganan
+            mulai berjalan, dan kamu dapat memantaunya di sini. Penarikan hanya dapat dilakukan
             sebelum Satgas membuka kasus.
           </p>
           {inst?.kunciSiap === false ? (
@@ -305,7 +367,7 @@ export function EscalationPanel({ session, r, dek, narasi, inst, busy, setMsg, a
               </label>
               {!confirmEsc ? (
                 <button className="btn teal" disabled={busy} onClick={() => setConfirmEsc(true)}>
-                  Eskalasi laporan ini
+                  Kirim laporan ini ke Satgas
                 </button>
               ) : (
                 <EscalateConfirm

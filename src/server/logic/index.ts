@@ -11,3 +11,4 @@ export * from './sla';
 export * from './anchor';
 export * from './kepatuhan';
 export * from './berkala';
+export * from './kesehatan';

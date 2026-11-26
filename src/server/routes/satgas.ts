@@ -1,14 +1,25 @@
 import { fromB64u } from '@gema/crypto';
 import { DEMO_INSTITUTION_ID } from '@/lib/demo/demo';
 import { persist } from '../db';
-import { advanceStatus, audit, issueSession, ipHash, limiters, nowFor, tick } from '../logic';
+import {
+  advanceStatus,
+  audit,
+  issueSession,
+  ipHash,
+  limiters,
+  nowFor,
+  peringatanSistem,
+  tick,
+} from '../logic';
 import {
   approvalsFor,
   approve,
   hasApproval,
+  mundurDariKasus,
   newChallenge,
   requestApproval,
   setPanelMode,
+  sudahMundur,
   verifyOwner,
 } from '../logic-satgas';
 import { checkPassword } from '../seed';
@@ -95,6 +106,10 @@ const ROUTES: Record<string, Route> = {
     return json({ ok: true });
   },
   'POST key': (ctx) => replaceKey(ctx),
+  'GET kesehatan': ({ req, db }, s) => {
+    satgasSession(req, ['Ketua', 'Auditor']);
+    return json({ peringatan: peringatanSistem(db, s.institution_id) });
+  },
   'GET audit': ({ req, db }) => {
     satgasSession(req, ['Auditor', 'Ketua']);
     return json({ entries: db.audit.slice(-200).reverse(), total: db.audit.length });
@@ -163,7 +178,7 @@ async function caseList({ db }: Ctx, s: SatgasSession) {
   const cases = Object.values(db.escalations)
     .filter((e) => e.institution_id === s.institution_id)
     .sort((x, y) => priority(y) - priority(x) || x.sla_due_at - y.sla_due_at)
-    .map((e) => caseListItem(db, e, s.role));
+    .map((e) => caseListItem(db, e, s.role, s.member_id));
   return json({ cases, now: nowFor(db, s.institution_id) });
 }
 
@@ -172,6 +187,7 @@ type CaseRoute = (ctx: Ctx, s: SatgasSession, e: Escalation) => Promise<Response
 /** Aksi yang memeriksa peran sendiri, jadi berjalan sebelum syarat Ketua/Anggota. */
 const OWN_CHECK: Record<string, CaseRoute> = {
   'POST assign': (ctx, s, e) => assign(ctx, s, e),
+  'POST mundur': ({ db }, s, e) => json({ ok: true, ...mundurDariKasus(db, s, e) }),
   'POST status': (ctx, s, e) => changeStatus(ctx, s, e),
 };
 
@@ -193,6 +209,9 @@ function caseActions(ctx: Ctx, s: SatgasSession, caseId: string) {
     throw new HttpError(404, 'Kasus tidak ditemukan');
 
   const key = `${ctx.method} ${ctx.seg[3] ?? ''}`;
+  // Yang sudah mundur tidak boleh menindak kasus. Satu-satunya yang tersisa: melepas kasus ke orang lain.
+  if (sudahMundur(e, s.member_id) && key !== 'POST assign' && key !== 'POST mundur')
+    throw new HttpError(403, 'Kamu sudah mundur dari kasus ini karena konflik kepentingan.');
   const own = OWN_CHECK[key];
   if (own) return own(ctx, s, e);
   satgasSession(ctx.req, ['Ketua', 'Anggota']);
@@ -215,6 +234,8 @@ async function assign({ req, db }: Ctx, s: SatgasSession, e: Escalation) {
   if (e.status === 'Selesai')
     throw new HttpError(409, 'Kasus yang selesai tidak dapat ditugaskan.');
   const target = assigneeOf(db, s, x.memberId);
+  if (target && sudahMundur(e, target.id))
+    throw new HttpError(409, 'Anggota itu sudah mundur dari kasus ini karena konflik kepentingan.');
   const now = nowFor(db, s.institution_id);
   e.assignee_id = target?.id ?? null;
   e.assigned_at = target ? now : null;

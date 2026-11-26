@@ -12,7 +12,7 @@ const ROLES = [
     pts: [
       'Tulis, atau ceritakan dengan suara. Semuanya dikunci di perangkatmu.',
       'Tanpa nama, email, atau telepon. Hanya kode dan enam kata.',
-      'Satgas baru tahu bila kamu memilih eskalasi, dan bisa ditarik selama Satgas belum membuka kasusnya.',
+      'Satgas baru tahu bila kamu memilih mengirim (eskalasi), dan bisa ditarik selama Satgas belum membuka kasusnya.',
     ],
     cta: { href: '/mulai', label: 'Buat brankas tanpa nama' },
     alt: { href: '/pahami', label: 'Ragu? Pahami dulu' },

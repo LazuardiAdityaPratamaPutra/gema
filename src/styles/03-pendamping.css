@@ -36,9 +36,7 @@
 .rj-tag {
   justify-self: start;
   font: 600 0.7rem var(--sans);
-  padding: 0.1rem 0.55rem;
   border-radius: 999px;
-  margin-bottom: 0.2rem;
 }
 
 .rj-links {

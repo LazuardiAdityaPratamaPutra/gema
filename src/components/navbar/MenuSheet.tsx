@@ -51,7 +51,7 @@ export function MenuSheet({
               signOut();
             }}
           >
-            Keluar sesi
+            Keluar akun
           </button>
         )}
         <button type="button" className="btn danger block" onClick={() => void quickExit()}>

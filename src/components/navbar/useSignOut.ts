@@ -4,7 +4,7 @@ import { api } from '@/lib/api';
 import { reporterStore, satgasStore, type ReporterSession, type SatgasSession } from '@/lib/store';
 import type { NavKind } from './model';
 
-/** Aksi "Keluar sesi" untuk jenis tampilan yang aktif; `null` bila tidak ada sesi untuk ditutup. */
+/** Aksi "Keluar akun" untuk jenis tampilan yang aktif; `null` bila tidak ada sesi untuk ditutup. */
 export function useSignOut(
   kind: NavKind,
   satgas: SatgasSession | null,

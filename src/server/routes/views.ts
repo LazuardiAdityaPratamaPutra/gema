@@ -26,6 +26,7 @@ function escalationForReporter(db: DB, esc: Escalation) {
     sumber: esc.sumber,
     escalatedAt: esc.escalated_at,
     opened: !!esc.opened_at,
+    openedAt: esc.opened_at ?? null,
     wrapped: esc.dek_wrapped_satgas,
     sla: slaView(db, esc),
     events: db.events
@@ -65,7 +66,7 @@ export function reportView(db: DB, id: string) {
 }
 
 /** Satu baris daftar kasus. Pimpinan hanya melihat status, tenggat, dan penanggung jawab. */
-export function caseListItem(db: DB, e: Escalation, role: string) {
+export function caseListItem(db: DB, e: Escalation, role: string, memberId?: string) {
   const base = {
     id: e.id,
     alias: e.alias,
@@ -75,6 +76,7 @@ export function caseListItem(db: DB, e: Escalation, role: string) {
     prioritas: !!e.prioritas,
     penanggungJawab: memberName(db, e.assignee_id),
   };
+  if (memberId && e.mundur?.includes(memberId)) return { ...base, mundur: true };
   if (role === 'Pimpinan') return base;
   return {
     ...base,

@@ -24,7 +24,7 @@ describe('navModel', () => {
     expect(m.kind).toBe('guest');
     expect(m.cta?.href).toBe('/mulai');
     expect(m.home).toBe('/');
-    expect(m.links.map((l) => l.label)).toContain('Papan');
+    expect(m.links.map((l) => l.label)).toContain('Kinerja Satgas');
   });
 
   it('ajakan utama tidak tampil di halaman tujuannya sendiri', () => {
@@ -37,7 +37,7 @@ describe('navModel', () => {
     expect(m.kind).toBe('reporter');
     expect(m.links).toBe(REPORTER);
     expect(m.cta?.href).toBe('/brankas/baru');
-    expect(m.who).toBe('Brankas aktif di perangkat ini');
+    expect(m.who).toBe('Masuk di perangkat ini');
     expect(m.home).toBe('/brankas');
   });
 
@@ -55,10 +55,10 @@ describe('navModel', () => {
     expect(ketua.who).toBe('Ketua');
     expect(ketua.home).toBe('/satgas');
     expect(ketua.links.map((l) => l.label)).toEqual(
-      expect.arrayContaining(['Kasus', 'Audit', 'Kunci']),
+      expect.arrayContaining(['Kasus', 'Jejak audit', 'Kunci Satgas']),
     );
     const auditor = navModel('/satgas/audit', satgas('Auditor'), null);
-    expect(auditor.links.map((l) => l.label)).not.toContain('Kunci');
+    expect(auditor.links.map((l) => l.label)).not.toContain('Kunci Satgas');
   });
 
   it('halaman masuk Satgas memakai menu tamu walau sesi masih ada', () => {

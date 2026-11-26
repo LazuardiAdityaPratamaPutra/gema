@@ -23,7 +23,7 @@ function PrivacyContext({ open }: { open: boolean }) {
     <details className="card ctx" open={open}>
       <summary>
         <h2 id="ctx-judul" className="title-sm">
-          Sebelum mengisi: ini yang terjadi pada isianmu
+          Apa yang diminta, dan siapa yang bisa melihatnya
         </h2>
       </summary>
       <dl className="ctx-list">
@@ -36,12 +36,13 @@ function PrivacyContext({ open }: { open: boolean }) {
           </dd>
         </div>
         <div>
-          <dt>Yang terlihat saat eskalasi</dt>
+          <dt>Siapa yang bisa membaca</dt>
           <dd>
-            Sebelum kamu memilih <Term k="eskalasi">eskalasi</Term>, hanya kamu yang bisa membaca
-            isinya. Sesudahnya, Satgas kampus bisa membaca seluruh isi laporan dan bukti dengan nama
-            samaran kasus. Gema tidak pernah meminta identitasmu, tetapi cerita dan buktimu bisa
-            memuat petunjuk tentang siapa kamu.
+            Sebelum kamu menekan Kirim ke Satgas (istilah resminya{' '}
+            <Term k="eskalasi">eskalasi</Term>), hanya kamu yang bisa membaca isinya. Sesudahnya,
+            Satgas kampus bisa membaca seluruh isi laporan dan bukti dengan nama samaran kasus. Gema
+            tidak pernah meminta identitasmu, tetapi cerita dan buktimu bisa memuat petunjuk tentang
+            siapa kamu.
           </dd>
         </div>
       </dl>
@@ -79,7 +80,11 @@ function CampusFields({
 }: Fields & { insts: InstitutionInfo[]; inst: InstitutionInfo | undefined }) {
   return (
     <>
-      {insts.length === 1 ? (
+      {insts.length === 0 ? (
+        <p className="small" aria-busy="true">
+          Perguruan tinggi: <strong>Memuat…</strong>
+        </p>
+      ) : insts.length === 1 ? (
         <p className="small">
           Perguruan tinggi: <strong>{insts[0].nama}</strong>
           {insts[0].demo ? ' (demo)' : ''}
@@ -111,12 +116,22 @@ function CampusFields({
           cerita atau bukti sungguhan.
         </p>
       )}
-      {inst && (
+      {(inst || insts.length === 0) && (
         <div className="field">
           <label htmlFor="unit">Fakultas atau unit terlapor</label>
-          <select id="unit" value={d.unitId} onChange={(e) => set('unitId', e.target.value)}>
+          <p className="hint m-0" id="unit-bantu">
+            Pilih yang paling dekat. Kalau tidak tahu, pilih &ldquo;Tidak tahu atau belum
+            yakin&rdquo;.
+          </p>
+          <select
+            id="unit"
+            aria-describedby="unit-bantu"
+            disabled={!inst}
+            value={d.unitId}
+            onChange={(e) => set('unitId', e.target.value)}
+          >
             <option value="">Pilih…</option>
-            {inst.units.map((u) => (
+            {(inst?.units ?? []).map((u) => (
               <option key={u.id} value={u.id}>
                 {u.nama}
               </option>
@@ -187,8 +202,8 @@ function RelasiFields({ d, set }: Fields) {
     <fieldset className="field relasi">
       <legend className="label">Apakah terlapor punya kuasa atas studimu atau pekerjaanmu?</legend>
       <p className="hint">
-        Bila ya, saat <Term k="eskalasi">eskalasi</Term> kamu bisa meminta Satgas memprioritaskan
-        kasusmu dan mempertimbangkan pelindungan, misalnya pengalihan pembimbing.
+        Bila ya, saat mengirim ke Satgas kamu bisa meminta Satgas memprioritaskan kasusmu dan
+        mempertimbangkan pelindungan, misalnya pengalihan pembimbing.
       </p>
       <div className="choices">
         {(Object.keys(RELASI_LABEL) as Relasi[]).map((k) => (

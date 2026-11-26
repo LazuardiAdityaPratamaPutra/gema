@@ -148,8 +148,19 @@ function ReviewSummary({
 function PatternChoice({ d, set }: Pick<Props, 'd' | 'set'>) {
   return (
     <div className="field mt-md">
-      <label htmlFor="k">Kapan kamu mau diberi tahu ada pola?</label>
-      <select id="k" value={d.k} onChange={(e) => set('k', Number(e.target.value))}>
+      <label htmlFor="k">
+        Kapan kamu mau diberi tahu ada laporan lain tentang orang yang sama?
+      </label>
+      <p className="small muted m-0" id="k-bantu">
+        Gema mencocokkan nama terlapor tanpa membuka nama atau identitas siapa pun. Kamu hanya
+        diberi tahu bahwa ada kecocokan.
+      </p>
+      <select
+        id="k"
+        aria-describedby="k-bantu"
+        value={d.k}
+        onChange={(e) => set('k', Number(e.target.value))}
+      >
         <option value={2}>Bila 2 laporan cocok (paling cepat)</option>
         <option value={3}>Bila 3 laporan cocok</option>
         <option value={4}>Bila 4 laporan cocok (paling berhati-hati)</option>

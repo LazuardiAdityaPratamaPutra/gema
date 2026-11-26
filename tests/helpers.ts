@@ -148,3 +148,13 @@ export async function submitReport(
 }
 
 const randomId = () => b64u(randomBytes(6));
+
+/** Mematikan Empat Mata butuh persetujuan anggota panel lain: Ketua meminta, Pimpinan menyetujui, Ketua mengulang. */
+export async function cabutEmpatMata(ketua: string, penyetuju: string) {
+  const minta = await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+  if (minta.status !== 409) return minta;
+  const daftar = await call('GET', 'satgas/approvals', { token: penyetuju });
+  const a = daftar.data.menungguKamu.find((x: { cabut?: boolean }) => x.cabut);
+  await call('POST', `satgas/approvals/${a.id}/approve`, { token: penyetuju, body: {} });
+  return call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+}

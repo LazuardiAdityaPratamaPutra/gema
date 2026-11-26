@@ -59,6 +59,41 @@ export function UrgentCase({ c }: { c: Case }) {
   );
 }
 
+/** Tenggat tindak lanjut beserta sisa atau keterlambatannya. */
+function KolomTenggat({ sla }: { sla: Case['sla'] }) {
+  return (
+    <td>
+      {fmtDate(sla.due)}{' '}
+      {sla.terlambat ? (
+        <span className="pill rose">Terlambat T{sla.tingkat}</span>
+      ) : (
+        sla.hariSisa != null && (
+          <span className={`pill ${sla.h2 ? 'amber' : ''}`}>{sla.hariSisa} hari kerja</span>
+        )
+      )}
+    </td>
+  );
+}
+
+/** Tautan ke kasus, atau penanda bila anggota ini sudah mundur dari kasus itu. */
+function KolomAksi({ c, role }: { c: Case; role: Role }) {
+  if (c.mundur)
+    return (
+      <td>
+        <span className="pill">Kamu mundur</span>
+      </td>
+    );
+  return (
+    <td>
+      {['Ketua', 'Anggota', 'Pimpinan'].includes(role) && (
+        <Link href={`/satgas/kasus/${c.id}`} className="btn ghost sm">
+          {role === 'Pimpinan' ? 'Lihat status' : 'Buka kasus'}
+        </Link>
+      )}
+    </td>
+  );
+}
+
 function CaseRow({ c, role }: { c: Case; role: Role }) {
   return (
     <tr>
@@ -79,26 +114,11 @@ function CaseRow({ c, role }: { c: Case; role: Role }) {
         </span>
       </td>
       <td>{c.penanggungJawab ?? <span className="muted">Belum ditugaskan</span>}</td>
-      <td>
-        {fmtDate(c.sla.due)}{' '}
-        {c.sla.terlambat ? (
-          <span className="pill rose">Terlambat T{c.sla.tingkat}</span>
-        ) : (
-          c.sla.hariSisa != null && (
-            <span className={`pill ${c.sla.h2 ? 'amber' : ''}`}>{c.sla.hariSisa} hari kerja</span>
-          )
-        )}
-      </td>
+      <KolomTenggat sla={c.sla} />
       {role !== 'Pimpinan' && (
         <td>{c.cluster && c.cluster.total > 1 ? `${c.cluster.total} laporan` : '-'}</td>
       )}
-      <td>
-        {['Ketua', 'Anggota', 'Pimpinan'].includes(role) && (
-          <Link href={`/satgas/kasus/${c.id}`} className="btn ghost sm">
-            {role === 'Pimpinan' ? 'Lihat status' : 'Buka kasus'}
-          </Link>
-        )}
-      </td>
+      <KolomAksi c={c} role={role} />
     </tr>
   );
 }

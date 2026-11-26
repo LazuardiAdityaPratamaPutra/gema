@@ -15,6 +15,60 @@ type Snap = {
   epsilon: number;
 };
 
+/** Tabel unit kali periode. Sel kosong berarti data terlalu sedikit untuk ditampilkan. */
+function TabelRadar({ snaps }: { snaps: Snap[] }) {
+  const periods = [...new Set(snaps.map((x) => x.periode))].sort().reverse();
+  const units = [...new Set(snaps.map((x) => x.unit))];
+  const cell = (u: string, p: string) => snaps.find((x) => x.unit === u && x.periode === p);
+  return (
+    <div
+      className="tablewrap card"
+      style={{ padding: 0 }}
+      role="region"
+      aria-label="Radar pola per unit dan periode"
+      tabIndex={0}
+    >
+      <table>
+        <caption className="sr">Radar pola per unit dan periode</caption>
+        <thead>
+          <tr>
+            <th scope="col">Unit</th>
+            {periods.map((p) => (
+              <th scope="col" key={p}>
+                {p}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {units.map((u) => (
+            <tr key={u}>
+              <th scope="row" className="rowhead">
+                {u}
+              </th>
+              {periods.map((p) => {
+                const c = cell(u, p);
+                return (
+                  <td key={p}>
+                    {c?.bucket ? (
+                      <>
+                        {c.bucket}{' '}
+                        {c.polaBerulang && <span className="pill rose">Pola berulang</span>}
+                      </>
+                    ) : (
+                      <span className="muted">-</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function Radar() {
   const { session } = useSatgas();
   const [s, setS] = useState<Snap[] | null>(null);
@@ -31,9 +85,6 @@ export default function Radar() {
         <SkeletonPage label="Memeriksa sesi" />
       </div>
     );
-  const periods = [...new Set(s?.map((x) => x.periode))].sort().reverse();
-  const units = [...new Set(s?.map((x) => x.unit))];
-  const cell = (u: string, p: string) => s?.find((x) => x.unit === u && x.periode === p);
   return (
     <div className="wrap">
       <header className="ph ph-foto">
@@ -47,51 +98,7 @@ export default function Radar() {
       </header>
       {err && <LoadError what="radar pola" message={err} />}
       {!s && !err && <SkeletonTable label="Memuat radar pola" />}
-      <div
-        className="tablewrap card"
-        style={{ padding: 0 }}
-        role="region"
-        aria-label="Radar pola per unit dan periode"
-        tabIndex={0}
-      >
-        <table>
-          <caption className="sr">Radar pola per unit dan periode</caption>
-          <thead>
-            <tr>
-              <th scope="col">Unit</th>
-              {periods.map((p) => (
-                <th scope="col" key={p}>
-                  {p}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {units.map((u) => (
-              <tr key={u}>
-                <th scope="row" className="rowhead">
-                  {u}
-                </th>
-                {periods.map((p) => {
-                  const c = cell(u, p);
-                  return (
-                    <td key={p}>
-                      {c?.bucket ? (
-                        <>
-                          {c.bucket}{' '}
-                          {c.polaBerulang && <span className="pill rose">Pola berulang</span>}
-                        </>
-                      ) : (
-                        <span className="muted">-</span>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {s && <TabelRadar snaps={s} />}
       <p className="small muted mt-md">
         Batas jujur: ini sinyal untuk memprioritaskan pencegahan, bukan bukti tentang individu mana
         pun.

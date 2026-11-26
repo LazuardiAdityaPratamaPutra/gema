@@ -6,6 +6,7 @@ import { LoadError } from '@/components/LoadError';
 import { SkeletonPage } from '@/components/Skeleton';
 import { ClusterNote, DosirHeader, LaporanCard, LockedDosir } from './DosirParts';
 import { IsiTerbaca } from './IsiTerbaca';
+import { MundurKasus } from './MundurKasus';
 import { Penanggung } from './Penanggung';
 import { StatusPimpinan } from './StatusPimpinan';
 import { Perkembangan } from './Perkembangan';
@@ -56,6 +57,7 @@ function DosirStaf({ id }: { id: string }) {
         reload={x.load}
       />
       <Perkembangan session={session} d={d} caseId={id} notes={notes} act={act} />
+      {d.escalation.status !== 'Selesai' && <MundurKasus session={session} caseId={id} />}
       {canRead && (
         <IsiTerbaca
           session={session}
