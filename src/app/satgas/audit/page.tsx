@@ -18,6 +18,61 @@ type Entry = {
   hash: string;
 };
 
+type Berkas = { entries: Entry[]; total: number };
+
+/** Hasil pemeriksaan rantai hash di peramban. */
+function RantaiAudit({ e, broken }: { e: Berkas; broken: boolean }) {
+  return (
+    <p className={`card integrity ${broken ? 'alert' : 'tint'}`} role="status" data-ok={!broken}>
+      <b>{broken ? 'Rantai tidak utuh' : 'Rantai utuh'}</b>
+      <span>
+        {broken
+          ? 'Ada entri yang berubah. Periksa entri yang ditandai sebelum melanjutkan.'
+          : `Dihitung di peramban ini: ${e.entries.length} entri terakhir dari ${e.total} saling mengait tanpa putus.`}
+      </span>
+    </p>
+  );
+}
+
+/** Tabel entri audit, terbaru lebih dulu. */
+function TabelAudit({ entries }: { entries: Entry[] }) {
+  return (
+    <div
+      className="tablewrap card"
+      style={{ padding: 0, marginTop: '1rem' }}
+      role="region"
+      aria-label="Entri jejak audit"
+      tabIndex={0}
+    >
+      <table>
+        <caption className="sr">Entri jejak audit</caption>
+        <thead>
+          <tr>
+            <th scope="col">Waktu</th>
+            <th scope="col">Aktor</th>
+            <th scope="col">Aksi</th>
+            <th scope="col">Objek</th>
+            <th scope="col">Hash</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((x) => (
+            <tr key={x.id}>
+              <td>{fmtDateTime(x.at)}</td>
+              <td>{x.aktor}</td>
+              <td>{x.aksi}</td>
+              <td>{x.objek}</td>
+              <td>
+                <code>{shortHash(x.hash, 6)}</code>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function Audit() {
   const { session } = useSatgas();
   const [e, setE] = useState<{ entries: Entry[]; total: number } | null>(null);
@@ -51,55 +106,8 @@ export default function Audit() {
       </header>
       {err && <LoadError what="jejak audit" message={err} />}
       {!e && !err && <SkeletonTable label="Memuat jejak audit" rows={5} />}
-      {e && (
-        <p
-          className={`card integrity ${broken ? 'alert' : 'tint'}`}
-          role="status"
-          data-ok={!broken}
-        >
-          <b>{broken ? 'Rantai tidak utuh' : 'Rantai utuh'}</b>
-          <span>
-            {broken
-              ? 'Ada entri yang berubah. Periksa entri yang ditandai sebelum melanjutkan.'
-              : `Dihitung di peramban ini: ${e.entries.length} entri terakhir dari ${e.total} saling mengait tanpa putus.`}
-          </span>
-        </p>
-      )}
-      {e && (
-        <div
-          className="tablewrap card"
-          style={{ padding: 0, marginTop: '1rem' }}
-          role="region"
-          aria-label="Entri jejak audit"
-          tabIndex={0}
-        >
-          <table>
-            <caption className="sr">Entri jejak audit</caption>
-            <thead>
-              <tr>
-                <th scope="col">Waktu</th>
-                <th scope="col">Aktor</th>
-                <th scope="col">Aksi</th>
-                <th scope="col">Objek</th>
-                <th scope="col">Hash</th>
-              </tr>
-            </thead>
-            <tbody>
-              {e?.entries.map((x) => (
-                <tr key={x.id}>
-                  <td>{fmtDateTime(x.at)}</td>
-                  <td>{x.aktor}</td>
-                  <td>{x.aksi}</td>
-                  <td>{x.objek}</td>
-                  <td>
-                    <code>{shortHash(x.hash, 6)}</code>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {e && <RantaiAudit e={e} broken={broken} />}
+      {e && <TabelAudit entries={e.entries} />}
     </div>
   );
 }

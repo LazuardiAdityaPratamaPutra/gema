@@ -25,8 +25,15 @@ export function WaitingPanel({
         {waiting.map((w) => (
           <li key={w.id} className="row row-between">
             <span>
-              <strong>{w.requester ?? 'Anggota lain'}</strong> meminta membuka{' '}
-              <strong>{w.alias}</strong> ({fmtDateTime(w.requestedAt)}).
+              <strong>{w.requester ?? 'Anggota lain'}</strong>{' '}
+              {w.cabut ? (
+                <>meminta mematikan Empat Mata</>
+              ) : (
+                <>
+                  meminta membuka <strong>{w.alias}</strong>
+                </>
+              )}{' '}
+              ({fmtDateTime(w.requestedAt)}).
             </span>
             <button
               className="btn teal sm"

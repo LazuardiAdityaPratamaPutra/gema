@@ -47,6 +47,7 @@ export const DEMO_UNITS = [
   { id: 'u-fk', nama: 'Fakultas Kedokteran', tipe: 'Fakultas' as const },
   { id: 'u-pasca', nama: 'Program Pascasarjana', tipe: 'Unit kerja' as const },
   { id: 'u-bem', nama: 'Unit Kegiatan Mahasiswa', tipe: 'Unit kerja' as const },
+  { id: 'u-belum-tahu', nama: 'Tidak tahu atau belum yakin', tipe: 'Unit kerja' as const },
 ];
 
 export const DEMO_CHAT = `31/10/2026 21.14 - Pak Hendra: Revisi bab 3 belum saya terima. Besok jam 8 malam ke ruangan saya saja.

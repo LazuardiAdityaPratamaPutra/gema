@@ -5,6 +5,8 @@ import { generateHybridKeypair, wrapForSatgas } from '@gema/pq-kem';
 import { call, newAccount, setup, submitReport } from '../helpers';
 import { getDb } from '@/server/db';
 import { parseAkunAdmin, provisionAdmin } from '@/server/seed/admin';
+import { setPengirim, type Surel } from '@/server/notify';
+import { tick } from '@/server/logic';
 
 const INST = 'inst-upnjatim';
 const SANDI = 'sandi-ketua-yang-panjang';
@@ -149,6 +151,86 @@ describe('mode sungguhan: eskalasi menunggu kunci Ketua', () => {
     });
     expect(ok.status).toBe(201);
   }, 120_000);
+});
+
+describe('mode sungguhan: Empat Mata butuh dua akun panel', () => {
+  it('menolak aktivasi bila anggota panel kurang dari dua, menerimanya bila cukup', async () => {
+    const ketua = (await masuk('ketua@upnjatim.ac.id', SANDI)).data.token as string;
+    const db = await getDb();
+    const anggota = Object.values(db.members).find((m) => m.email === 'anggota@upnjatim.ac.id')!;
+
+    anggota.role = 'Auditor';
+    const tolak = await call('POST', 'satgas/panel', { token: ketua, body: { mode: '2dari3' } });
+    expect(tolak.status).toBe(409);
+    expect(tolak.data.error).toMatch(/dua akun panel/);
+    expect(db.institutions[INST].panel_mode).toBe('tunggal');
+
+    anggota.role = 'Anggota';
+    const ok = await call('POST', 'satgas/panel', { token: ketua, body: { mode: '2dari3' } });
+    expect(ok.status).toBe(200);
+    expect(ok.data.panelMode).toBe('2dari3');
+
+    const balik = await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    expect(balik.status).toBe(409);
+    const anggotaToken = (await masuk('anggota@upnjatim.ac.id', 'sandi-anggota-panjang')).data
+      .token as string;
+    const a = (await call('GET', 'satgas/approvals', { token: anggotaToken })).data.menungguKamu[0];
+    await call('POST', `satgas/approvals/${a.id}/approve`, { token: anggotaToken, body: {} });
+    const selesai = await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    expect(selesai.data.panelMode).toBe('tunggal');
+  });
+});
+
+describe('mode sungguhan: surel peringatan keterlambatan', () => {
+  it('mengirim surel tanpa alias ke Ketua (T1) dan Pimpinan (T2), sekali per kenaikan, dan tahan gagal kirim', async () => {
+    const db = await getDb();
+    const terkirim: Surel[] = [];
+    setPengirim(async (m) => {
+      terkirim.push(m);
+    });
+    // Pimpinan ditambahkan agar T2 punya penerima
+    db.members['m-pimpinan-uji'] = {
+      ...Object.values(db.members)[0],
+      id: 'm-pimpinan-uji',
+      email: 'rektor@upnjatim.ac.id',
+      nama: 'Pimpinan Uji',
+      role: 'Pimpinan',
+    };
+    const e = Object.values(db.escalations)[0];
+    e.status = 'Diterima' as typeof e.status;
+    e.tingkat_tangga = 0;
+    e.sla_due_at = Date.now() - 6 * 24 * 3600_000; // lewat 4 hari kerja: T1 dan T2
+    await tick(db);
+    expect(terkirim.map((m) => m.to).sort()).toEqual([
+      'ketua@upnjatim.ac.id',
+      'rektor@upnjatim.ac.id',
+    ]);
+    for (const m of terkirim) {
+      expect(m.text).not.toContain(e.alias);
+      expect(m.subject).toMatch(/melewati tenggat/);
+    }
+    // idempoten: tick berikutnya tidak mengirim ulang
+    await tick(db);
+    expect(terkirim).toHaveLength(2);
+
+    // pengirim rusak tidak menggagalkan tick dan tercatat di audit
+    e.tingkat_tangga = 0;
+    setPengirim(async () => {
+      throw new Error('smtp mati');
+    });
+    await expect(tick(db)).resolves.toBeTruthy();
+    expect(db.audit.some((a) => a.aksi.startsWith('email-tangga-gagal'))).toBe(true);
+    setPengirim(null);
+    delete db.members['m-pimpinan-uji'];
+  });
+
+  it('tanpa konfigurasi SMTP tidak ada yang dikirim', async () => {
+    const db = await getDb();
+    const e = Object.values(db.escalations)[0];
+    e.tingkat_tangga = 0;
+    await expect(tick(db)).resolves.toBeTruthy();
+    expect(db.audit.filter((a) => a.aksi === 'email-tangga-T1')).toHaveLength(1);
+  });
 });
 
 describe('parseAkunAdmin', () => {

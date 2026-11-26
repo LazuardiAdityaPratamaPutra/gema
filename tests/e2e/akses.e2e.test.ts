@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { b64u, randomBytes } from '@gema/crypto';
 import { wrapForSatgas } from '@gema/pq-kem';
-import { call, newAccount, setup, submitReport } from '../helpers';
+import { cabutEmpatMata, call, newAccount, setup, submitReport } from '../helpers';
 
 beforeAll(setup, 120_000);
 
@@ -120,7 +120,7 @@ describe('Empat Mata tidak bisa dilewati', () => {
     // pelapor lain tidak dapat mengunduh bukti orang
     const other = await newAccount();
     expect((await call('GET', `evidence/${evId}/blob`, { token: other.token })).status).toBe(403);
-    await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    await cabutEmpatMata(ketua, await login('Pimpinan'));
   }, 120_000);
 });
 

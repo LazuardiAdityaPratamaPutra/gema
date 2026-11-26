@@ -15,6 +15,41 @@ import { useScrolled } from './navbar/useScrolled';
 import { useSignOut } from './navbar/useSignOut';
 import { zoneOf } from './navbar/zone';
 
+/** Tautan utama di bilah desktop; tautan khusus lembar menu tidak ikut. */
+function NavLinks({
+  links,
+  active,
+}: {
+  links: ReturnType<typeof navModel>['links'];
+  active: (href: string) => boolean;
+}) {
+  return (
+    <nav className="nb-links" aria-label="Menu utama">
+      {links
+        .filter((l) => !l.sheetOnly)
+        .map((l) => (
+          <Link
+            key={l.href + l.label}
+            href={l.href}
+            aria-current={active(l.href) ? 'page' : undefined}
+          >
+            {l.label}
+          </Link>
+        ))}
+    </nav>
+  );
+}
+
+/** Peringatan saat koneksi putus; draf tetap aman di perangkat. */
+function PesanOffline() {
+  return (
+    <p className="nb-offline" role="status">
+      Koneksi terputus. Draf tetap tersimpan di perangkat ini. Mengunci laporan, eskalasi, dan
+      memuat data baru menunggu koneksi kembali.
+    </p>
+  );
+}
+
 export function Navbar() {
   const online = useOnline();
   const path = usePathname();
@@ -34,12 +69,7 @@ export function Navbar() {
 
   return (
     <header className="nb" ref={boxRef} data-open={open} data-scrolled={scrolled}>
-      {!online && (
-        <p className="nb-offline" role="status">
-          Koneksi terputus. Draf tetap tersimpan di perangkat ini. Mengunci laporan, eskalasi, dan
-          memuat data baru menunggu koneksi kembali.
-        </p>
-      )}
+      {!online && <PesanOffline />}
       <div className="nb-bar">
         <Link href={model.home} className="nb-brand" aria-label="Gema, ke halaman utama">
           <Echo size={30} />
@@ -47,17 +77,7 @@ export function Navbar() {
             <Wordmark height={30} />
           </span>
         </Link>
-        <nav className="nb-links" aria-label="Menu utama">
-          {links.map((l) => (
-            <Link
-              key={l.href + l.label}
-              href={l.href}
-              aria-current={active(l.href) ? 'page' : undefined}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        <NavLinks links={links} active={active} />
         <div className="nb-end">
           {cta && (
             <Link href={cta.href} className="nb-cta">
@@ -66,9 +86,14 @@ export function Navbar() {
               <span className="nb-cta-short">{cta.short}</span>
             </Link>
           )}
+          {model.kind === 'guest' && path !== '/masuk' && (
+            <Link href="/masuk" className="nb-ghost nb-signout">
+              Masuk
+            </Link>
+          )}
           {signOut && (
             <button type="button" className="nb-ghost nb-signout" onClick={signOut}>
-              Keluar sesi
+              Keluar akun
             </button>
           )}
           <QuickExitButton />

@@ -24,14 +24,14 @@ const subscribeLebar = (cb: () => void) => {
 const kLebar = () => window.matchMedia(LEBAR).matches;
 const sLebar = () => true;
 
-export default function Baru() {
+/** Semua keadaan wizard: isian, penyimpanan, langkah, dan daftar kampus. */
+function useBaru() {
   const lebar = useSyncExternalStore(subscribeLebar, kLebar, sLebar);
   const { session } = useReporter();
   const f = useDraftFields();
-  const { d, set, files, lostFiles } = f;
+  const { d } = f;
   const store = useDraftStorage(session, f);
   const w = useWizard(session, f, store);
-  const { step, last, headRef } = w;
 
   const insts = useInstitutions(
     (id) => f.setD((p) => (p.institutionId ? p : { ...p, institutionId: id })),
@@ -44,24 +44,18 @@ export default function Baru() {
     [d.kapan, d.dimana, d.saksi, d.dampak],
   );
   const normName = useMemo(() => normalizeName(d.nama), [d.nama]);
+  return { session, f, store, w, insts, inst, unit, filled, normName, lebar };
+}
 
-  if (!session)
-    return (
-      <div className="narrow">
-        <SkeletonPage label="Memeriksa sesi" />
-      </div>
-    );
+type Baru = ReturnType<typeof useBaru>;
 
+/** Langkah yang sedang tampil: siapa, apa yang terjadi, lalu tinjau. */
+function Langkah({ b }: { b: Baru }) {
+  const { f, w, insts, inst, unit, filled, normName, lebar } = b;
+  const { d, set, files, lostFiles } = f;
+  const { step, last, headRef } = w;
   return (
-    <div className="narrow">
-      <SaveBanner
-        step={step}
-        saveState={store.saveState}
-        lastSaved={store.lastSaved}
-        restoredAt={store.restoredAt}
-        lostFiles={lostFiles}
-        onRetry={() => void store.persist()}
-      />
+    <>
       {step === 0 && (
         <StepWho
           d={d}
@@ -105,16 +99,42 @@ export default function Baru() {
           onSkipLost={f.skipLost}
         />
       )}
+    </>
+  );
+}
+
+export default function Baru() {
+  const b = useBaru();
+  const { session, f, store, w, inst, unit } = b;
+  const { d, set, lostFiles } = f;
+  if (!session)
+    return (
+      <div className="narrow">
+        <SkeletonPage label="Memeriksa sesi" />
+      </div>
+    );
+
+  return (
+    <div className="narrow">
+      <SaveBanner
+        step={w.step}
+        saveState={store.saveState}
+        lastSaved={store.lastSaved}
+        restoredAt={store.restoredAt}
+        lostFiles={lostFiles}
+        onRetry={() => void store.persist()}
+      />
+      <Langkah b={b} />
       <StepNav
-        step={step}
-        last={last}
+        step={w.step}
+        last={w.last}
         busy={w.busy}
-        canNext={stepReady(d)[step]}
+        canNext={stepReady(d)[w.step]}
         fromReview={w.fromReview}
         hasLost={lostFiles.length > 0}
         blocked={!stepReady(d).every(Boolean)}
-        hint={missingHint(d, step)}
-        onBack={() => set('step', step - 1)}
+        hint={missingHint(d, w.step)}
+        onBack={() => set('step', w.step - 1)}
         onNext={w.next}
         onSend={() => void w.send(inst, unit)}
       />

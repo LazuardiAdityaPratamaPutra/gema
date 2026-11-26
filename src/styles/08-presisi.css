@@ -1,6 +1,6 @@
 /* Lapisan presisi: satu definisi per komponen, memakai token di 00-token.css.
    Sengaja tidak mengubah palet, font, pita warna, atau warna zona.
-   Dimuat setelah 07 (zona) dan sebelum 08 (utilitas), jadi menimpa sisa lapisan lama. */
+   Dimuat setelah 07 (zona) dan sebelum 09 (palet satu warna), jadi menimpa sisa lapisan lama. */
 
 /* ---------- Teks dan ukuran baca ---------- */
 

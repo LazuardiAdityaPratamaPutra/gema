@@ -18,7 +18,7 @@ export type InstitutionInfo = {
   }[];
 };
 
-export type EvidenceView = {
+type EvidenceView = {
   id: string;
   sha256: string;
   messageRoot: string | null;
@@ -69,6 +69,7 @@ export type ReportView = {
     sumber: string;
     escalatedAt: number;
     opened: boolean;
+    openedAt: number | null;
     sla: SlaView;
     events: { at: number; label: string; actor: string }[];
     ladder: { tingkat: number; at: number }[];

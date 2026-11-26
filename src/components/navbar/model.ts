@@ -30,7 +30,7 @@ export function isStaffView(
   return path.startsWith('/satgas') || (isShared(path) && !reporter);
 }
 
-const GUEST_CTA: Cta = { href: '/mulai', label: 'Buat brankas', short: 'Mulai' };
+const GUEST_CTA: Cta = { href: '/mulai', label: 'Mulai melapor', short: 'Mulai' };
 const REPORTER_CTA: Cta = { href: '/brankas/baru', label: 'Laporan baru', short: 'Lapor' };
 
 function modelFor(
@@ -53,7 +53,7 @@ function modelFor(
       kind: 'reporter',
       links: decoy ? [] : REPORTER,
       cta: decoy ? null : REPORTER_CTA,
-      who: decoy ? '' : 'Brankas aktif di perangkat ini',
+      who: decoy ? '' : 'Masuk di perangkat ini',
       home: '/brankas',
     };
   }

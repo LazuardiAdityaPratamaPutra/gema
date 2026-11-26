@@ -1,6 +1,6 @@
 /** Mode Empat Mata: dosir hanya terbuka bila anggota lain yang berbeda menyetujui. */
 import { beforeAll, describe, expect, it } from 'vitest';
-import { call, setup } from '../helpers';
+import { cabutEmpatMata, call, setup } from '../helpers';
 
 beforeAll(setup, 120_000);
 
@@ -85,10 +85,49 @@ describe('Mode Empat Mata', () => {
 
   it('mode tunggal tidak meminta persetujuan', async () => {
     const ketua = await login('Ketua');
-    await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    await cabutEmpatMata(ketua, await login('Pimpinan'));
     const cases = await call('GET', 'satgas/cases', { token: ketua });
     expect(
       (await call('GET', `satgas/cases/${cases.data.cases[0].id}`, { token: ketua })).status,
     ).toBe(200);
+  });
+
+  it('Ketua tidak bisa mematikan Empat Mata sendirian; butuh persetujuan anggota lain', async () => {
+    const ketua = await login('Ketua');
+    const pimpinan = await login('Pimpinan');
+    const anggota = await login('Anggota');
+    await call('POST', 'satgas/panel', { token: ketua, body: { mode: '2dari3' } });
+
+    const minta = await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    expect(minta.status).toBe(409);
+    expect(minta.data.error).toMatch(/persetujuan anggota panel lain/);
+    expect((await call('GET', 'satgas/me', { token: ketua })).data.institution.panelMode).toBe(
+      '2dari3',
+    );
+
+    // Ketua tidak bisa menyetujui permintaannya sendiri; Auditor/Pengawas tidak berwenang
+    const milikku = await call('GET', 'satgas/approvals', { token: ketua });
+    const mine = milikku.data.milikku.find((x: { cabut?: boolean }) => x.cabut);
+    expect(
+      (await call('POST', `satgas/approvals/${mine.id}/approve`, { token: ketua, body: {} }))
+        .status,
+    ).toBe(403);
+
+    // permintaan yang sama tidak menggandakan antrean
+    await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    const antre = await call('GET', 'satgas/approvals', { token: anggota });
+    expect(antre.data.menungguKamu.filter((x: { cabut?: boolean }) => x.cabut)).toHaveLength(1);
+
+    await call('POST', `satgas/approvals/${mine.id}/approve`, { token: pimpinan, body: {} });
+    const ok = await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } });
+    expect(ok.status).toBe(200);
+    expect(ok.data.panelMode).toBe('tunggal');
+
+    // izin sekali pakai: mematikan lagi setelah mengaktifkan ulang butuh persetujuan baru
+    await call('POST', 'satgas/panel', { token: ketua, body: { mode: '2dari3' } });
+    expect(
+      (await call('POST', 'satgas/panel', { token: ketua, body: { mode: 'tunggal' } })).status,
+    ).toBe(409);
+    await cabutEmpatMata(ketua, pimpinan);
   });
 });

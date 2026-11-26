@@ -1,18 +1,3 @@
-/*
-  Lapisan modern: kedalaman (gradasi halus, bayangan berlapis, kaca), navbar pil melayang.
-  Dimuat setelah 07h. Menghapus impornya di layout.tsx mengembalikan tema tonal polos.
-*/
-:root {
-  --sh-1:
-    0 1px 2px rgb(16 36 29 / 6%), 0 6px 16px rgb(16 36 29 / 6%), 0 18px 36px rgb(16 36 29 / 5%);
-  --sh-2:
-    0 2px 4px rgb(16 36 29 / 6%), 0 12px 28px rgb(16 36 29 / 10%), 0 32px 64px rgb(16 36 29 / 12%);
-  --pine-grad: linear-gradient(160deg, #137257 0%, #0e5a45 55%, #0a4636 100%);
-  --nb-gap: 0.7rem;
-  --btn-lg: 52px;
-  --btn-sm: 44px;
-}
-
 body {
   background: linear-gradient(180deg, var(--tn-0) 0%, #eef5f0 100%);
 }
@@ -75,7 +60,7 @@ body {
   display: inline-flex;
   align-items: center;
   height: 2.1rem;
-  padding: 0 1rem;
+  padding: 0 0.9rem;
   font-size: 0.92rem;
   font-weight: 600;
   color: var(--ink-2);
@@ -91,13 +76,6 @@ body {
   box-shadow:
     0 1px 2px rgb(16 36 29 / 10%),
     0 4px 10px rgb(16 36 29 / 8%);
-}
-
-@media (hover: hover) {
-  .nb-links a:not([aria-current='page']):hover {
-    background: rgb(255 255 255 / 60%);
-    color: var(--ink);
-  }
 }
 
 .nb-cta {
@@ -150,10 +128,6 @@ body {
   width: fit-content;
   max-width: calc(100% - 1.25rem);
   box-shadow: var(--sh-1);
-}
-
-html {
-  scroll-padding-top: calc(var(--nb-h) + 2.5rem);
 }
 
 /* beranda: pita hero naik ke belakang navbar melayang */
@@ -902,12 +876,13 @@ a:hover,
   }
 }
 
-/* ---------- navbar desktop: tiga kolom setara, menu tepat di tengah, kontrol sama tinggi ---------- */
+/* ---------- navbar desktop: menu di tengah ruang antara logo dan tombol, kontrol sama tinggi ---------- */
 @media (width >= 75em) {
   .nb-bar:has(.nb-links) {
     display: grid;
-    grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
-    gap: 0.6rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-content: start;
+    gap: 0.6rem 1rem;
   }
 
   .nb-bar:has(.nb-links) .nb-brand {
@@ -915,6 +890,7 @@ a:hover,
   }
 
   .nb-bar:has(.nb-links) .nb-links {
+    justify-self: center;
     margin-inline: 0;
   }
 

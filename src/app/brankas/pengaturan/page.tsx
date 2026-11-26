@@ -27,11 +27,21 @@ export default function Pengaturan() {
           Kembali ke Brankasmu
         </Link>
         <h1>Pengaturan keamanan</h1>
-        <p className="lede">
-          <Term k="kodePaksa">Kode Paksa</Term> dan pemulihan. Bila dipaksa membuka brankas,
-          masukkan kata sandi kedua. Brankas akan menampilkan isi tiruan yang kamu tentukan. Dari
-          luar, tidak ada tanda bahwa ada brankas lain.
-        </p>
+        <p className="lede">Tiga cara melindungi brankasmu. Semuanya opsional.</p>
+        <ul className="lede-list">
+          <li>
+            <Term k="kodePaksa">Kode Paksa</Term>: bila ada yang memaksamu membuka brankas, masukkan
+            kata sandi kedua. Yang tampil hanya isi tiruan buatanmu.
+          </li>
+          <li>
+            Passkey: masuk dengan PIN, sidik jari, atau wajah di perangkat ini, tanpa mengetik 6
+            kata.
+          </li>
+          <li>
+            Pemulihan: dua orang yang kamu percaya menyimpan bagian pemulihan, supaya kamu bisa
+            masuk lagi bila kehilangan kata sandi.
+          </li>
+        </ul>
       </header>
       {justRecovered && (
         <p className="card tint" role="status">

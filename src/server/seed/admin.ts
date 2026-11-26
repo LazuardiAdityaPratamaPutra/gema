@@ -13,7 +13,7 @@ import { uid } from '../util';
 import { RUJUKAN_UPN } from './institusi';
 import { checkPassword, hashPassword } from './password';
 
-export const INSTITUSI_SUNGGUHAN_ID = 'inst-upnjatim';
+const INSTITUSI_SUNGGUHAN_ID = 'inst-upnjatim';
 
 type AkunAdmin = { email: string; nama: string; role: SatgasRole; password: string };
 
@@ -21,36 +21,43 @@ const PERAN: readonly SatgasRole[] = ['Ketua', 'Anggota', 'Auditor', 'Pimpinan',
 const MIN_SANDI = 12;
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Membaca dan memeriksa `GEMA_SATGAS_AKUN`. Salah isi dilaporkan dengan jelas, bukan diam-diam diabaikan. */
-export function parseAkunAdmin(raw: string | undefined): AkunAdmin[] {
-  if (!raw || !raw.trim()) return [];
-  let data: unknown;
+function bacaJson(raw: string): unknown {
   try {
-    data = JSON.parse(raw);
+    return JSON.parse(raw);
   } catch {
     throw new Error('GEMA_SATGAS_AKUN bukan JSON yang valid.');
   }
+}
+
+const teks = (v: unknown) => (typeof v === 'string' ? v : '');
+
+/** Satu akun: isian dinormalkan lalu diperiksa; galat menyebut nomor akunnya. */
+function periksaAkun(x: unknown, nomor: number, dipakai: Set<string>): AkunAdmin {
+  const n = `Akun ke-${nomor} di GEMA_SATGAS_AKUN`;
+  const a = (x ?? {}) as Record<string, unknown>;
+  const email = teks(a.email).trim().toLowerCase();
+  const nama = teks(a.nama).trim();
+  const role = a.role as SatgasRole;
+  const password = teks(a.password);
+  if (!RE_EMAIL.test(email)) throw new Error(`${n}: email tidak valid.`);
+  if (dipakai.has(email)) throw new Error(`${n}: email ${email} dipakai dua kali.`);
+  if (!nama || nama.length > 80) throw new Error(`${n}: nama kosong atau lebih dari 80 huruf.`);
+  if (!PERAN.includes(role))
+    throw new Error(`${n}: role harus salah satu dari ${PERAN.join(', ')}.`);
+  if (password.length < MIN_SANDI)
+    throw new Error(`${n}: kata sandi minimal ${MIN_SANDI} karakter.`);
+  dipakai.add(email);
+  return { email, nama, role, password };
+}
+
+/** Membaca dan memeriksa `GEMA_SATGAS_AKUN`. Salah isi dilaporkan dengan jelas, bukan diam-diam diabaikan. */
+export function parseAkunAdmin(raw: string | undefined): AkunAdmin[] {
+  if (!raw || !raw.trim()) return [];
+  const data = bacaJson(raw);
   if (!Array.isArray(data) || data.length === 0)
     throw new Error('GEMA_SATGAS_AKUN harus berupa daftar akun yang tidak kosong.');
-  const hasil: AkunAdmin[] = [];
   const dipakai = new Set<string>();
-  for (const [i, x] of data.entries()) {
-    const n = `Akun ke-${i + 1} di GEMA_SATGAS_AKUN`;
-    const a = (x ?? {}) as Record<string, unknown>;
-    const email = typeof a.email === 'string' ? a.email.trim().toLowerCase() : '';
-    const nama = typeof a.nama === 'string' ? a.nama.trim() : '';
-    const role = a.role as SatgasRole;
-    const password = typeof a.password === 'string' ? a.password : '';
-    if (!RE_EMAIL.test(email)) throw new Error(`${n}: email tidak valid.`);
-    if (dipakai.has(email)) throw new Error(`${n}: email ${email} dipakai dua kali.`);
-    if (!nama || nama.length > 80) throw new Error(`${n}: nama kosong atau lebih dari 80 huruf.`);
-    if (!PERAN.includes(role))
-      throw new Error(`${n}: role harus salah satu dari ${PERAN.join(', ')}.`);
-    if (password.length < MIN_SANDI)
-      throw new Error(`${n}: kata sandi minimal ${MIN_SANDI} karakter.`);
-    dipakai.add(email);
-    hasil.push({ email, nama, role, password });
-  }
+  const hasil = data.map((x, i) => periksaAkun(x, i + 1, dipakai));
   if (!hasil.some((h) => h.role === 'Ketua'))
     throw new Error('GEMA_SATGAS_AKUN harus memuat minimal satu akun Ketua.');
   return hasil;

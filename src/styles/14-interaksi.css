@@ -41,8 +41,12 @@
 .sk-page {
   display: grid;
   gap: 0.9rem;
+  align-content: start;
   padding-block: 2rem;
   max-width: 44rem;
+
+  /* setinggi layar: footer tidak terlihat sampai isi asli menggantikan kerangka, jadi tidak ada lompatan */
+  min-height: 100svh;
 }
 
 .sk-rows {

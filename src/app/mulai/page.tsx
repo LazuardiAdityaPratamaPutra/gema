@@ -14,13 +14,16 @@ export default function Mulai() {
         <Ilustrasi motif="brankas" />
         <h1>Kode dan kata sandimu</h1>
         <p className="lede">
-          Ini satu-satunya kunci brankasmu. Dibuat di perangkat ini, tidak dikirim ke mana pun dalam
-          bentuk asli. Bila hilang, kami tidak bisa memulihkannya. Kamu bisa menyiapkan pemulihan
-          lewat dua orang tepercaya di Pengaturan setelah masuk.
+          Ini satu-satunya cara masuk ke brankasmu. Simpan sekarang, karena bila hilang kami tidak
+          bisa memulihkannya. Keduanya dibuat di perangkat ini dan tidak dikirim ke mana pun.
         </p>
       </header>
       <CredentialCard cred={cred} />
       <CredentialActions cred={cred} />
+      <p className="small muted">
+        Cara menyimpannya: unduh kartu cetak, atau tulis di kertas yang hanya kamu tahu tempatnya.
+        Tanpa keduanya kamu tidak bisa masuk lagi ke brankasmu.
+      </p>
 
       <label className="check mt-lg">
         <input type="checkbox" checked={saved} onChange={(e) => setSaved(e.target.checked)} />
@@ -37,7 +40,8 @@ export default function Mulai() {
       <p className="small muted mulai-next">
         Berikutnya: tiga langkah singkat untuk menulis laporan (siapa dan di mana, kejadian dan
         bukti, tinjau dan kunci). Isianmu disimpan sebagai draf di perangkat ini, jadi boleh
-        berhenti kapan saja.
+        berhenti kapan saja. Pemulihan lewat dua orang tepercaya bisa kamu siapkan di Pengaturan
+        setelah masuk.
       </p>
       <button
         className="btn teal"

@@ -143,6 +143,8 @@ export type Escalation = {
   /** anggota Satgas yang bertanggung jawab atas kasus (ditetapkan Ketua); null = belum ditugaskan */
   assignee_id?: string | null;
   assigned_at?: number | null;
+  /** anggota Satgas yang menyatakan konflik kepentingan; mereka tidak lagi bisa membuka atau menindak kasus ini */
+  mundur?: string[];
 };
 
 type CaseEvent = {
@@ -259,5 +261,5 @@ export type DB = {
   approvals: Approval[];
   runtime: Runtime;
   clock: { demoOffsetMs: number };
-  meta: { seededAt: number; contoh?: boolean; adminDiperbarui?: number };
+  meta: { seededAt: number; contoh?: boolean; adminDiperbarui?: number; cronTerakhir?: number };
 };

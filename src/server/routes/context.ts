@@ -18,7 +18,7 @@ export const json = (data: unknown, status = 200) =>
     headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' },
   });
 
-export async function body<T = Record<string, unknown>>(req: Request): Promise<T> {
+async function body<T = Record<string, unknown>>(req: Request): Promise<T> {
   try {
     return (await req.json()) as T;
   } catch {

@@ -16,12 +16,15 @@ export type Case = {
   unit?: string;
   cluster?: { total: number; tereskalasi: number; tersegel: number };
   opened?: boolean;
+  /** sesi ini sudah mundur dari kasus ini karena konflik kepentingan */
+  mundur?: boolean;
 };
 export type Waiting = {
   id: string;
   alias: string;
   requester: string | null;
   requestedAt: number;
+  cabut?: boolean;
 }[];
 export type Ladder = {
   alias: string;

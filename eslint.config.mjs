@@ -28,4 +28,14 @@ export default defineConfig([
       'prefer-const': 'error',
     },
   },
+  {
+    // Ambang keterbacaan: fungsi yang melewatinya dipecah, bukan ambangnya dinaikkan.
+    files: ['src/**/*.{ts,tsx}', 'packages/**/*.ts'],
+    rules: {
+      complexity: ['error', 12],
+      'max-lines-per-function': ['error', { max: 80, skipComments: true, skipBlankLines: true }],
+      'max-params': ['error', 6],
+      'max-depth': ['error', 4],
+    },
+  },
 ]);

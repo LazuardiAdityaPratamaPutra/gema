@@ -4,10 +4,13 @@ import { api } from '@/lib/api';
 import type { SatgasSession } from '@/lib/store';
 
 /** Satgas memastikan orang yang mengaku pelapor benar-benar pemilik laporan, tanpa tahu siapa dia. */
-export function OwnerProofSatgas({ session, caseId }: { session: SatgasSession; caseId: string }) {
+type Hasil = { valid: boolean; reason: string | null };
+
+/** Keadaan dan aksi pemeriksaan: buat tantangan, lalu periksa bukti yang dibalas pelapor. */
+function usePemeriksaan(session: SatgasSession, caseId: string) {
   const [challenge, setChallenge] = useState('');
   const [proof, setProof] = useState('');
-  const [result, setResult] = useState<{ valid: boolean; reason: string | null } | null>(null);
+  const [result, setResult] = useState<Hasil | null>(null);
   const [err, setErr] = useState('');
 
   async function ask() {
@@ -36,7 +39,12 @@ export function OwnerProofSatgas({ session, caseId }: { session: SatgasSession; 
       setErr(e instanceof Error ? e.message : 'Gagal memeriksa bukti.');
     }
   }
+  return { challenge, proof, setProof, result, err, ask, check };
+}
 
+/** Satgas memastikan orang yang mengaku pelapor benar-benar pemilik laporan, tanpa tahu siapa dia. */
+export function OwnerProofSatgas({ session, caseId }: { session: SatgasSession; caseId: string }) {
+  const { challenge, proof, setProof, result, err, ask, check } = usePemeriksaan(session, caseId);
   return (
     <section className="card my-lg" aria-labelledby="bp">
       <h2 className="title-sm" id="bp">

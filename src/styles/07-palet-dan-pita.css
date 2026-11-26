@@ -200,34 +200,3 @@ main table:not(.keep) tbody th::before {
 .ph-row {
   align-items: flex-end;
 }
-
-/* parallax hero: hanya transform, digerakkan scroll di compositor (tanpa JS) */
-
-.orb {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    @keyframes drift-slow {
-      to {
-        transform: translate3d(0, 110px, 0);
-      }
-    }
-
-    @keyframes drift-fast {
-      to {
-        transform: translate3d(0, -70px, 0);
-      }
-    }
-
-    @keyframes drift-card {
-      to {
-        transform: translate3d(0, 36px, 0);
-      }
-    }
-  }
-}

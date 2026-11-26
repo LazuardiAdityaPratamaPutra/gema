@@ -310,10 +310,6 @@
   }
 }
 
-html {
-  --zone: #e7e8e3;
-}
-
 /* header halaman: satu bidang warna per zona + motif gema (gelombang) */
 .ph {
   position: relative;

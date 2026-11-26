@@ -10,7 +10,10 @@ export const cron: Handler = async ({ method, seg: [a, b], req, db }) => {
 
   if (b === 'tick') {
     requireCronSecret(req, false);
-    return json(await tick(db));
+    db.meta.cronTerakhir = Date.now();
+    const hasil = await tick(db);
+    persist(db);
+    return json(hasil);
   }
 
   if (b === 'commit-ref' && method === 'POST') {
