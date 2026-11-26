@@ -25,6 +25,9 @@ CSS Gema ada di `src/styles/`, dimuat berurutan oleh `src/app/layout.tsx`. **Uru
 2. Jangan menulis ulang selektor yang sudah ada di berkas lain. Ubah aturan aslinya.
 3. Warna, ukuran huruf, dan jarak memakai token dari `00-token.css`.
 4. `!important` hanya di `13-utilitas`, di blok `prefers-reduced-motion`, dan di blok `forced-colors`.
+5. Animasi hanya memakai `transform` dan `opacity`. Mengubah `width`, `height`, atau `left` memicu layout; jalur pemilih peran di beranda diisi dengan `scaleX`/`scaleY` untuk itu. Satu pengecualian yang disengaja: takik panel peran bergeser lewat `left`, karena posisinya persen dari wadah dan tidak bisa dinyatakan dengan `transform`.
+6. Warna hijau dan madu memakai `--aksen` dan `--madu`. Untuk warna berlapis alfa dari token, pakai `color-mix(in srgb, var(--token) N%, transparent)`.
+7. Tekstur kertas pada amplop cek berkas adalah SVG kecil di variabel `--kertas` (data URI, diizinkan oleh `img-src data:` di `src/proxy.ts`). Jangan memindahkannya ke berkas terpisah tanpa alasan: itu menambah satu permintaan jaringan.
 
 ## Penjaga otomatis
 

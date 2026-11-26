@@ -93,19 +93,6 @@ a.card:hover {
   background: var(--tint);
 }
 
-.tab .dot {
-  background: var(--tint-2);
-}
-
-.tab[aria-selected='true'] .dot {
-  background: var(--ink);
-}
-
-.pts li {
-  border-left: 0;
-  padding-left: 0;
-}
-
 .band-clock {
   clip-path: none;
   padding-top: 0;
@@ -121,23 +108,6 @@ a.card:hover {
 }
 
 /* poin panel: titik terisi menggantikan garis vertikal */
-.panel .pts li {
-  position: relative;
-  padding-left: 1.2rem;
-  border-left: 0;
-}
-
-.panel .pts li::before {
-  content: '';
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0.62em;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--ink);
-}
 
 /* pita jam: teks terang di navy; kartu kalender tetap gelap di atas putih */
 
@@ -147,23 +117,6 @@ a.card:hover {
 
 .band-clock .lamps li[data-on='true'] .lp {
   border-color: #fff;
-}
-
-.panel .btn.ghost {
-  background: var(--soft);
-  border: 0;
-}
-
-@media (hover: hover) {
-  .panel .btn.teal:hover:not([disabled]) {
-    background: var(--aksen-hover);
-    color: var(--ink);
-  }
-
-  .panel .btn.ghost:hover:not([disabled]) {
-    background: var(--soft-hover);
-    color: var(--ink);
-  }
 }
 
 /* ---------- tabel: baris bergantian dan kepala berwarna, bukan garis ---------- */
@@ -223,11 +176,6 @@ label.choice:has(input:checked) {
 label.drop {
   border: 0;
   background: var(--tint);
-}
-
-.tab,
-.tabs {
-  border-bottom: 0;
 }
 
 .sbar {

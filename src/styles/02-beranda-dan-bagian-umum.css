@@ -1,103 +1,6 @@
 /* Beranda, kepala halaman, tabel mobile, wizard, kaki halaman */
 /* beranda */
 
-.chooser {
-  --c: var(--c-penyintas);
-  grid-template-columns: minmax(230px, 300px) 1fr;
-  transition: --c 200ms;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: column;
-}
-
-.tab {
-  text-align: left;
-  padding: 1.15rem 1.3rem;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  font: 700 1.02rem/1.25 var(--sans);
-  color: var(--ink);
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-  min-height: 64px;
-  transition: background-color 160ms;
-}
-
-.tab:last-child {
-  border-bottom: 0;
-}
-
-.tab .dot {
-  border-radius: 50%;
-  flex: none;
-}
-
-.tab[aria-selected='true'] {
-  margin-right: -1.5px;
-}
-
-@media (hover: hover) {
-  .tab[aria-selected='false']:hover {
-    background: var(--paper-2);
-  }
-}
-
-.panel {
-  background: var(--c);
-  padding: clamp(1.4rem, 3.4vw, 2.8rem);
-  transition: background-color 220ms var(--ease-out);
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-  min-height: 22rem;
-}
-
-.panel h2 {
-  margin: 0;
-  font-size: clamp(1.8rem, 3vw + 0.5rem, 2.9rem);
-  max-width: 16ch;
-}
-
-.panel ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.8rem;
-  max-width: 54ch;
-  counter-reset: p;
-}
-
-.panel li {
-  display: grid;
-  grid-template-columns: 2rem 1fr;
-}
-
-.panel li::before {
-  counter-increment: p;
-  content: counter(p);
-  font: 700 0.8rem var(--mono);
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  border: 1.5px solid var(--ink);
-  display: grid;
-  place-items: center;
-  margin-top: 0.15rem;
-}
-
-.panel .row {
-  margin-top: auto;
-}
-
-.panel-in {
-  animation: fadeUp 260ms var(--ease-out) both;
-}
-
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -107,24 +10,6 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@media (width <= 50em) {
-  .chooser {
-    grid-template-columns: 1fr;
-  }
-
-  .tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .tab[aria-selected='true'] {
-    margin-right: 0;
-  }
-
-  .panel {
-    min-height: 0;
   }
 }
 
@@ -235,6 +120,19 @@
   background: none;
 }
 
+/* cincin fokus mengikuti bentuk penggeser dan hanya muncul untuk keyboard; klik mouse tidak meninggalkan kotak */
+.slider:focus {
+  outline: none;
+  box-shadow: none;
+  background: none;
+}
+
+.slider:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
 .lamps {
   list-style: none;
   margin: 1.2rem 0 0;
@@ -303,10 +201,6 @@
   .wave i {
     animation: none;
     transform: scaleY(0.7);
-  }
-
-  .panel-in {
-    animation: none;
   }
 }
 
@@ -616,33 +510,6 @@ td {
 }
 
 /* pemilih peran di mobile: kisi 2x2, label utuh */
-@media (width <= 50em) {
-  .tabs {
-    flex-direction: row;
-    scrollbar-width: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow: visible;
-  }
-
-  .tab {
-    white-space: normal;
-    flex: initial;
-    border-right: 1px solid var(--line);
-    min-height: 60px;
-    font-size: 0.92rem;
-    padding: 0.75rem 0.85rem;
-    align-items: center;
-  }
-
-  .tab:nth-child(2n) {
-    border-right: 0;
-  }
-
-  .tab:nth-child(n + 3) {
-    border-bottom: 0;
-  }
-}
 
 /* langkah wizard berlabel */
 .wsteps {
@@ -776,5 +643,374 @@ td {
 @media (prefers-reduced-motion: reduce) {
   body::after {
     transition: none;
+  }
+}
+
+/* ---------- beranda: pemilih peran. Satu jalur kasus, empat tempat berdiri ---------- */
+.peran {
+  --garis: #9db8aa;
+}
+
+.peran-jalur {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* jalur dari penyimpanan sampai pemantauan; bagian yang sudah dilalui diisi warna aksen */
+.peran-jalur::before,
+.peran-jalur::after {
+  content: '';
+  position: absolute;
+  top: 0.8rem;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.peran-jalur::before {
+  background: var(--garis);
+}
+
+/* diisi lewat skala (bukan lebar) agar animasinya tidak memicu layout */
+.peran-jalur::after {
+  background: var(--aksen);
+  transform-origin: 0 50%;
+  transform: scaleX(calc(var(--k) / 3));
+  transition: transform 320ms var(--ease-out);
+}
+
+.peran-titik {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0 0.4rem 0.2rem;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ink);
+  text-align: center;
+  cursor: pointer;
+}
+
+.peran-node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.peran-node::before {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid var(--garis);
+  background: var(--paper);
+  transition:
+    transform 260ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out);
+}
+
+.peran-titik[data-lalu='true'] .peran-node::before {
+  border-color: var(--aksen);
+  background: var(--aksen);
+}
+
+.peran-titik[aria-selected='true'] .peran-node::before {
+  transform: scale(1.5);
+  border-color: var(--aksen);
+  background: var(--c);
+  box-shadow: 0 0 0 4px var(--paper);
+}
+
+.peran-titik b {
+  font-size: 1.02rem;
+  line-height: 1.25;
+}
+
+.peran-titik small {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.peran-titik[aria-selected='true'] b {
+  color: var(--aksen);
+}
+
+.peran-titik:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .peran-titik[aria-selected='false']:hover b {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.peran-isi {
+  position: relative;
+  margin-top: 2.2rem;
+  padding: clamp(1.5rem, 3.5vw, 2.8rem);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--sh-1);
+}
+
+/* takik kecil menunjuk titik yang sedang dipilih */
+.peran-isi::before {
+  content: '';
+  position: absolute;
+  top: -0.6rem;
+  left: calc((var(--k) + 0.5) * 25%);
+  width: 1.1rem;
+  height: 1.1rem;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: #fff;
+  transform: translateX(-50%) rotate(45deg);
+  transition: left 320ms var(--ease-out);
+}
+
+.peran-masuk {
+  display: grid;
+  gap: 1.4rem 3.5rem;
+  animation: fadeUp 240ms var(--ease-out);
+}
+
+.peran-masuk h2 {
+  font-size: clamp(1.9rem, 3.4vw, 2.8rem);
+  line-height: 1.1;
+  max-width: 14ch;
+}
+
+.peran-poin {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.peran-poin li {
+  position: relative;
+  padding: 0.95rem 0 0.95rem 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.peran-poin li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.peran-poin li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.65rem;
+  width: 0.7rem;
+  height: 2px;
+  background: var(--aksen);
+}
+
+.peran-poin li:first-child::before {
+  top: 0.8rem;
+}
+
+.peran-badan .row {
+  margin-top: 1.4rem;
+}
+
+@media (width >= 62em) {
+  .peran-masuk {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: center;
+  }
+}
+
+/* layar sempit: jalur menjadi daftar tegak, dan takik tidak dipakai */
+@media (width < 62em) {
+  .peran-jalur {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 1fr;
+  }
+
+  .peran-jalur::before,
+  .peran-jalur::after {
+    inset: 1.6rem auto 1.6rem 0.75rem;
+    width: 2px;
+    height: auto;
+  }
+
+  .peran-jalur::after {
+    transform-origin: 50% 0;
+    transform: scaleY(calc(var(--k) / 3));
+  }
+
+  .peran-titik {
+    grid-template-columns: 1.6rem 1fr;
+    place-items: center start;
+    column-gap: 0.9rem;
+    padding: 0.35rem 0.3rem;
+    text-align: left;
+  }
+
+  .peran-node {
+    grid-row: 1 / span 2;
+  }
+
+  .peran-isi {
+    margin-top: 1.2rem;
+  }
+
+  .peran-isi::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peran-jalur::after,
+  .peran-node::before,
+  .peran-isi::before {
+    transition: none;
+  }
+
+  .peran-masuk {
+    animation: none;
+  }
+}
+
+/* ---------- beranda: tiga keputusan pelapor, dengan rel yang menautkan ketiganya ---------- */
+.t-pilih {
+  --rel: rgb(255 255 255 / 28%);
+
+  list-style: none;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  max-width: 34rem;
+}
+
+.t-pilih li {
+  position: relative;
+  padding-left: 2.1rem;
+}
+
+.t-pilih li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 2px solid var(--rel);
+  background: transparent;
+}
+
+.t-pilih li:first-child::before {
+  border-color: var(--madu);
+  background: var(--madu);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--madu) 22%, transparent);
+}
+
+.t-pilih li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 1.6rem;
+  bottom: -1.3rem;
+  width: 2px;
+  background: var(--rel);
+}
+
+.t-pilih b {
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.t-pilih span {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 86%);
+}
+
+/* ---------- beranda: cek berkas. Amplop di kiri, tiga langkah di kanan agar tidak sepola dengan bagian lain ---------- */
+.v-alur {
+  list-style: none;
+  counter-reset: v;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.3rem;
+}
+
+.v-alur li {
+  position: relative;
+  counter-increment: v;
+  padding-left: 3.2rem;
+}
+
+.v-alur li::before {
+  content: counter(v);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: #f2f8f4;
+  color: var(--aksen);
+  font: 700 1rem/1 var(--mono);
+}
+
+.v-alur li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 1.05rem;
+  top: 2.4rem;
+  bottom: -1.1rem;
+  width: 2px;
+  background: rgb(255 255 255 / 30%);
+}
+
+.v-alur b {
+  display: block;
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.v-alur span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 84%);
+}
+
+@media (width > 53.75em) {
+  .verify .v-wrap {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .verify .v-copy {
+    order: 2;
   }
 }

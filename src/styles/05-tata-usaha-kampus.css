@@ -60,13 +60,11 @@ th.rowhead {
     color: #fff;
   }
 
-  .btn.teal:hover:not([disabled]),
-  .panel .btn.teal:hover:not([disabled]) {
+  .btn.teal:hover:not([disabled]) {
     border-color: var(--pen-dark);
   }
 
-  .btn.ghost:hover:not([disabled]),
-  .panel .btn.ghost:hover:not([disabled]) {
+  .btn.ghost:hover:not([disabled]) {
     border-color: var(--ink);
   }
 }
@@ -241,43 +239,6 @@ html[data-zone='demo'] .ph {
 }
 
 /* peran: daftar biasa, tanpa nomor */
-.chooser {
-  border: 0;
-}
-
-.tabs {
-  border-right: 0;
-  background: var(--card);
-}
-
-.tab {
-  border-bottom-color: var(--line);
-}
-
-.tab .dot {
-  border: 0;
-  width: 12px;
-  height: 12px;
-}
-
-.panel .pts {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.7rem;
-  max-width: 54ch;
-}
-
-.panel .pts li {
-  display: block;
-}
-
-@media (width <= 50em) {
-  .tab {
-    border-right-color: var(--line);
-  }
-}
 
 /* amplop cokelat untuk pemeriksa bukti */
 
@@ -679,10 +640,6 @@ details.fold > summary span {
 .timeline li::before {
   background: var(--lime);
   border-color: var(--ink);
-}
-
-.tab[aria-selected='true'] {
-  background: var(--dc);
 }
 
 .mic.rec {

@@ -103,6 +103,16 @@ function Verdict({ res }: { res: R | null }) {
   );
 }
 
+/** Urutan kerja cek berkas, dari amplop sampai hasil. */
+const LANGKAH = [
+  { judul: 'Taruh berkasnya di amplop', isi: 'Tidak perlu akun.' },
+  { judul: 'Sidiknya dihitung di perangkatmu', isi: 'Berkasnya tidak dikirim ke mana pun.' },
+  {
+    judul: 'Dicocokkan dengan catatan Gema',
+    isi: 'Kamu langsung tahu berkas itu masih sama atau sudah berbeda.',
+  },
+] as const;
+
 /** Periksa keutuhan berkas langsung dari beranda: sidik dihitung di perangkat, berkas tidak dikirim. */
 export function EvidenceCheck() {
   const [res, setRes] = useState<R | null>(null);
@@ -121,13 +131,17 @@ export function EvidenceCheck() {
         quality={60}
         className="t-bg"
       />
-      <div className="wrap">
-        <div>
+      <div className="wrap v-wrap">
+        <div className="v-copy">
           <Words as="h2" id="cek" text="Ada yang bilang buktimu diedit?" />
-          <p>
-            Masukkan berkasnya ke amplop ini. Sidiknya dihitung di perangkatmu lalu dicocokkan
-            dengan catatan Gema. Berkasnya tidak dikirim ke mana pun, dan tidak perlu akun.
-          </p>
+          <ol className="v-alur">
+            {LANGKAH.map((l) => (
+              <li key={l.judul}>
+                <b>{l.judul}</b>
+                <span>{l.isi}</span>
+              </li>
+            ))}
+          </ol>
         </div>
         <div>
           <Envelope onFile={(f) => void check(f)} />
