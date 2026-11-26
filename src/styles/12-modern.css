@@ -175,27 +175,6 @@ details.fold {
   background: radial-gradient(closest-side, rgb(242 163 58 / 26%), transparent 72%);
 }
 
-.chooser .panel {
-  background: linear-gradient(145deg, #fff 0%, var(--tn-1) 100%);
-  box-shadow: var(--sh-1);
-  border-radius: 20px;
-}
-
-.chooser .tab {
-  background: #fff;
-  box-shadow:
-    0 1px 2px rgb(16 36 29 / 6%),
-    0 4px 10px rgb(16 36 29 / 5%);
-  border-radius: 12px;
-}
-
-.chooser .tab[aria-selected='true'] {
-  background: var(--pine-grad);
-  box-shadow:
-    0 2px 4px rgb(10 70 54 / 25%),
-    0 10px 20px rgb(14 90 69 / 24%);
-}
-
 /* ---------- tombol utama ---------- */
 .btn.teal,
 .btn:not(.ghost, .danger, .teal):not(.nb-cta) {
@@ -233,13 +212,73 @@ form .btn.ghost,
 }
 
 .verify .drop.envelope {
-  box-shadow: 0 24px 60px rgb(0 0 0 / 28%);
-  background-color: #f2f8f4;
+  --kertas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .2 0 0 0 0 .15 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  overflow: visible;
+  margin-top: 5.6rem;
+  min-height: 15rem;
+  padding-top: 3.4rem;
+  background-color: #a9c7b6;
+  background-image: linear-gradient(180deg, #8fb3a0 0%, #b4d0bf 40%);
   border-radius: 22px;
+  box-shadow: 0 28px 56px rgb(0 0 0 / 34%);
   transition:
     transform 240ms var(--ease-out),
-    box-shadow 240ms var(--ease-out),
-    background-color 240ms var(--ease-out);
+    box-shadow 240ms var(--ease-out);
+}
+
+/* lembar berkas yang menyembul dari mulut amplop */
+.verify .drop.envelope::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 15%;
+  right: 15%;
+  top: -3.1rem;
+  height: 9rem;
+  border-radius: 6px 6px 0 0;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 1.05rem, rgb(14 90 69 / 16%) 1.05rem 1.12rem)
+      0.9rem 1.6rem / calc(100% - 1.8rem) 4.4rem no-repeat,
+    linear-gradient(180deg, #fff 0%, #f1f6f3 100%);
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 70%),
+    0 6px 14px rgb(0 0 0 / 22%);
+  transition: transform 260ms var(--ease-out);
+}
+
+/* sisi depan amplop: kertas dengan lipatan V dan serat halus, menutup bagian bawah lembar */
+.verify .drop.envelope::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 2.3rem 0 0;
+  border-radius: 4px 4px 22px 22px;
+  background:
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        rgb(14 70 52 / 22%) 50%,
+        transparent calc(50% + 1px)
+      )
+      0 100% / 50% 66% no-repeat,
+    linear-gradient(
+        to top left,
+        transparent calc(50% - 1px),
+        rgb(14 70 52 / 22%) 50%,
+        transparent calc(50% + 1px)
+      )
+      100% 100% / 50% 66% no-repeat,
+    linear-gradient(to top right, rgb(14 70 52 / 6%) 50%, transparent 50%) 0 100% / 50% 66%
+      no-repeat,
+    linear-gradient(to top left, rgb(14 70 52 / 6%) 50%, transparent 50%) 100% 100% / 50% 66%
+      no-repeat,
+    var(--kertas) 0 0 / 140px 140px,
+    linear-gradient(180deg, #f8fcf9 0%, #e6f0ea 100%);
+  box-shadow:
+    0 -10px 14px -8px rgb(0 0 0 / 28%),
+    inset 0 1px 0 #fff;
+  pointer-events: none;
 }
 
 .band-clock {
@@ -432,8 +471,7 @@ form .btn.ghost,
 /* kelompok tombol: jarak sama di semua tempat */
 .hero-cta,
 .next-acts,
-.acts,
-.chooser .panel .row {
+.acts {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
@@ -456,7 +494,6 @@ form .btn.ghost,
     inset: -10% 0;
   }
 
-  .chooser .panel .btn,
   .t-closer .next-acts .btn {
     flex: 1 1 100%;
     width: 100%;
@@ -492,6 +529,54 @@ form .btn.ghost,
 .t-proof-band .t-proof-copy p,
 .t-proof-band .t-cap {
   color: #fff;
+}
+
+/* sertifikat: dua lembar kertas lain di belakangnya, bingkai resmi, dan pita hijau di tepi atas */
+.t-proof-band .t-fig .rc-folder {
+  position: relative;
+  isolation: isolate;
+}
+
+.t-proof-band .t-fig .rc-folder::before,
+.t-proof-band .t-fig .rc-folder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgb(0 0 0 / 32%);
+}
+
+.t-proof-band .t-fig .rc-folder::before {
+  transform: translate(0.9rem, 0.8rem);
+  background: linear-gradient(180deg, #f0e9d8 0%, #e4dcc6 100%);
+}
+
+.t-proof-band .t-fig .rc-folder::after {
+  transform: translate(1.8rem, 1.6rem);
+  background: linear-gradient(180deg, #d8cfb6 0%, #c9bfa2 100%);
+}
+
+.t-proof-band .t-fig .receipt {
+  border-top: 6px solid var(--aksen);
+  background: linear-gradient(180deg, #fff 0%, #f6f8f3 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 80%) inset,
+    0 18px 36px rgb(0 0 0 / 34%);
+}
+
+.t-proof-band .t-fig .receipt::before {
+  content: '';
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--aksen) 24%, transparent);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+/* keterangan di bawah sertifikat diberi jarak agar tidak tertimpa lembar belakang */
+.t-proof-band .t-cap {
+  margin-top: 2.3rem;
 }
 
 .verify .t-bg {
@@ -681,7 +766,6 @@ html .ph-foto .sbar b {
   .nb-qx,
   .nb-burger,
   .pw-toggle,
-  .chooser .tab,
   .card,
   .receipt,
   .cal,
@@ -695,11 +779,6 @@ html .ph-foto .sbar b {
 
   .btn[disabled] {
     border-color: GrayText !important;
-  }
-
-  .chooser .tab[aria-selected='true'] {
-    border-color: Highlight;
-    outline: 2px solid Highlight;
   }
 
   .t-hero::after,
@@ -813,11 +892,18 @@ main a:not([class]):hover,
 /* ---------- amplop cek berkas: hover dan seret tetap terbaca ---------- */
 .verify .drop.envelope:hover,
 .verify .drop.envelope[data-over='true'] {
-  background-color: #fff;
   box-shadow:
     0 0 0 4px rgb(255 225 74 / 85%),
-    0 28px 64px rgb(0 0 0 / 32%);
+    0 32px 64px rgb(0 0 0 / 38%);
   transform: translateY(-3px);
+}
+
+.verify .drop.envelope:hover::before {
+  transform: translateY(-0.7rem);
+}
+
+.verify .drop.envelope[data-over='true']::before {
+  transform: translateY(1rem);
 }
 
 .verify .drop.envelope .env-text,
@@ -826,6 +912,8 @@ main a:not([class]):hover,
 }
 
 .verify .drop.envelope .env-text {
+  position: relative;
+  z-index: 3;
   font-size: 1.5rem;
 }
 
@@ -836,15 +924,23 @@ main a:not([class]):hover,
 }
 
 .verify .drop.envelope .env-flap {
-  background: #cfe3d7;
-  transition:
-    transform 240ms var(--ease-out),
-    background-color 240ms var(--ease-out);
+  inset: auto 0 100%;
+  height: 5.4rem;
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  background:
+    repeating-linear-gradient(45deg, rgb(14 90 69 / 14%) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, rgb(14 90 69 / 14%) 0 5px, transparent 5px 10px),
+    linear-gradient(180deg, #7ea892 0%, #9cc0ac 100%);
+  transform-origin: 50% 100%;
+  transition: transform 260ms var(--ease-out);
 }
 
-.verify .drop.envelope:hover .env-flap,
+.verify .drop.envelope:hover .env-flap {
+  transform: scaleY(1.1);
+}
+
 .verify .drop.envelope[data-over='true'] .env-flap {
-  background: #b9d6c6;
+  transform: scaleY(0.9);
 }
 
 /* ---------- hasil cek: teks gelap di atas latar terang ---------- */
@@ -949,7 +1045,6 @@ main a:not([class]):hover,
 /* ---------- tombol sekunder: hover putih bersih dengan cincin pinus, bukan abu keruh ---------- */
 @media (hover: hover) {
   html .btn.ghost:hover:not([disabled]),
-  html .panel .btn.ghost:hover:not([disabled]),
   html[data-zone] .ph:not(.ph-foto) .btn.ghost:hover:not([disabled]),
   html .nb-ghost:hover {
     background: #fff;

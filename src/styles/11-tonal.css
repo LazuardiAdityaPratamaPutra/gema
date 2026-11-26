@@ -57,7 +57,6 @@ details.fold,
 .assist,
 .drop,
 .drop.envelope,
-.chooser .panel,
 .limits details,
 .nb-sheet {
   border-radius: 14px;
@@ -65,8 +64,7 @@ details.fold,
 
 .pill,
 .cal-day,
-.nb-links a,
-.chooser .tab {
+.nb-links a {
   border-radius: 8px;
 }
 
@@ -168,55 +166,6 @@ main:has(> .t-band) {
 }
 
 /* ---------- beranda: pemilih peran ---------- */
-
-.chooser {
-  display: grid;
-  gap: 1.2rem 2rem;
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: visible;
-  margin-top: 0;
-}
-
-@media (width >= 62em) {
-  .chooser {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
-    align-items: start;
-  }
-}
-
-.chooser .tabs {
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.chooser .tab {
-  border: 0;
-  padding: 0.8rem 1rem;
-  font-weight: 650;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.chooser .tab[aria-selected='true'] {
-  color: #fff;
-}
-
-.chooser .tab[aria-selected='true'] .dot {
-  background: #fff;
-}
-
-.chooser .panel {
-  padding: clamp(1.5rem, 3.5vw, 2.6rem);
-}
-
-.chooser .panel h2 {
-  font-size: clamp(1.9rem, 3.4vw, 2.8rem);
-  line-height: 1.1;
-}
 
 /* ---------- beranda: bukti ---------- */
 .t-proof {

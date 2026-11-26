@@ -48,7 +48,6 @@ body {
 /* ---------- tombol ---------- */
 .btn,
 .btn.teal,
-.panel .btn.teal,
 .nb-cta,
 html[data-zone] .ph .btn:not(.ghost):not(.teal):not(.danger):not(.light) {
   background: #0e5a45;
@@ -178,9 +177,6 @@ html[data-zone] .ph {
 }
 
 /* ---------- beranda: pemilih peran sebagai blok hijau muda berbulatan besar ---------- */
-.chooser .panel {
-  color: var(--ink);
-}
 
 /* ---------- beranda: jam tenggat sebagai momen utama ---------- */
 .band-clock {

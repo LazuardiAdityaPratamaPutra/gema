@@ -47,6 +47,16 @@ export function Hero() {
   );
 }
 
+/** Tiga keputusan yang selalu ada di tangan pelapor; hanya klaim yang benar-benar dipenuhi aplikasi. */
+const KEPUTUSAN = [
+  {
+    judul: 'Simpan',
+    isi: 'Isinya dienkripsi di perangkatmu. Menyimpan tidak berarti melapor, jadi tidak ada yang dikirim ke Satgas.',
+  },
+  { judul: 'Kirim', isi: 'Satgas baru tahu setelah kamu menekan kirim dan mengonfirmasinya.' },
+  { judul: 'Hapus', isi: 'Kamu bisa menghapus laporan selamanya dari halamannya.' },
+] as const;
+
 export function ProofBand() {
   return (
     <section className="t-proof-band" aria-labelledby="sidik">
@@ -61,7 +71,14 @@ export function ProofBand() {
       <div className="wrap t-proof">
         <div className="t-proof-copy">
           <Words as="h2" id="sidik" text="Kamu yang memutuskan." />
-          <p>Kamu yang memutuskan kapan, dan apakah, laporanmu sampai ke Satgas.</p>
+          <ul className="t-pilih">
+            {KEPUTUSAN.map((k) => (
+              <li key={k.judul}>
+                <b>{k.judul}</b>
+                <span>{k.isi}</span>
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="t-fig">
           <Receipt />
