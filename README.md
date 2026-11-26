@@ -96,6 +96,7 @@ Beberapa hal yang sengaja dibuat begitu:
 - **Draf tersimpan terenkripsi di perangkat** tiap 10 detik, jadi pelapor boleh berhenti kapan saja. Isi berkas bukti perlu dipilih ulang saat lanjut.
 - **Keluar cepat** tersedia di setiap halaman (juga lewat Esc dua kali): menghapus draf dan sesi di perangkat lalu membuka situs netral.
 - **Kode Paksa** membuka brankas tiruan bila pelapor dipaksa membuka brankasnya.
+- **Catatan penanganan**: setelah kasus dikirim, pelapor dapat mengunduh kronologi (kirim, tenggat, status, keterlambatan, waktu Satgas membuka kasus, hash bukti) sebagai satu berkas HTML untuk dibawa ke pihak luar bila Satgas tidak bergerak. Dibuat di perangkat, tanpa nama atau isi laporan.
 - **Kapan dan Di mana wajib diisi, tetapi boleh kira-kira.** Kapan dipilih dari kalender (atau hanya bulan bila tanggal pastinya terlupa) dan tidak boleh di masa depan. Periode kejadian berupa pilihan semester, bukan ketikan, agar nilainya baku dan bisa dicocokkan antar-laporan.
 
 ### 2. Dari penyimpanan sampai eskalasi
@@ -127,7 +128,7 @@ sequenceDiagram
 
 ### 3. Penanganan oleh Satgas
 
-Setiap kasus melewati lima status, dan hanya boleh maju satu langkah (Tindak_lanjut berarti tindak lanjut pimpinan). Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Kalau tenggat terlewat, naik ke T1 Ketua Satgas; lalu T2 Pimpinan (terlambat 3 hari kerja); lalu T3 kementerian, hanya agregat (10 hari kerja). Ambang T2 dan T3 adalah nilai bawaan dan bisa diatur.
+Setiap kasus melewati lima status, dan hanya boleh maju satu langkah (Tindak_lanjut berarti tindak lanjut pimpinan). Tenggatnya 3 hari kerja (Permendikbudristek 55/2024 Pasal 53). Bila terlewat, tangga eskalasi naik sendiri dan tercatat di jejak audit. Kalau tenggat terlewat, naik ke T1 Ketua Satgas; lalu T2 Pimpinan (terlambat 3 hari kerja); lalu T3 kementerian, hanya agregat (10 hari kerja). Ambang T2 dan T3 adalah nilai bawaan dan bisa diatur. Kenaikan tangga tercatat di aplikasi; bila SMTP diatur, penerima tingkatnya juga mendapat surel tanpa isi kasus. Penjadwal harian yang menaikkan tangga dipantau: Ketua dan Auditor melihat peringatan bila penjadwal mati lebih dari dua hari.
 
 ```mermaid
 stateDiagram-v2
@@ -149,7 +150,9 @@ stateDiagram-v2
 | Auditor  | Memeriksa jejak audit berantai hash                                                                     |
 | Pengawas | Melihat angka agregat tingkat 3, tanpa isi kasus                                                        |
 
-Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui permintaan pembukaan (berlaku 30 menit), dan kunci Satgas dipecah 2-dari-3 sehingga satu orang tidak bisa membukanya sendirian.
+Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui permintaan pembukaan (berlaku 30 menit), dan kunci Satgas dipecah 2-dari-3 sehingga satu orang tidak bisa membukanya sendirian. Mengaktifkannya butuh minimal dua akun panel, dan mematikannya butuh persetujuan anggota panel lain.
+
+Anggota panel yang punya **konflik kepentingan** dapat **mundur** dari satu kasus. Setelah itu ia tidak bisa membuka, menindak, atau menyetujui akses kasus itu, penugasannya lepas, dan kejadiannya tercatat di jejak audit serta terlihat oleh pelapor tanpa nama dan tanpa alasan.
 
 ### 4. Yang bisa dilihat siapa saja
 
@@ -171,6 +174,8 @@ Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui per
 - Passkey (WebAuthn PRF) dan pemulihan lewat tiga orang tepercaya
 - Bicara saja: suara jadi teks di perangkat
 - Eskalasi, eskalasi bersyarat, dan penarikan
+- Catatan penanganan untuk dibawa ke pihak luar
+- Melihat kapan Satgas membuka kasusnya
 
 </td>
 <td width="33%" valign="top">
@@ -180,6 +185,9 @@ Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui per
 - Daftar kasus dengan tenggat dan label Prioritas
 - Penugasan penanggung jawab
 - Mode Empat Mata dengan kunci terpecah
+- Mundur karena konflik kepentingan
+- Peringatan bila penjadwal harian mati
+- Surel tangga eskalasi (opsional)
 - Bukti Pemilik nol-pengetahuan
 - Jejak audit berantai hash
 - Radar pola berderau dan direktori rujukan
@@ -271,7 +279,7 @@ gema/
 │  └─ matching  chat-parser  pendamping  dp  passphrase
 ├─ tests/
 │  ├─ e2e/             uji alur API dari laporan sampai pertanggungjawaban
-│  └─ unit/            uji klaim teks, galat dikte, vektor ML-KEM
+│  └─ unit/            uji fungsi murni dan penjaga (CSS, bentuk kekerasan, vektor ML-KEM)
 ├─ scripts/            pembangun Verifier Mandiri, penyalin runtime WASM
 ├─ docs/               panduan, catatan desain, arsip
 └─ public/             logo, gambar, runtime WASM
@@ -312,6 +320,9 @@ Yang belum diukur: jejak energi atau karbon, dan kinerja di bawah beban banyak p
 - Pendamping berbasis kata, bukan model bahasa besar, dan selalu menyebut hasilnya "petunjuk, bukan keputusan hukum". Akurasi suara pada ucapan manusia belum diukur.
 - Nomor layanan rujukan perlu diperiksa ulang sebelum peluncuran.
 - Penyimpanan hanya cocok untuk satu instans server.
+- Gema membuat kasus yang dipendam terdeteksi dan terdokumentasi, bukan mencegah suap atau kolusi: dua anggota panel yang bersekongkol menembus Empat Mata, dan mundur bergantung pada kejujuran anggota. Eskalasi tercatat di dalam aplikasi; tidak ada jalur otomatis ke kementerian.
+- Catatan penanganan disusun dari data aplikasi, bukan dokumen resmi kampus, dan tidak membuktikan isi laporan benar.
+- Belum diuji di perangkat nyata (passkey, Safari), oleh pengguna awam, atau oleh penguji penetrasi independen.
 - Keluar cepat menghapus draf dan sesi di perangkat ini, tetapi tidak menghapus riwayat peramban.
 
 ## Lisensi

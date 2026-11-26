@@ -26,14 +26,20 @@ export function Hero() {
             Satgas menanganinya tepat waktu.
           </p>
           <div className="hero-cta">
-            <Link href="/pahami" className="btn teal">
-              Pahami dulu
+            <Link href="/mulai" className="btn teal">
+              Buat brankas tanpa nama
             </Link>
-            <DemoLink className="btn ghost">Coba demo 5 menit</DemoLink>
+            <Link href="/pahami" className="btn ghost">
+              Ragu? Pahami dulu
+            </Link>
           </div>
           <p className="hero-batas">
             Gema tidak bisa menjamin anonimitas: isi ceritamu tetap bisa menunjukkan siapa kamu.{' '}
             <Link href="/panduan#batas">Baca batasnya</Link>
+          </p>
+          <p className="hero-batas">
+            Dalam bahaya sekarang? <Link href="/panduan#bantuan">Lihat bantuan segera</Link>.{' '}
+            <DemoLink style={{ whiteSpace: 'nowrap' }}>Coba demo 5 menit</DemoLink>
           </p>
         </div>
       </div>
