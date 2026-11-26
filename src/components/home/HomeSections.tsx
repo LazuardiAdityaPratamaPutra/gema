@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { DemoLink } from '@/components/DemoLink';
 import { NextStep } from '@/components/NextStep';
 import { Words } from '@/components/motion/Words';
 import { Receipt } from './Receipt';
@@ -28,9 +29,7 @@ export function Hero() {
             <Link href="/pahami" className="btn teal">
               Pahami dulu
             </Link>
-            <Link href="/demo" className="btn ghost">
-              Coba demo 5 menit
-            </Link>
+            <DemoLink className="btn ghost">Coba demo 5 menit</DemoLink>
           </div>
           <p className="hero-batas">
             Gema tidak bisa menjamin anonimitas: isi ceritamu tetap bisa menunjukkan siapa kamu.{' '}

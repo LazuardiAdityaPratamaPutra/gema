@@ -100,6 +100,13 @@ export function registerSeeder(fn: Seeder): void {
   seeder = fn;
 }
 
+let boot: Seeder | null = null;
+
+/** Pekerjaan yang dijalankan setiap basis data selesai dimuat (bukan hanya saat kosong), mis. menyamakan akun admin. */
+export function registerBoot(fn: Seeder): void {
+  boot = fn;
+}
+
 export function getDb(): Promise<DB> {
   if (!g.__gemaDb) {
     g.__gemaDb = (async () => {
@@ -111,6 +118,11 @@ export function getDb(): Promise<DB> {
         if (!seeder) throw new Error('Pengisi data awal belum didaftarkan (registerSeeder)');
         await seeder(db);
         await be.save(db);
+      }
+      if (boot) {
+        const sebelum = db.meta.adminDiperbarui;
+        await boot(db);
+        if (db.meta.adminDiperbarui !== sebelum) await be.save(db);
       }
       rebuildIndex(db);
       g.__gemaLoaded = db;

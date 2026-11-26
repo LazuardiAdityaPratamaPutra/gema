@@ -4,6 +4,7 @@ import { api, ApiError } from '@/lib/api';
 import { AAD, AAD_CATATAN, type BuktiMeta, type Narasi } from '@/lib/laporan/report-format';
 import { loadSatgasSecret } from '@/lib/vault/satgas-key';
 import type { SatgasSession } from '@/lib/store';
+import { kapanLabel } from '@/lib/laporan/kapan';
 
 export type Detail = {
   escalation: {
@@ -117,7 +118,7 @@ export function assistInputOf(narasi: Narasi | null, meta: BuktiMeta | null) {
   const { terlapor } = narasi;
   return {
     apa: narasi.apa,
-    kapan: narasi.kapan,
+    kapan: kapanLabel(narasi.kapan),
     dimana: narasi.dimana,
     saksi: narasi.saksi,
     dampak: narasi.dampak,

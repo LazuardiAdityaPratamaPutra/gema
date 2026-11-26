@@ -1,6 +1,8 @@
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import Link from 'next/link';
+import { island } from '@/lib/ui/island-bus';
+import { salin } from '@/lib/ui/salin';
 import { satgasStore, type SatgasSession } from '@/lib/store';
 import { login } from '@/lib/vault/vault-client';
 import type { DemoAccount, Info, Run } from './useDemo';
@@ -78,11 +80,23 @@ export function DemoLogins({ info, busy, run }: Props & { info: Info | null }) {
         <h2 className="title-md" id="sat">
           Masuk sebagai Satgas
         </h2>
+        {info && (
+          <p className="small m-0" style={{ marginBottom: '.9rem' }}>
+            Kata sandi semua akun demo: <code>{info.password}</code>{' '}
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={() => void salin(info.password).then((ok) => ok && island.toast('Disalin'))}
+            >
+              Salin
+            </button>
+          </p>
+        )}
         {info?.members.map((m) => (
           <AccountRow
             key={m.role}
             title={m.role}
-            sub={m.nama}
+            sub={m.email}
             busy={busy}
             onEnter={() => void asStaff(m.role)}
           />

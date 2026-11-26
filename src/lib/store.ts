@@ -59,7 +59,7 @@ export type ReporterSession = {
 export type SatgasSession = {
   token: string;
   member: { nama: string; role: string; email: string };
-  institution: { id: string; nama: string; demo: boolean };
+  institution: { id: string; nama: string; demo: boolean; kunciSiap?: boolean };
 };
 
 /** Sesi disimpan di sessionStorage: hilang saat tab ditutup. Kunci tidak pernah masuk localStorage. */

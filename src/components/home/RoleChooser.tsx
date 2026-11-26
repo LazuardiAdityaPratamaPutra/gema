@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
+import { useDemoAktif } from '@/lib/ui/useDemoAktif';
 
 const ROLES = [
   {
@@ -40,7 +41,7 @@ const ROLES = [
       'Kunci Satgas dibuat dan disimpan di perangkat Ketua.',
     ],
     cta: { href: '/satgas/masuk', label: 'Masuk Satgas' },
-    alt: { href: '/demo', label: 'Coba dengan data demo' },
+    alt: { href: '/demo', label: 'Coba dengan data demo', soloDemo: true },
   },
   {
     id: 'publik',
@@ -61,6 +62,8 @@ export function RoleChooser() {
   const [i, setI] = useState(0);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const r = ROLES[i];
+  const demo = useDemoAktif();
+  const sembunyikanAlt = 'soloDemo' in r.alt && !demo;
   const move = (n: number) => {
     const k = (n + ROLES.length) % ROLES.length;
     setI(k);
@@ -120,9 +123,11 @@ export function RoleChooser() {
             <Link className="btn teal" href={r.cta.href}>
               {r.cta.label}
             </Link>
-            <Link className="btn ghost" href={r.alt.href}>
-              {r.alt.label}
-            </Link>
+            {!sembunyikanAlt && (
+              <Link className="btn ghost" href={r.alt.href}>
+                {r.alt.label}
+              </Link>
+            )}
           </div>
         </div>
       </div>

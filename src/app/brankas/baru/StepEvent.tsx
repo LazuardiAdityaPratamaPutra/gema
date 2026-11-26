@@ -1,8 +1,9 @@
-import type { RefObject } from 'react';
+import { useState, type RefObject } from 'react';
 import { ChatSignals } from '@/components/ChatSignals';
 import { Dictate } from '@/components/Dictate';
 import { Nudges } from '@/components/Nudges';
 import type { Draft } from '@/lib/laporan/drafts';
+import { bulanIni, hariIni, kapanMode } from '@/lib/laporan/kapan';
 import { fmtBytes } from '@/lib/ui/format';
 import type { FileInput } from '@/lib/laporan/report-build';
 import { MAX_FILE, MAX_FILES } from '@/lib/laporan/report-format';
@@ -125,6 +126,42 @@ function MoreDetails({
   );
 }
 
+/** Kapan kejadian dipilih dari kalender. Bila tanggal pastinya sudah lupa, cukup pilih bulan. */
+function KapanField({ value, set }: { value: string; set: SetField }) {
+  const mode = kapanMode(value);
+  const [bulan, setBulan] = useState(mode === 'bulan');
+  const lama = mode === 'lama';
+  const cocok = bulan ? mode === 'bulan' : mode === 'tanggal';
+  const ganti = (b: boolean) => {
+    setBulan(b);
+    if (b && mode === 'tanggal') set('kapan', value.slice(0, 7));
+    else if (!b && mode === 'bulan') set('kapan', '');
+  };
+  return (
+    <div className="field">
+      <label htmlFor="kapan">Kapan (wajib)</label>
+      <input
+        id="kapan"
+        type={bulan ? 'month' : 'date'}
+        max={bulan ? bulanIni() : hariIni()}
+        value={cocok ? value : ''}
+        aria-required="true"
+        aria-describedby={lama ? 'kapan-lama' : undefined}
+        onChange={(e) => set('kapan', e.target.value)}
+      />
+      <label className="choice">
+        <input type="checkbox" checked={bulan} onChange={(e) => ganti(e.target.checked)} />
+        <span>Aku hanya ingat bulannya</span>
+      </label>
+      {lama && (
+        <p className="small muted m-0" id="kapan-lama">
+          Sebelumnya kamu menulis: “{value}”. Pilih tanggal untuk menggantinya.
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** Periode kejadian sebagai pilihan semester (maksimal dua), bukan ketikan, agar nilainya baku dan bisa dicocokkan. */
 function PeriodeField({ d, set }: Pick<Props, 'd' | 'set'>) {
   const dipilih = periodeDipilih(d.periode);
@@ -174,7 +211,8 @@ export function StepEvent(p: Props) {
       </h1>
       <p className="muted">
         Tulis sebanyak yang kamu mampu. Kapan dan di mana perlu diisi, tetapi kira-kira saja sudah
-        cukup. Bagian lain boleh dikosongkan atau ditulis nanti, dan kamu bisa kembali melengkapi.
+        cukup; hanya ingat bulannya pun boleh. Bagian lain boleh dikosongkan atau ditulis nanti, dan
+        kamu bisa kembali melengkapi.
       </p>
       <div className="field">
         <label htmlFor="apa">Kejadian</label>
@@ -183,16 +221,7 @@ export function StepEvent(p: Props) {
         <Nudges text={d.apa} filled={filled} />
       </div>
       <div className="grid g2" style={{ gap: '1rem' }}>
-        <div className="field">
-          <label htmlFor="kapan">Kapan (wajib)</label>
-          <input
-            id="kapan"
-            value={d.kapan}
-            aria-required="true"
-            placeholder="Kira-kira juga boleh, misalnya Oktober 2026"
-            onChange={(e) => set('kapan', e.target.value)}
-          />
-        </div>
+        <KapanField value={d.kapan} set={set} />
         <div className="field">
           <label htmlFor="dimana">Di mana (wajib)</label>
           <input

@@ -281,48 +281,57 @@ export function EscalationPanel({ session, r, dek, narasi, inst, busy, setMsg, a
             tenggat berjalan dan kamu dapat memantaunya di sini. Penarikan hanya dapat dilakukan
             sebelum Satgas membuka kasus.
           </p>
-          {r.match.notify && r.match.size && r.match.size > 1 && (
-            <ModeChoice mode={mode} setMode={setMode} />
-          )}
-          <label className="check prio">
-            <input
-              type="checkbox"
-              checked={prioritas}
-              onChange={(e) => setPrio(e.target.checked)}
-            />
-            <span>
-              <b>Minta diprioritaskan</b>: terlapor punya kuasa atas studi atau pekerjaanku.
-              {dependent ? ' (Kamu menandai ini saat menulis laporan.)' : ''} Satgas hanya melihat
-              tanda ini di daftar kasus, bukan isinya.
-            </span>
-          </label>
-          {!confirmEsc ? (
-            <button className="btn teal" disabled={busy} onClick={() => setConfirmEsc(true)}>
-              Eskalasi laporan ini
-            </button>
+          {inst?.kunciSiap === false ? (
+            <p className="card warn small" role="status">
+              Satgas {inst.nama} belum menyiapkan kunci, jadi eskalasi belum bisa dilakukan.
+              Laporanmu tetap tersimpan dan terkunci di perangkatmu. Coba lagi nanti.
+            </p>
           ) : (
-            <EscalateConfirm
-              session={session}
-              r={r}
-              dek={dek}
-              inst={inst}
-              busy={busy}
-              act={act}
-              mode={mode}
-              prioritas={prioritas}
-              onCancel={() => setConfirmEsc(false)}
-            />
+            <>
+              {r.match.notify && r.match.size && r.match.size > 1 && (
+                <ModeChoice mode={mode} setMode={setMode} />
+              )}
+              <label className="check prio">
+                <input
+                  type="checkbox"
+                  checked={prioritas}
+                  onChange={(e) => setPrio(e.target.checked)}
+                />
+                <span>
+                  <b>Minta diprioritaskan</b>: terlapor punya kuasa atas studi atau pekerjaanku.
+                  {dependent ? ' (Kamu menandai ini saat menulis laporan.)' : ''} Satgas hanya
+                  melihat tanda ini di daftar kasus, bukan isinya.
+                </span>
+              </label>
+              {!confirmEsc ? (
+                <button className="btn teal" disabled={busy} onClick={() => setConfirmEsc(true)}>
+                  Eskalasi laporan ini
+                </button>
+              ) : (
+                <EscalateConfirm
+                  session={session}
+                  r={r}
+                  dek={dek}
+                  inst={inst}
+                  busy={busy}
+                  act={act}
+                  mode={mode}
+                  prioritas={prioritas}
+                  onCancel={() => setConfirmEsc(false)}
+                />
+              )}
+              <ConditionalBox
+                session={session}
+                r={r}
+                dek={dek}
+                inst={inst}
+                prioritas={prioritas}
+                busy={busy}
+                setMsg={setMsg}
+                act={act}
+              />
+            </>
           )}
-          <ConditionalBox
-            session={session}
-            r={r}
-            dek={dek}
-            inst={inst}
-            prioritas={prioritas}
-            busy={busy}
-            setMsg={setMsg}
-            act={act}
-          />
         </>
       )}
     </section>

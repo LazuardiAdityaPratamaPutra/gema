@@ -1,4 +1,5 @@
 import { anchorProof, ipHash, limiters } from '../logic';
+import { demoEnabled } from '../demo-flag';
 import { HttpError } from '../util';
 import { clientIp, json, type Ctx, type Handler } from './context';
 
@@ -18,6 +19,7 @@ const institutions: Route = ({ db }) =>
         fpMode: i.fp_mode,
         slaHari: i.sla_hari,
         publicKey: i.public_key_satgas,
+        kunciSiap: i.demo || i.kunci_siap !== false,
         rujukan: i.rujukan ?? [],
         units: db.units.filter((u) => u.institution_id === i.id),
       })),
@@ -90,6 +92,7 @@ const compliance: Route = ({ db }) =>
 /** Rute bernama `"METODE segmen"`; `*` berarti metode apa pun. */
 const ROUTES: Record<string, Route> = {
   '* health': () => json({ ok: true, at: new Date().toISOString() }),
+  'GET config': () => json({ demo: demoEnabled() }),
   'GET institutions': institutions,
   'GET anchors': anchors,
   'GET evidence': evidenceProof,

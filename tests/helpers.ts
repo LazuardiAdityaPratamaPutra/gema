@@ -108,6 +108,7 @@ export async function submitReport(
   nama: string,
   attrs: any,
   text = 'isi berkas bukti rahasia',
+  institutionId = 'inst-demo',
 ) {
   const built = await buildReport({
     kek: acc.keys.kek,
@@ -123,12 +124,12 @@ export async function submitReport(
     },
     attrs,
     files: [{ nama: 'bukti.txt', tipe: 'text/plain', bytes: utf8(text) }],
-    fp: (inputs) => evalFp(acc.token, 'inst-demo', 'draft-' + randomId(), inputs),
+    fp: (inputs) => evalFp(acc.token, institutionId, 'draft-' + randomId(), inputs),
   });
   const res = await call('POST', 'reports', {
     token: acc.token,
     body: {
-      institutionId: 'inst-demo',
+      institutionId,
       unitId: 'u-ft',
       k: 2,
       ownerPub: ownerKeyFromDek(built.dek).publicKey,

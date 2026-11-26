@@ -12,7 +12,7 @@ Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
 ![Next.js](https://img.shields.io/badge/Next.js_16-0A3F31?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-0E5A45?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript_strict-0E5A45?style=flat-square&logo=typescript&logoColor=white)
-![Tes](https://img.shields.io/badge/tes-244_lolos-0E5A45?style=flat-square)
+![Tes](https://img.shields.io/badge/tes-250_lolos-0E5A45?style=flat-square)
 ![Aksesibilitas](https://img.shields.io/badge/axe--core-0_pelanggaran-0E5A45?style=flat-square)
 ![Lisensi](https://img.shields.io/badge/lisensi-MIT-F2A33A?style=flat-square)
 
@@ -96,6 +96,7 @@ Beberapa hal yang sengaja dibuat begitu:
 - **Draf tersimpan terenkripsi di perangkat** tiap 10 detik, jadi pelapor boleh berhenti kapan saja. Isi berkas bukti perlu dipilih ulang saat lanjut.
 - **Keluar cepat** tersedia di setiap halaman (juga lewat Esc dua kali): menghapus draf dan sesi di perangkat lalu membuka situs netral.
 - **Kode Paksa** membuka brankas tiruan bila pelapor dipaksa membuka brankasnya.
+- **Kapan dan Di mana wajib diisi, tetapi boleh kira-kira.** Kapan dipilih dari kalender (atau hanya bulan bila tanggal pastinya terlupa) dan tidak boleh di masa depan. Periode kejadian berupa pilihan semester, bukan ketikan, agar nilainya baku dan bisa dicocokkan antar-laporan.
 
 ### 2. Dari penyimpanan sampai eskalasi
 
@@ -154,7 +155,7 @@ Dengan mode **Empat Mata**, dosir hanya terbuka bila anggota lain menyetujui per
 
 - **Periksa bukti** (`/verifikasi`): unggah berkas dan Paket Bukti, lalu cek apakah berkas masih utuh sejak waktu pengunggahan. Tanpa akun, bahkan bisa offline lewat berkas HTML mandiri.
 - **Papan Kepatuhan** (`/papan`): persentase ketepatan waktu UPN Veteran Jawa Timur per kuartal. Angkanya diberi derau privasi diferensial supaya satu kasus tidak bisa ditebak.
-- **Coba demo** (`/demo`): semua peran Satgas dengan basis data kosong; kamu membuat laporan sendiri, dalam sekitar lima menit.
+- **Coba demo** (`/demo`): masuk sebagai pelapor atau sebagai peran Satgas dengan satu klik, memakai data contoh fiktif yang diberi label "Mode demo". Email dan kata sandi akun Satgas demo ditampilkan di `/demo` dan di halaman masuk Satgas, supaya jalur masuk yang sama dengan akun sungguhan bisa dicoba.
 
 ## Fitur
 
@@ -222,7 +223,7 @@ npm install     # bila unduhan biner onnxruntime-node gagal: npm install --ignor
 npm run dev     # http://localhost:3000
 ```
 
-Buka `/demo` untuk mencoba semua peran Satgas. Demo dimulai kosong, tanpa laporan atau kasus rekaan; data yang kamu buat tersimpan di `.data/`.
+Buka `/demo` untuk mencoba semua peran. Selama Mode Demo aktif (bawaan di pengembangan), basis data baru berisi data contoh fiktif: tiga pelapor, beberapa kasus, dan angka kepatuhan. Data tersimpan di `.data/`; hapus folder itu dan jalankan ulang untuk memulai dari awal. Jalankan dengan `GEMA_SEED_CONTOH=off` untuk basis data kosong. Di produksi, demo hanya menyala bila `GEMA_DEMO=on`, dan instans demo tidak boleh dipakai untuk cerita nyata. Untuk dipakai sungguhan tanpa unsur demo, lihat [Mode sungguhan](docs/panduan/DEPLOY.md#mode-sungguhan-tanpa-demo): akun admin dibuat dari `GEMA_SATGAS_AKUN`, dan eskalasi menunggu Ketua membuat kunci sendiri.
 
 <details>
 <summary><b>Perintah yang tersedia</b></summary>
@@ -261,7 +262,7 @@ gema/
 │  ├─ server/
 │  │  ├─ routes/       rute API per domain: publik, akun, pelapor, satgas, demo, cron
 │  │  ├─ logic/        aturan inti: sesi, akun, laporan, klaster, eskalasi, SLA, anchor
-│  │  ├─ seed/         institusi, unit, dan akun peran Mode Demo (fixture uji hanya dengan GEMA_SEED_CONTOH=on)
+│  │  ├─ seed/         institusi, unit, dan akun peran Mode Demo (data contoh fiktif ikut dimuat saat Mode Demo aktif; matikan dengan GEMA_SEED_CONTOH=off)
 │  │  └─ backends/     penyimpanan berkas dan PostgreSQL
 │  ├─ styles/          CSS berlapis, urutan impor di layout.tsx menentukan cascade
 │  └─ proxy.ts         CSP nonce

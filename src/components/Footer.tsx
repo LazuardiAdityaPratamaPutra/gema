@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DemoLink } from './DemoLink';
 import { Echo, Wordmark } from './Echo';
 export function Footer() {
   return (
@@ -17,7 +18,7 @@ export function Footer() {
           <Link href="/panduan#batas">Batas jujur</Link>
           <Link href="/verifikasi">Periksa bukti</Link>
           <Link href="/bukti-teknis">Bukti teknis</Link>
-          <Link href="/demo">Coba demo</Link>
+          <DemoLink>Coba demo</DemoLink>
           <Link href="/satgas/masuk">Masuk Satgas</Link>
         </nav>
       </div>
