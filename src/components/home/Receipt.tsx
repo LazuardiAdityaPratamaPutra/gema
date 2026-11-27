@@ -4,6 +4,11 @@ import { Term } from '@/components/Term';
 
 const HASH = 'fec0ab92b480521f2e5d872065a1c7f48eb7cf13951e9924da3620311ac16eed';
 const HEX = '0123456789abcdef';
+/** Kode batang untuk bagian sobekan: tinggi tiap batang diambil dari satu bita sidik contoh. */
+const BATANG = Array.from({ length: 32 }, (_, i) => {
+  const nilai = parseInt(HASH.slice(i * 2, i * 2 + 2), 16);
+  return { x: i * 4, h: 6 + (nilai % 13), w: nilai % 3 === 0 ? 3 : 2 };
+});
 
 /** Sertifikat bukti yang dijepit di map plastik, seperti berkas di tata usaha kampus. */
 export function Receipt() {
@@ -34,7 +39,7 @@ export function Receipt() {
   const done = n >= HASH.length;
   return (
     <div className="rc-folder">
-      <span className="rc-tab">Bukti</span>
+      <span className="rc-tape" aria-hidden="true" />
       <figure className="receipt" aria-label="Contoh sertifikat bukti">
         <p className="rc-top">Sertifikat bukti E-0312</p>
         <p className="rc-file">
@@ -60,6 +65,17 @@ export function Receipt() {
             <dd>13 Nov 2026</dd>
           </div>
         </dl>
+        <svg
+          className="rc-bars"
+          viewBox="0 0 128 20"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          {BATANG.map((b) => (
+            <rect key={b.x} x={b.x} y={20 - b.h} width={b.w} height={b.h} />
+          ))}
+        </svg>
         <span className="rc-stamp" data-on={done}>
           <b>Utuh</b>
           <small>tercatat Gema</small>

@@ -7,7 +7,13 @@ import { bulanIni, hariIni, kapanMode } from '@/lib/laporan/kapan';
 import { fmtBytes } from '@/lib/ui/format';
 import type { FileInput } from '@/lib/laporan/report-build';
 import { MAX_FILE, MAX_FILES } from '@/lib/laporan/report-format';
-import { periodeDipilih, periodeLabel, periodeOpsi, type SetField } from './draft-form';
+import {
+  periodeDaftar,
+  periodeDipilih,
+  periodeSusun,
+  type PeriodeOpsi,
+  type SetField,
+} from './draft-form';
 import { MissingFiles } from './parts';
 
 type Props = {
@@ -107,7 +113,7 @@ function MoreDetails({
         <label htmlFor="alias">Nama panggilan terlapor</label>
         <input id="alias" value={d.alias} onChange={(e) => set('alias', e.target.value)} />
       </div>
-      <div className="grid g2" style={{ gap: '1rem' }}>
+      <div className="grid g2 g-rapat">
         <PeriodeField d={d} set={set} />
         <div className="field">
           <label htmlFor="lokasi">Lokasi umum</label>
@@ -162,40 +168,64 @@ function KapanField({ value, set }: { value: string; set: SetField }) {
   );
 }
 
+type PeriodeSelectProps = {
+  id: string;
+  label: string;
+  kosong: string;
+  value: string;
+  opsi: PeriodeOpsi[];
+  disabled?: boolean;
+  onChange: (nilai: string) => void;
+};
+
+/** Satu dropdown semester dengan pilihan kosong di awal. */
+function PeriodeSelect({ id, label, kosong, value, opsi, disabled, onChange }: PeriodeSelectProps) {
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <select id={id} value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}>
+        <option value="">{kosong}</option>
+        {opsi.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 /** Periode kejadian sebagai pilihan semester (maksimal dua), bukan ketikan, agar nilainya baku dan bisa dicocokkan. */
 function PeriodeField({ d, set }: Pick<Props, 'd' | 'set'>) {
   const dipilih = periodeDipilih(d.periode);
-  const opsi = periodeOpsi();
-  const semua = [
-    ...opsi,
-    ...dipilih
-      .filter((v) => !opsi.some((o) => o.value === v))
-      .map((v) => ({ value: v, label: periodeLabel(v) })),
-  ];
-  const penuh = dipilih.length >= 2;
-  const ubah = (v: string, on: boolean) =>
-    set('periode', (on ? [...dipilih, v] : dipilih.filter((x) => x !== v)).join(', '));
+  const daftar = periodeDaftar(dipilih);
+  const [pertama = '', kedua = ''] = dipilih;
+  const ubah = (yang: 'pertama' | 'kedua') => (nilai: string) =>
+    set('periode', periodeSusun(pertama, kedua, yang, nilai));
   return (
-    <fieldset className="field relasi">
+    <fieldset className="field relasi" aria-describedby="periode-info">
       <legend>Periode kejadian</legend>
-      <p className="small muted m-0" id="periode-info">
-        Pilih sampai dua semester. {penuh ? 'Sudah dua; lepas satu untuk mengganti.' : ''}
+      <p className="hint" id="periode-info">
+        Pilih sampai dua semester.
       </p>
-      <div className="choices" aria-describedby="periode-info">
-        {semua.map((o) => {
-          const on = dipilih.includes(o.value);
-          return (
-            <label key={o.value} className="choice">
-              <input
-                type="checkbox"
-                checked={on}
-                disabled={!on && penuh}
-                onChange={(e) => ubah(o.value, e.target.checked)}
-              />
-              <span>{o.label}</span>
-            </label>
-          );
-        })}
+      <div className="grid g2 g-rapat">
+        <PeriodeSelect
+          id="periode-1"
+          label="Semester"
+          kosong="Belum dipilih"
+          value={pertama}
+          opsi={daftar}
+          onChange={ubah('pertama')}
+        />
+        <PeriodeSelect
+          id="periode-2"
+          label="Semester kedua (opsional)"
+          kosong="Tidak ada"
+          value={kedua}
+          opsi={daftar.filter((o) => o.value !== pertama)}
+          disabled={!pertama}
+          onChange={ubah('kedua')}
+        />
       </div>
     </fieldset>
   );
@@ -220,7 +250,7 @@ export function StepEvent(p: Props) {
         <Dictate onText={(t) => set('apa', d.apa ? `${d.apa} ${t}` : t)} />
         <Nudges text={d.apa} filled={filled} />
       </div>
-      <div className="grid g2" style={{ gap: '1rem' }}>
+      <div className="grid g2 g-rapat">
         <KapanField value={d.kapan} set={set} />
         <div className="field">
           <label htmlFor="dimana">Di mana (wajib)</label>

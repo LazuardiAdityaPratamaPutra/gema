@@ -337,8 +337,9 @@
 
 .pw-toggle {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
+  margin-block: auto;
   border: 0;
   font: 700 0.85rem var(--sans);
   cursor: pointer;

@@ -27,7 +27,8 @@ CSS Gema ada di `src/styles/`, dimuat berurutan oleh `src/app/layout.tsx`. **Uru
 4. `!important` hanya di `13-utilitas`, di blok `prefers-reduced-motion`, dan di blok `forced-colors`.
 5. Animasi hanya memakai `transform` dan `opacity`. Mengubah `width`, `height`, atau `left` memicu layout; jalur pemilih peran di beranda diisi dengan `scaleX`/`scaleY` untuk itu. Satu pengecualian yang disengaja: takik panel peran bergeser lewat `left`, karena posisinya persen dari wadah dan tidak bisa dinyatakan dengan `transform`.
 6. Warna hijau dan madu memakai `--aksen` dan `--madu`. Untuk warna berlapis alfa dari token, pakai `color-mix(in srgb, var(--token) N%, transparent)`.
-7. Tekstur kertas pada amplop cek berkas adalah SVG kecil di variabel `--kertas` (data URI, diizinkan oleh `img-src data:` di `src/proxy.ts`). Jangan memindahkannya ke berkas terpisah tanpa alasan: itu menambah satu permintaan jaringan.
+7. Radius besar (`--r-panel`) hanya untuk objek yang berdiri sendiri, seperti kartu foto di header halaman Satgas. Pita foto selebar layar tetap datar. Satu pengecualian yang disengaja sebagai lengkung penutup: sudut bawah hero dan sudut atas footer. Jangan menjadikan semua pita kartu melayang.
+8. Tekstur kertas pada amplop cek berkas adalah SVG kecil di variabel `--kertas` (data URI, diizinkan oleh `img-src data:` di `src/proxy.ts`). Jangan memindahkannya ke berkas terpisah tanpa alasan: itu menambah satu permintaan jaringan.
 
 ## Penjaga otomatis
 
@@ -40,4 +41,6 @@ CSS Gema ada di `src/styles/`, dimuat berurutan oleh `src/app/layout.tsx`. **Uru
 
 ## Utang yang tersisa
 
-Sekitar 129 selektor masih tersebar di lebih dari satu berkas. Menggabungkannya tidak aman secara otomatis, karena aturan lain di antaranya menyentuh properti yang sama dan urutan cascade bisa berubah. Pembersihan berikutnya sebaiknya dikerjakan per komponen, dengan membandingkan gaya terhitung sebelum dan sesudah di tiga lebar layar.
+Sekitar 117 selektor masih tersebar di lebih dari satu berkas. Menggabungkannya tidak aman secara otomatis, karena aturan lain di antaranya menyentuh properti yang sama dan urutan cascade bisa berubah. Pembersihan berikutnya sebaiknya dikerjakan per komponen, dengan membandingkan gaya terhitung sebelum dan sesudah di tiga lebar layar.
+
+Cara yang terbukti aman dan dipakai pada amplop serta sertifikat: di browser, rekam `getComputedStyle` semua elemen dan pseudo-elemen komponen (termasuk sebelum sidik selesai diketik, saat hover, dan saat berkas diseret) pada beberapa lebar dan dua mode gerak, hapus deklarasi yang dicurigai mati, lalu rekam ulang. Hasilnya harus identik. Hati-hati dengan pengukur otomatis yang mencabut deklarasi satu per satu: transisi CSS menutupi perubahan sesaat, dan keadaan yang tidak direkam (hasil cek berkas, sidik sedang diketik) membuatnya salah menandai deklarasi hidup sebagai mati. Dalam satu kasus pengukur menandai `color` amplop sebagai mati padahal menghapusnya mengubah warna turunannya menjadi kuning.

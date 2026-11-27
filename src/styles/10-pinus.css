@@ -168,10 +168,6 @@ html[data-zone] .ph {
 
 /* ---------- beranda: hero ---------- */
 
-.receipt {
-  background: #fff;
-}
-
 .rc-stamp {
   color: #0e5a45;
 }
@@ -221,21 +217,6 @@ html[data-zone='demo'] .ph .lede {
 }
 
 html[data-zone='demo'] .ph h1 {
-  color: var(--ink);
-}
-
-/* ---------- amplop bukti ---------- */
-.drop.envelope {
-  background: var(--tint-2);
-  color: var(--ink);
-}
-
-.drop.envelope .env-flap {
-  background: var(--tint);
-}
-
-.drop.envelope .env-text,
-.drop.envelope .env-text small {
   color: var(--ink);
 }
 

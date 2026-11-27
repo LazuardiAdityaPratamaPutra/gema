@@ -12,7 +12,7 @@ Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
 ![Next.js](https://img.shields.io/badge/Next.js_16-0A3F31?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-0E5A45?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript_strict-0E5A45?style=flat-square&logo=typescript&logoColor=white)
-![Tes](https://img.shields.io/badge/tes-292_lolos-0E5A45?style=flat-square)
+![Tes](https://img.shields.io/badge/tes-296_lolos-0E5A45?style=flat-square)
 ![Aksesibilitas](https://img.shields.io/badge/axe--core-0_pelanggaran-0E5A45?style=flat-square)
 ![Lisensi](https://img.shields.io/badge/lisensi-MIT-F2A33A?style=flat-square)
 

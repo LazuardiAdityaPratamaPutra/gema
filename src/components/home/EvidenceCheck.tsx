@@ -65,6 +65,12 @@ function Envelope({ onFile }: { onFile: (f?: File) => void }) {
       }}
     >
       <span className="env-flap" aria-hidden="true" />
+      <span className="env-stamp" aria-hidden="true" />
+      <svg className="env-post" viewBox="0 0 120 56" aria-hidden="true" focusable="false">
+        <circle cx="30" cy="28" r="22" />
+        <circle cx="30" cy="28" r="15" />
+        <path d="M58 14h58M58 24h58M58 34h58M58 44h58" />
+      </svg>
       <span className="env-text">
         Masukkan berkas ke sini
         <small>atau ketuk untuk memilih foto, dokumen, atau ekspor chat</small>
