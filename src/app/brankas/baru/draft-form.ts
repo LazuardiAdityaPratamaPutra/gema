@@ -92,6 +92,29 @@ export const periodeDipilih = (periode: string): string[] =>
     .map((x) => x.trim())
     .filter(Boolean);
 
+/** Semester yang boleh dipilih: yang terbaru, ditambah nilai lama di draf yang tidak ada dalam daftar itu. */
+export function periodeDaftar(dipilih: string[], now: Date = new Date()): PeriodeOpsi[] {
+  const opsi = periodeOpsi(now);
+  const lama = dipilih
+    .filter((v) => !opsi.some((o) => o.value === v))
+    .map((v) => ({ value: v, label: periodeLabel(v) }));
+  return [...opsi, ...lama];
+}
+
+/**
+ * Menyusun nilai periode (paling banyak dua, tanpa duplikat) setelah salah satu dari dua pilihan berubah.
+ * Mengosongkan pilihan pertama menaikkan pilihan kedua menjadi yang pertama.
+ */
+export function periodeSusun(
+  pertama: string,
+  kedua: string,
+  ubah: 'pertama' | 'kedua',
+  nilai: string,
+): string {
+  const [a, b] = ubah === 'pertama' ? [nilai, kedua === nilai ? '' : kedua] : [pertama, nilai];
+  return [a, b].filter(Boolean).join(', ');
+}
+
 /** Label yang terbaca untuk nilai periode; nilai lama yang tidak dikenal ditampilkan apa adanya. */
 export function periodeLabel(value: string): string {
   const m = /^(\d{4}\/\d{4})-(ganjil|genap)$/.exec(value);

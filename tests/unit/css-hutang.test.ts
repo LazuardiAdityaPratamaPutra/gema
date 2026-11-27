@@ -15,7 +15,7 @@ const files = fs
   .sort();
 
 /** Selektor yang muncul di lebih dari satu berkas. Turunkan angka ini setiap kali menggabungkan; jangan naikkan. */
-const BATAS_SELEKTOR_TERSEBAR = 129;
+const BATAS_SELEKTOR_TERSEBAR = 117;
 
 type Aturan = { f: string; i: number; ctx: string; sels: string[]; decls: Declaration[] };
 

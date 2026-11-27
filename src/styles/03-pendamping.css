@@ -282,10 +282,6 @@ fieldset.relasi {
   margin: 0;
 }
 
-.choice:has(input:checked) {
-  border-color: var(--ink);
-}
-
 .choice:has(input:focus-visible) {
   outline: 3px solid var(--focus);
   outline-offset: 2px;

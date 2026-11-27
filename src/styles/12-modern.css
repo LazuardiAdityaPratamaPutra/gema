@@ -139,7 +139,8 @@ body {
   display: flex;
   align-items: center;
   min-height: clamp(34rem, 86vh, 50rem);
-  background: #1c2622;
+  border-radius: 0 0 var(--r-panel) var(--r-panel);
+  background: #2a5a4a;
   color: #fff;
   overflow: clip;
 }
@@ -158,7 +159,6 @@ details.fold {
 
 .receipt,
 .t-fig .receipt {
-  box-shadow: var(--sh-2);
   border-radius: 18px;
 }
 
@@ -205,23 +205,24 @@ form .btn.ghost,
 .verify {
   background:
     radial-gradient(42rem 26rem at 100% 0%, rgb(255 255 255 / 12%), transparent 60%),
-    linear-gradient(135deg, #137257 0%, #0e5a45 50%, #08382c 100%);
+    linear-gradient(135deg, #17725a 0%, #135f4b 50%, #0d4c3b 100%);
   position: relative;
   isolation: isolate;
   overflow: clip;
 }
 
 .verify .drop.envelope {
-  --kertas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .2 0 0 0 0 .15 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --kertas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .38 0 0 0 0 .27 0 0 0 0 .1 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   overflow: visible;
   margin-top: 5.6rem;
   min-height: 15rem;
   padding-top: 3.4rem;
-  background-color: #a9c7b6;
-  background-image: linear-gradient(180deg, #8fb3a0 0%, #b4d0bf 40%);
+  background-color: #f3e8cc;
+  background-image: linear-gradient(180deg, #e8d9b3 0%, #f4ead0 45%);
   border-radius: 22px;
   box-shadow: 0 28px 56px rgb(0 0 0 / 34%);
+  transform: rotate(-1.2deg);
   transition:
     transform 240ms var(--ease-out),
     box-shadow 240ms var(--ease-out);
@@ -244,6 +245,7 @@ form .btn.ghost,
   box-shadow:
     0 -1px 0 rgb(255 255 255 / 70%),
     0 6px 14px rgb(0 0 0 / 22%);
+  transform: rotate(-2deg);
   transition: transform 260ms var(--ease-out);
 }
 
@@ -258,23 +260,33 @@ form .btn.ghost,
     linear-gradient(
         to top right,
         transparent calc(50% - 1px),
-        rgb(14 70 52 / 22%) 50%,
+        rgb(112 80 30 / 28%) 50%,
         transparent calc(50% + 1px)
       )
       0 100% / 50% 66% no-repeat,
     linear-gradient(
         to top left,
         transparent calc(50% - 1px),
-        rgb(14 70 52 / 22%) 50%,
+        rgb(112 80 30 / 28%) 50%,
         transparent calc(50% + 1px)
       )
       100% 100% / 50% 66% no-repeat,
-    linear-gradient(to top right, rgb(14 70 52 / 6%) 50%, transparent 50%) 0 100% / 50% 66%
+    linear-gradient(to top right, rgb(112 80 30 / 7%) 50%, transparent 50%) 0 100% / 50% 66%
       no-repeat,
-    linear-gradient(to top left, rgb(14 70 52 / 6%) 50%, transparent 50%) 100% 100% / 50% 66%
+    linear-gradient(to top left, rgb(112 80 30 / 7%) 50%, transparent 50%) 100% 100% / 50% 66%
       no-repeat,
     var(--kertas) 0 0 / 140px 140px,
-    linear-gradient(180deg, #f8fcf9 0%, #e6f0ea 100%);
+    linear-gradient(180deg, #fbf3df 0%, #efe2c0 100%),
+    repeating-linear-gradient(
+      -45deg,
+      var(--aksen) 0 12px,
+      #fbf3df 12px 22px,
+      var(--madu) 22px 34px,
+      #fbf3df 34px 44px
+    );
+  border: 8px solid transparent;
+  background-clip:
+    padding-box, padding-box, padding-box, padding-box, padding-box, padding-box, border-box;
   box-shadow:
     0 -10px 14px -8px rgb(0 0 0 / 28%),
     inset 0 1px 0 #fff;
@@ -297,12 +309,13 @@ form .btn.ghost,
   display: flex;
   align-items: center;
   margin-block: 0;
+  padding-bottom: var(--r-panel);
   min-height: clamp(28rem, 62vh, 36rem);
 }
 
-/* ---------- kaki halaman: gelap, menutup halaman ---------- */
+/* ---------- kaki halaman: hijau pinus, menutup halaman ---------- */
 .footer {
-  background: linear-gradient(180deg, #0f2d24 0%, #0a211a 100%);
+  background: linear-gradient(180deg, #16705a 0%, #125f4b 100%);
   color: #d6e6dc;
 }
 
@@ -364,8 +377,8 @@ form .btn.ghost,
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgb(7 24 18 / 80%) 0%, rgb(7 24 18 / 52%) 48%, rgb(7 24 18 / 4%) 80%),
-    linear-gradient(0deg, rgb(7 24 18 / 45%) 0%, transparent 40%);
+    linear-gradient(90deg, rgb(16 86 68 / 84%) 0%, rgb(16 86 68 / 62%) 48%, rgb(16 86 68 / 4%) 80%),
+    linear-gradient(0deg, rgb(16 86 68 / 40%) 0%, transparent 40%);
 }
 
 .t-hero .t-hero-grid {
@@ -505,7 +518,7 @@ form .btn.ghost,
   position: relative;
   isolation: isolate;
   overflow: clip;
-  background: #2a2118;
+  background: #2a5a4a;
 }
 
 .t-proof-band .t-bg {
@@ -519,9 +532,9 @@ form .btn.ghost,
   z-index: -1;
   background: linear-gradient(
     90deg,
-    rgb(18 12 6 / 88%) 0%,
-    rgb(18 12 6 / 66%) 55%,
-    rgb(18 12 6 / 48%) 100%
+    rgb(16 86 68 / 86%) 0%,
+    rgb(16 86 68 / 80%) 55%,
+    rgb(16 86 68 / 74%) 100%
   );
 }
 
@@ -531,10 +544,16 @@ form .btn.ghost,
   color: #fff;
 }
 
-/* sertifikat: dua lembar kertas lain di belakangnya, bingkai resmi, dan pita hijau di tepi atas */
+/* sertifikat: kertas krem agak miring, dua lembar warna lain di belakangnya, dan lakban madu di atas */
 .t-proof-band .t-fig .rc-folder {
   position: relative;
   isolation: isolate;
+  transform: rotate(-2.2deg);
+  transition: transform 320ms var(--ease-out);
+}
+
+.t-proof-band .t-fig:hover .rc-folder {
+  transform: translateY(-4px) rotate(-0.6deg);
 }
 
 .t-proof-band .t-fig .rc-folder::before,
@@ -545,21 +564,30 @@ form .btn.ghost,
   z-index: -1;
   border-radius: 18px;
   box-shadow: 0 14px 30px rgb(0 0 0 / 32%);
+  transition: transform 320ms var(--ease-out);
 }
 
 .t-proof-band .t-fig .rc-folder::before {
-  transform: translate(0.9rem, 0.8rem);
-  background: linear-gradient(180deg, #f0e9d8 0%, #e4dcc6 100%);
+  transform: translate(0.7rem, 0.5rem) rotate(2.6deg);
+  background: linear-gradient(180deg, #f0e6cc 0%, #e4d8b6 100%);
 }
 
 .t-proof-band .t-fig .rc-folder::after {
-  transform: translate(1.8rem, 1.6rem);
-  background: linear-gradient(180deg, #d8cfb6 0%, #c9bfa2 100%);
+  transform: translate(1.2rem, 0.9rem) rotate(5.4deg);
+  background: linear-gradient(180deg, #cfe2d6 0%, #b8d3c3 100%);
+}
+
+.t-proof-band .t-fig:hover .rc-folder::before {
+  transform: translate(1rem, 0.6rem) rotate(4deg);
+}
+
+.t-proof-band .t-fig:hover .rc-folder::after {
+  transform: translate(1.7rem, 1rem) rotate(8deg);
 }
 
 .t-proof-band .t-fig .receipt {
   border-top: 6px solid var(--aksen);
-  background: linear-gradient(180deg, #fff 0%, #f6f8f3 100%);
+  background: linear-gradient(180deg, #fffdf6 0%, #f8f0dc 100%);
   box-shadow:
     0 1px 0 rgb(255 255 255 / 80%) inset,
     0 18px 36px rgb(0 0 0 / 34%);
@@ -612,11 +640,13 @@ html[data-zone] .ph.ph-foto {
   position: relative;
   isolation: isolate;
   overflow: clip;
-  border-radius: 22px;
-  background: #16222a;
+  border-radius: var(--r-panel);
+  background: #2a5a4a;
   color: #fff;
   margin: 1rem 0 1.8rem;
-  padding: clamp(1.6rem, 4vw, 3rem);
+  padding: var(--ph-pad);
+
+  --ph-pad: clamp(1.6rem, 4vw, 3rem);
   box-shadow: var(--sh-2);
 }
 
@@ -626,6 +656,15 @@ html[data-zone] .ph.ph-foto {
   object-position: 50% 48%;
 }
 
+/* di layar lebar kepala berupa grid: foto latar harus menutup sampai tepi panel, bukan hanya isinya */
+@media (width >= 62em) {
+  .ph-foto:has(> h1):has(> .lede) > .ph-bg {
+    margin: calc(-1 * var(--ph-pad));
+    min-width: calc(100% + 2 * var(--ph-pad));
+    min-height: calc(100% + 2 * var(--ph-pad));
+  }
+}
+
 .ph-foto::after {
   content: '';
   position: absolute;
@@ -633,9 +672,9 @@ html[data-zone] .ph.ph-foto {
   z-index: -1;
   background: linear-gradient(
     90deg,
-    rgb(8 20 28 / 92%) 0%,
-    rgb(8 20 28 / 72%) 60%,
-    rgb(8 20 28 / 56%) 100%
+    rgb(16 86 68 / 90%) 0%,
+    rgb(16 86 68 / 78%) 60%,
+    rgb(16 86 68 / 64%) 100%
   );
 }
 
@@ -890,20 +929,24 @@ main a:not([class]):hover,
 }
 
 /* ---------- amplop cek berkas: hover dan seret tetap terbaca ---------- */
-.verify .drop.envelope:hover,
+.verify .drop.envelope:hover {
+  box-shadow: 0 34px 64px rgb(0 0 0 / 38%);
+  transform: translateY(-4px) rotate(0deg);
+}
+
 .verify .drop.envelope[data-over='true'] {
   box-shadow:
     0 0 0 4px rgb(255 225 74 / 85%),
     0 32px 64px rgb(0 0 0 / 38%);
-  transform: translateY(-3px);
+  transform: translateY(-3px) rotate(0deg);
 }
 
 .verify .drop.envelope:hover::before {
-  transform: translateY(-0.7rem);
+  transform: translateY(-0.8rem) rotate(-2deg);
 }
 
 .verify .drop.envelope[data-over='true']::before {
-  transform: translateY(1rem);
+  transform: translateY(1rem) rotate(0deg);
 }
 
 .verify .drop.envelope .env-text,
@@ -928,9 +971,9 @@ main a:not([class]):hover,
   height: 5.4rem;
   clip-path: polygon(0 100%, 100% 100%, 50% 0);
   background:
-    repeating-linear-gradient(45deg, rgb(14 90 69 / 14%) 0 5px, transparent 5px 10px),
-    repeating-linear-gradient(-45deg, rgb(14 90 69 / 14%) 0 5px, transparent 5px 10px),
-    linear-gradient(180deg, #7ea892 0%, #9cc0ac 100%);
+    repeating-linear-gradient(45deg, rgb(112 80 30 / 12%) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, rgb(112 80 30 / 12%) 0 5px, transparent 5px 10px),
+    linear-gradient(180deg, #d9c58f 0%, #e6d6a8 100%);
   transform-origin: 50% 100%;
   transition: transform 260ms var(--ease-out);
 }

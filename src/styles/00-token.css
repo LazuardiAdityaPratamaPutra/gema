@@ -112,6 +112,7 @@
   --r-md: 12px;
   --r-lg: 16px;
   --band: clamp(3rem, 7vw, 5.5rem);
+  --r-panel: clamp(20px, 3.2vw, 32px);
   --sh-1:
     0 1px 2px rgb(16 36 29 / 6%), 0 6px 16px rgb(16 36 29 / 6%), 0 18px 36px rgb(16 36 29 / 5%);
   --sh-2:

@@ -77,7 +77,6 @@ p.small:not(.card) {
 }
 
 .nb-ghost:active,
-.pw-toggle:active,
 .nb-qx:active,
 .contoh button:active {
   transform: scale(0.97);

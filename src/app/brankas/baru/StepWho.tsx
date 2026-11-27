@@ -119,7 +119,7 @@ function CampusFields({
       {(inst || insts.length === 0) && (
         <div className="field">
           <label htmlFor="unit">Fakultas atau unit terlapor</label>
-          <p className="hint m-0" id="unit-bantu">
+          <p className="hint" id="unit-bantu">
             Pilih yang paling dekat. Kalau tidak tahu, pilih &ldquo;Tidak tahu atau belum
             yakin&rdquo;.
           </p>

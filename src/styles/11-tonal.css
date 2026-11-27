@@ -198,25 +198,14 @@ main:has(> .t-band) {
   padding: 0;
 }
 
-.t-fig .rc-tab {
-  display: none;
-}
-
-.t-fig .receipt {
-  background: #fff;
-}
-
 .t-cap {
   margin: 0.8rem 0 0;
   font-size: 0.88rem;
-  color: var(--muted);
 }
 
 /* ---------- beranda: amplop pada pita hijau pinus ---------- */
 .verify {
   color: #fff;
-  border-radius: 0;
-  margin-inline: 0;
   padding-block: var(--band);
 
   --ink: #fff;
@@ -284,9 +273,15 @@ main:has(> .t-band) {
 }
 
 /* ---------- kaki halaman ---------- */
+/* footer: hanya tepi atasnya yang melengkung; di beranda ia menumpang sedikit di atas pita penutup */
 .footer {
-  border-radius: 0;
+  border-radius: var(--r-panel) var(--r-panel) 0 0;
   margin-top: 0;
+  position: relative;
+}
+
+main:has(> .t-band) + .footer {
+  margin-top: calc(-1 * var(--r-panel));
 }
 
 main:not(:has(> .t-band)) + .footer {

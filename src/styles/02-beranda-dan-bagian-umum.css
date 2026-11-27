@@ -13,10 +13,6 @@
   }
 }
 
-.verify {
-  margin-top: clamp(3rem, 8vw, 6rem);
-}
-
 .verify .wrap {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

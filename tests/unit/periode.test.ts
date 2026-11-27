@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   EMPTY,
   missingHint,
+  periodeDaftar,
   periodeDipilih,
   periodeLabel,
   periodeOpsi,
+  periodeSusun,
   stepReady,
 } from '@/app/brankas/baru/draft-form';
 import { bulanIni, hariIni, kapanLabel, kapanMode, kapanSah } from '@/lib/laporan/kapan';
@@ -34,6 +36,29 @@ describe('periode kejadian sebagai pilihan', () => {
     expect(periodeLabel('2026/2027-ganjil')).toBe('Ganjil 2026/2027');
     expect(periodeLabel('2025-1')).toBe('2025-1');
     expect(periodeDipilih('a, b ,,c')).toEqual(['a', 'b', 'c']);
+  });
+});
+
+describe('dua dropdown periode', () => {
+  const A = '2026/2027-ganjil';
+  const B = '2025/2026-genap';
+  it('mengisi pilihan pertama lalu kedua menghasilkan dua nilai terurut', () => {
+    expect(periodeSusun('', '', 'pertama', A)).toBe(A);
+    expect(periodeSusun(A, '', 'kedua', B)).toBe(`${A}, ${B}`);
+  });
+  it('memilih semester pertama yang sama dengan yang kedua tidak membuat duplikat', () => {
+    expect(periodeSusun(A, B, 'pertama', B)).toBe(B);
+  });
+  it('mengosongkan pilihan pertama menaikkan yang kedua, mengosongkan kedua menyisakan satu', () => {
+    expect(periodeSusun(A, B, 'pertama', '')).toBe(B);
+    expect(periodeSusun(A, B, 'kedua', '')).toBe(A);
+    expect(periodeSusun(A, '', 'pertama', '')).toBe('');
+  });
+  it('daftar memuat nilai lama dari draf yang sudah tidak ada di semester terbaru', () => {
+    const d = periodeDaftar(['2019/2020-ganjil', A], new Date(2026, 10, 25));
+    expect(d[0].value).toBe(A);
+    expect(d.at(-1)).toEqual({ value: '2019/2020-ganjil', label: 'Ganjil 2019/2020' });
+    expect(d.filter((o) => o.value === A)).toHaveLength(1);
   });
 });
 
