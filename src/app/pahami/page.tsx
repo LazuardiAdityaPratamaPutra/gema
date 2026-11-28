@@ -120,10 +120,10 @@ export default function Pahami() {
           </h2>
           <Matches enough={enough} started={text.trim() !== ''} hits={hits} />
           <div className="row" style={{ marginTop: '1.2rem' }}>
-            <Link className="btn teal" href="/mulai" onClick={() => carry(text)}>
+            <Link className="btn teal btn-blok" href="/mulai" onClick={() => carry(text)}>
               Simpan dulu, tanpa nama
             </Link>
-            <Link className="btn ghost" href="/panduan#bantuan">
+            <Link className="btn ghost btn-blok" href="/panduan#bantuan">
               Cari bantuan
             </Link>
           </div>

@@ -23,7 +23,7 @@ export function CredentialCard({ cred }: { cred: Cred | null }) {
             <ol
               style={{
                 margin: 0,
-                paddingLeft: '1.4rem',
+                paddingLeft: '1.9rem',
                 columns: '2 160px',
                 fontFamily: 'var(--mono)',
               }}
@@ -79,7 +79,7 @@ export function CredentialActions({ cred }: { cred: Cred | null }) {
               )
           }
         >
-          {copied ? 'Tersalin' : 'Salin'}
+          {copied ? 'Tersalin' : 'Salin kode dan kata sandi'}
         </button>
       </div>
       <p className="small muted">

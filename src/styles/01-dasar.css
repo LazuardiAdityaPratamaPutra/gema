@@ -85,6 +85,12 @@ main {
   padding-block: 1.6rem 4rem;
 }
 
+@media (width <= 30em) {
+  main {
+    padding-bottom: 2.4rem;
+  }
+}
+
 .muted {
   color: var(--muted);
 }

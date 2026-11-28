@@ -37,14 +37,8 @@ export default function Mulai() {
           {error}
         </p>
       )}
-      <p className="small muted mulai-next">
-        Berikutnya: tiga langkah singkat untuk menulis laporan (siapa dan di mana, kejadian dan
-        bukti, tinjau dan kunci). Isianmu disimpan sebagai draf di perangkat ini, jadi boleh
-        berhenti kapan saja. Pemulihan lewat dua orang tepercaya bisa kamu siapkan di Pengaturan
-        setelah masuk.
-      </p>
       <button
-        className="btn teal"
+        className="btn teal btn-blok"
         type="button"
         disabled={!saved || busy || !cred}
         aria-busy={busy}
@@ -57,6 +51,12 @@ export default function Mulai() {
           Mengolah kunci. Ini sengaja dibuat lambat dan bisa memakan beberapa detik.
         </p>
       )}
+      <p className="small muted mulai-next">
+        Berikutnya: tiga langkah singkat untuk menulis laporan (siapa dan di mana, kejadian dan
+        bukti, tinjau dan kunci). Isianmu disimpan sebagai draf di perangkat ini, jadi boleh
+        berhenti kapan saja. Pemulihan lewat dua orang tepercaya bisa kamu siapkan di Pengaturan
+        setelah masuk.
+      </p>
     </div>
   );
 }

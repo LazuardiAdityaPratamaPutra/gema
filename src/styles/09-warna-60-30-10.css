@@ -98,10 +98,6 @@ a.card:hover {
   transform: none;
 }
 
-.next .btn.ghost {
-  background: var(--soft);
-}
-
 /* poin panel: titik terisi menggantikan garis vertikal */
 
 /* pita jam: teks terang di navy; kartu kalender tetap gelap di atas putih */

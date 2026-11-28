@@ -40,6 +40,8 @@ export function DemoAkun({ l }: { l: SatgasLoginState }) {
             onClick={() => {
               l.setEmail(m.email);
               l.setPw(info.password);
+              // formulir ada di atas panel ini: bawa pengguna ke tombol Masuk begitu sudah aktif
+              setTimeout(() => document.getElementById('masuk-satgas')?.focus(), 60);
             }}
           >
             Pakai akun ini
