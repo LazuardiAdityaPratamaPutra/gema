@@ -16,12 +16,41 @@ Tanpa nama, email, atau telepon. Semua dikunci di perangkatmu.
 ![Aksesibilitas](https://img.shields.io/badge/axe--core-0_pelanggaran-0E5A45?style=flat-square)
 ![Lisensi](https://img.shields.io/badge/lisensi-MIT-F2A33A?style=flat-square)
 
-[Pembeda](#yang-membedakan-gema) · [Alur kerja](#alur-kerja) · [Fitur](#fitur) · [Privasi](#cara-kerja-privasi) · [Mulai cepat](#mulai-cepat) · [Struktur](#struktur-proyek) · [Batas yang jujur](#batas-yang-jujur)
+[Mulai cepat](#mulai-cepat) · [Pembeda](#yang-membedakan-gema) · [Alur kerja](#alur-kerja) · [Fitur](#fitur) · [Privasi](#cara-kerja-privasi) · [Keberlanjutan](#keberlanjutan) · [Struktur](#struktur-proyek) · [Batas yang jujur](#batas-yang-jujur)
 
 </div>
 
+**Teknologi berkelanjutan untuk kampus.** Gema dijalankan sendiri oleh kampus tanpa API AI berbayar, mengikuti tenggat dan kewajiban Satgas di Permendikbudristek 55/2024, dan tidak bergantung pada satu admin yang dipercaya (rinciannya di [Keberlanjutan](#keberlanjutan)).
+
 > [!WARNING]
 > Gema masih prototipe dan belum diaudit pihak independen. Jangan dipakai untuk kasus nyata sebelum ditinjau ahli keamanan dan hukum.
+
+## Mulai cepat
+
+Prasyarat: Node.js 22 atau lebih baru.
+
+```bash
+npm install     # bila unduhan biner onnxruntime-node gagal: npm install --ignore-scripts
+npm run dev     # http://localhost:3000
+```
+
+Buka `/demo` untuk mencoba semua peran. Selama Mode Demo aktif (bawaan di pengembangan), basis data baru berisi data contoh fiktif: tiga pelapor, beberapa kasus, dan angka kepatuhan. Data tersimpan di `.data/`; hapus folder itu dan jalankan ulang untuk memulai dari awal. Jalankan dengan `GEMA_SEED_CONTOH=off` untuk basis data kosong. Di produksi, demo hanya menyala bila `GEMA_DEMO=on`, dan instans demo tidak boleh dipakai untuk cerita nyata. Untuk dipakai sungguhan tanpa unsur demo, lihat [Mode sungguhan](docs/panduan/DEPLOY.md#mode-sungguhan-tanpa-demo): akun admin dibuat dari `GEMA_SATGAS_AKUN`, dan eskalasi menunggu Ketua membuat kunci sendiri.
+
+<details>
+<summary><b>Perintah yang tersedia</b></summary>
+
+<br />
+
+| Perintah            | Fungsi                                                              |
+| ------------------- | ------------------------------------------------------------------- |
+| `npm run check`     | Semua pemeriksaan sekaligus: tipe, ESLint, Stylelint, Prettier, tes |
+| `npm test`          | Vitest: kripto, OPRF, KEM, Merkle, parser, API, Postgres            |
+| `npm run typecheck` | `tsc --noEmit` dengan `noUnusedLocals` dan `noUnusedParameters`     |
+| `npm run lint`      | ESLint                                                              |
+| `npm run lint:css`  | Stylelint untuk `src/styles/*.css`                                  |
+| `npm run format`    | Prettier menulis ulang berkas                                       |
+
+</details>
 
 ## Kenapa Gema
 
@@ -139,7 +168,6 @@ stateDiagram-v2
     Rekomendasi --> Tindak_lanjut
     Tindak_lanjut --> Selesai
     Selesai --> [*]
-
 ```
 
 | Peran    | Yang bisa dilakukan                                                                                     |
@@ -222,33 +250,6 @@ sertifikat waktu ◀── akar Merkle harian ──┘  diarsipkan ke repositor
 - CSP berbasis nonce per permintaan, tanpa `unsafe-inline` untuk skrip.
 - Sesi pelapor dikunci setelah 5 menit tanpa aktivitas; isi laporan tersamar sampai dibuka.
 
-## Mulai cepat
-
-Prasyarat: Node.js 22 atau lebih baru.
-
-```bash
-npm install     # bila unduhan biner onnxruntime-node gagal: npm install --ignore-scripts
-npm run dev     # http://localhost:3000
-```
-
-Buka `/demo` untuk mencoba semua peran. Selama Mode Demo aktif (bawaan di pengembangan), basis data baru berisi data contoh fiktif: tiga pelapor, beberapa kasus, dan angka kepatuhan. Data tersimpan di `.data/`; hapus folder itu dan jalankan ulang untuk memulai dari awal. Jalankan dengan `GEMA_SEED_CONTOH=off` untuk basis data kosong. Di produksi, demo hanya menyala bila `GEMA_DEMO=on`, dan instans demo tidak boleh dipakai untuk cerita nyata. Untuk dipakai sungguhan tanpa unsur demo, lihat [Mode sungguhan](docs/panduan/DEPLOY.md#mode-sungguhan-tanpa-demo): akun admin dibuat dari `GEMA_SATGAS_AKUN`, dan eskalasi menunggu Ketua membuat kunci sendiri.
-
-<details>
-<summary><b>Perintah yang tersedia</b></summary>
-
-<br />
-
-| Perintah            | Fungsi                                                              |
-| ------------------- | ------------------------------------------------------------------- |
-| `npm run check`     | Semua pemeriksaan sekaligus: tipe, ESLint, Stylelint, Prettier, tes |
-| `npm test`          | Vitest: kripto, OPRF, KEM, Merkle, parser, API, Postgres            |
-| `npm run typecheck` | `tsc --noEmit` dengan `noUnusedLocals` dan `noUnusedParameters`     |
-| `npm run lint`      | ESLint                                                              |
-| `npm run lint:css`  | Stylelint untuk `src/styles/*.css`                                  |
-| `npm run format`    | Prettier menulis ulang berkas                                       |
-
-</details>
-
 ## Struktur proyek
 
 <details>
@@ -271,7 +272,8 @@ gema/
 │  │  ├─ routes/       rute API per domain: publik, akun, pelapor, satgas, demo, cron
 │  │  ├─ logic/        aturan inti: sesi, akun, laporan, klaster, eskalasi, SLA, anchor
 │  │  ├─ seed/         institusi, unit, dan akun peran Mode Demo (data contoh fiktif ikut dimuat saat Mode Demo aktif; matikan dengan GEMA_SEED_CONTOH=off)
-│  │  └─ backends/     penyimpanan berkas dan PostgreSQL
+│  │  ├─ backends/     penyimpanan berkas dan PostgreSQL
+│  │  └─ logic-akun.ts, logic-satgas.ts   pintu masuk logika akun dan Satgas
 │  ├─ styles/          CSS berlapis, urutan impor di layout.tsx menentukan cascade
 │  └─ proxy.ts         CSP nonce
 ├─ packages/           pustaka tanpa dependensi UI
@@ -289,14 +291,15 @@ gema/
 
 ## Dokumentasi
 
-| Dokumen                                                                      | Isi                                          |
-| ---------------------------------------------------------------------------- | -------------------------------------------- |
-| [`docs/ARSITEKTUR.md`](docs/ARSITEKTUR.md)                                   | Peta kode, alur data, dan kebiasaan kode     |
-| [`docs/KONTRIBUSI.md`](docs/KONTRIBUSI.md)                                   | Cara menambah endpoint, halaman, dan gaya    |
-| [`docs/desain/CSS.md`](docs/desain/CSS.md)                                   | Peta CSS dan aturan menambah gaya            |
-| [`docs/desain/PENYEMPURNAAN-VISUAL.md`](docs/desain/PENYEMPURNAAN-VISUAL.md) | Keputusan visual, pengukuran, dan batasannya |
-| [`docs/desain/AUDIT-UI.md`](docs/desain/AUDIT-UI.md)                         | Audit antarmuka dan aksesibilitas            |
-| [`docs/desain/KREDIT-FOTO.md`](docs/desain/KREDIT-FOTO.md)                   | Kredit foto latar                            |
+| Dokumen                                                                      | Isi                                            |
+| ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| [`docs/ARSITEKTUR.md`](docs/ARSITEKTUR.md)                                   | Peta kode, alur data, dan kebiasaan kode       |
+| [`docs/panduan/DEPLOY.md`](docs/panduan/DEPLOY.md)                           | Menjalankan di server, termasuk mode sungguhan |
+| [`docs/KONTRIBUSI.md`](docs/KONTRIBUSI.md)                                   | Cara menambah endpoint, halaman, dan gaya      |
+| [`docs/desain/CSS.md`](docs/desain/CSS.md)                                   | Peta CSS dan aturan menambah gaya              |
+| [`docs/desain/PENYEMPURNAAN-VISUAL.md`](docs/desain/PENYEMPURNAAN-VISUAL.md) | Keputusan visual, pengukuran, dan batasannya   |
+| [`docs/desain/AUDIT-UI.md`](docs/desain/AUDIT-UI.md)                         | Audit antarmuka dan aksesibilitas              |
+| [`docs/desain/KREDIT-FOTO.md`](docs/desain/KREDIT-FOTO.md)                   | Kredit foto latar                              |
 
 ## Keberlanjutan
 

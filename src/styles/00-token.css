@@ -122,3 +122,11 @@
   --btn-lg: 52px;
   --btn-sm: 44px;
 }
+
+/* ponsel: tombol lebih ramping, tetap jauh di atas minimum WCAG 2.5.8 (24 px) */
+@media (width <= 30em) {
+  :root {
+    --btn-lg: 46px;
+    --btn-sm: 40px;
+  }
+}

@@ -585,6 +585,31 @@ form .btn.ghost,
   transform: translate(1.7rem, 1rem) rotate(8deg);
 }
 
+/* ponsel: lembar belakang lebih rapat dan sertifikat menyisakan ruang di kanan, jadi tidak terpotong tepi layar */
+@media (width <= 35em) {
+  .t-proof-band .t-fig .rc-folder {
+    width: calc(100% - 1.1rem);
+    justify-self: start;
+    transform: rotate(-1.6deg);
+  }
+
+  .t-proof-band .t-fig .rc-folder::before {
+    transform: translate(0.45rem, 0.4rem) rotate(2deg);
+  }
+
+  .t-proof-band .t-fig .rc-folder::after {
+    transform: translate(0.8rem, 0.7rem) rotate(4deg);
+  }
+
+  .t-proof-band .t-fig:hover .rc-folder::before {
+    transform: translate(0.6rem, 0.45rem) rotate(3deg);
+  }
+
+  .t-proof-band .t-fig:hover .rc-folder::after {
+    transform: translate(0.9rem, 0.75rem) rotate(5.5deg);
+  }
+}
+
 .t-proof-band .t-fig .receipt {
   border-top: 6px solid var(--aksen);
   background: linear-gradient(180deg, #fffdf6 0%, #f8f0dc 100%);
