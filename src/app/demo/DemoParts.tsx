@@ -22,13 +22,22 @@ function AccountRow({
   onEnter: () => void;
 }) {
   return (
-    <div className="row" style={{ justifyContent: 'space-between', marginBottom: '.7rem' }}>
-      <span>
+    <div
+      className="row"
+      style={{ justifyContent: 'space-between', flexWrap: 'nowrap', marginBottom: '.7rem' }}
+    >
+      <span style={{ flex: '1 1 auto', minWidth: 0 }}>
         <strong>{title}</strong>
         <br />
         <span className="small muted">{sub}</span>
       </span>
-      <button className="btn ghost sm" disabled={busy} aria-busy={busy} onClick={onEnter}>
+      <button
+        className="btn ghost sm"
+        style={{ flexShrink: 0 }}
+        disabled={busy}
+        aria-busy={busy}
+        onClick={onEnter}
+      >
         Masuk
       </button>
     </div>
@@ -81,8 +90,11 @@ export function DemoLogins({ info, busy, run }: Props & { info: Info | null }) {
           Masuk sebagai Satgas
         </h2>
         {info && (
-          <p className="small m-0" style={{ marginBottom: '.9rem' }}>
-            Kata sandi semua akun demo: <code>{info.password}</code>{' '}
+          <div className="row" style={{ marginBottom: '1rem' }}>
+            <span className="small">
+              Kata sandi semua akun demo:{' '}
+              <code style={{ whiteSpace: 'nowrap' }}>{info.password}</code>
+            </span>
             <button
               type="button"
               className="btn ghost sm"
@@ -90,7 +102,7 @@ export function DemoLogins({ info, busy, run }: Props & { info: Info | null }) {
             >
               Salin
             </button>
-          </p>
+          </div>
         )}
         {info?.members.map((m) => (
           <AccountRow

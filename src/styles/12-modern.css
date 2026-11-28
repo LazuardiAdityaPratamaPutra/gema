@@ -194,7 +194,12 @@ details.fold {
 /* Di kartu putih dan formulir, tombol sekunder diberi tinta dan garis agar tetap terlihat. */
 .card .btn.ghost,
 form .btn.ghost,
-.alt-line .btn.ghost {
+.alt-line .btn.ghost,
+.next .btn.ghost,
+.next-acts .btn.ghost,
+.hasil .btn.ghost,
+.peran-badan .btn.ghost,
+.ph:not(.ph-foto) .btn.ghost {
   background: #eaf3ee;
   box-shadow:
     inset 0 0 0 1.5px #6f9684,

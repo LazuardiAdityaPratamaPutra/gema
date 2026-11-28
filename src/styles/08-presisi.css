@@ -27,6 +27,13 @@ small,
   line-height: 1.5;
 }
 
+/* tautan kecil yang berdiri sendiri tetap punya tinggi sasaran sentuh */
+a.small {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+}
+
 .field label,
 label {
   font-size: var(--t-label);
@@ -370,8 +377,8 @@ details.ctx[open] > summary::after {
 
 /* judul halaman dalam: lebih kecil dari hero beranda supaya hierarki jelas */
 
-/* /mulai: arah langkah berikutnya, tepat di atas tombol */
+/* /mulai: arah langkah berikutnya, di bawah tombol agar aksi utama tidak terdorong */
 .mulai-next {
   max-width: var(--measure);
-  margin: 1rem 0 0.9rem;
+  margin: 0.9rem 0 0;
 }

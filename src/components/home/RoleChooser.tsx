@@ -17,6 +17,7 @@ export function RoleChooser() {
   };
   return (
     <div className="peran" style={{ ['--c' as string]: r.color, ['--k' as string]: i }}>
+      <p className="peran-petunjuk">Pilih posisimu untuk melihat jalurnya.</p>
       <div
         className="peran-jalur"
         role="tablist"
@@ -63,11 +64,11 @@ export function RoleChooser() {
               ))}
             </ul>
             <div className="row">
-              <Link className="btn teal" href={r.cta.href}>
+              <Link className="btn teal btn-blok" href={r.cta.href}>
                 {r.cta.label}
               </Link>
               {!sembunyikanAlt && (
-                <Link className="btn ghost" href={r.alt.href}>
+                <Link className="btn ghost btn-blok" href={r.alt.href}>
                   {r.alt.label}
                 </Link>
               )}

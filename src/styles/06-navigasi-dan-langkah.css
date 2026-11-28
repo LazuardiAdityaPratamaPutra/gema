@@ -327,6 +327,14 @@
   }
 }
 
+/* ponsel: aksi utama sebuah halaman selalu penuh lebar, mudah dijangkau ibu jari */
+@media (width <= 30em) {
+  .btn-blok {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
 .hero-cta {
   margin-top: 1.4rem;
 }
@@ -351,6 +359,11 @@
   gap: 0.6rem 1rem;
   flex-wrap: wrap;
   align-items: center;
+}
+
+/* keterangan selalu di baris sendiri, tombol di bawahnya, jadi semua blok punya susunan yang sama */
+.alt-line > .muted {
+  flex: 0 0 100%;
 }
 
 .next.urgent {

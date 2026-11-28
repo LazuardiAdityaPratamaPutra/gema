@@ -32,7 +32,12 @@ export function LoginForm({ l }: { l: SatgasLoginState }) {
           {l.err}
         </p>
       )}
-      <button className="btn teal" disabled={l.busy || !l.email || !l.pw} aria-busy={l.busy}>
+      <button
+        id="masuk-satgas"
+        className="btn teal btn-blok"
+        disabled={l.busy || !l.email || !l.pw}
+        aria-busy={l.busy}
+      >
         {l.busy ? 'Masuk…' : 'Masuk'}
       </button>
     </form>
