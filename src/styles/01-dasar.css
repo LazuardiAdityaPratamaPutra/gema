@@ -22,6 +22,12 @@ body {
   flex-direction: column;
 }
 
+@media (width <= 30em) {
+  body {
+    font-size: 1rem;
+  }
+}
+
 h1,
 h2,
 h3 {

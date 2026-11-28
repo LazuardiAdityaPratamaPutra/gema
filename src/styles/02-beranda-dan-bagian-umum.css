@@ -593,6 +593,34 @@ td {
   padding-block: 2.4rem 2.8rem;
 }
 
+/* ponsel: kaki halaman dipadatkan agar tidak memakan layar */
+@media (width <= 30em) {
+  .footer {
+    padding-block: 1.6rem 1.8rem;
+    font-size: 0.84rem;
+  }
+
+  .footer .wrap {
+    gap: 0.6rem;
+  }
+
+  .footer .footer-brand {
+    margin-bottom: 0.2rem;
+  }
+
+  .footer p {
+    line-height: 1.5;
+  }
+
+  .footer nav {
+    gap: 0 1.1rem;
+  }
+
+  .footer nav a {
+    min-height: 2.25rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rc-stamp,
   .rc-hash,
